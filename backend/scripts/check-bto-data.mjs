@@ -1,7 +1,10 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
-const BTO_URL = new URL("../../frontend/public/data/bto/projects.json", import.meta.url);
+const BTO_URL = new URL(
+  "../../frontend/public/data/recordbto/projects.json",
+  import.meta.url
+);
 const BTO_PATH = fileURLToPath(BTO_URL);
 
 async function main() {
@@ -12,26 +15,48 @@ async function main() {
   if (!Array.isArray(projects) || projects.length === 0) {
     errors.push("BTO dataset is missing a non-empty projects array.");
   }
+  if (payload.projectCount !== projects.length) {
+    errors.push(
+      `BTO projectCount is ${payload.projectCount}; expected ${projects.length}.`
+    );
+  }
+  if (
+    typeof payload.generatedAt !== "string" ||
+    !Number.isFinite(Date.parse(payload.generatedAt))
+  ) {
+    errors.push("BTO dataset has an invalid generatedAt timestamp.");
+  }
+
+  const projectIds = new Set();
 
   for (const project of projects) {
     if (!project.id) errors.push("Project is missing id.");
+    if (projectIds.has(project.id)) errors.push(`Duplicate project id ${project.id}.`);
+    projectIds.add(project.id);
     if (!project.name) errors.push(`${project.id ?? "unknown"} is missing name.`);
+    if (project.dataSource !== "recordbto") {
+      errors.push(`${project.id ?? "unknown"} is not marked as RecordBTO data.`);
+    }
     if (!Array.isArray(project.flatVariants)) {
       errors.push(`${project.id ?? "unknown"} flatVariants is not an array.`);
       continue;
     }
 
+    const variantTypes = new Set();
     for (const variant of project.flatVariants) {
-      if (!Number.isFinite(variant.basePrice)) {
+      if (variantTypes.has(variant.type)) {
+        errors.push(`${project.id} has duplicate ${variant.type} variants.`);
+      }
+      variantTypes.add(variant.type);
+      if (!Number.isFinite(variant.basePrice) || variant.basePrice <= 0) {
         errors.push(`${project.id} ${variant.type} has invalid basePrice.`);
       }
 
       if (
-        Number.isFinite(variant.floorAreaSqm) &&
-        variant.floorAreaSqm > 0 &&
-        !Number.isFinite(variant.pricePerSqm)
+        variant.pricePerSqm !== undefined &&
+        (!Number.isFinite(variant.pricePerSqm) || variant.pricePerSqm <= 0)
       ) {
-        errors.push(`${project.id} ${variant.type} is missing pricePerSqm.`);
+        errors.push(`${project.id} ${variant.type} has invalid pricePerSqm.`);
       }
     }
 

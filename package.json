@@ -13,6 +13,13 @@
     "data:merge-bto": "node backend/scripts/merge-bto-datasets.mjs",
     "data:check-bto": "node backend/scripts/check-bto-data.mjs",
     "test:scoring": "node backend/scripts/check-bto-scoring.mjs",
-    "data:refresh": "npm run data:recordbto && npm run data:btohq && npm run data:rail-stations && npm run data:merge-bto"
+    "test:affordability": "node backend/scripts/check-affordability.mjs",
+    "test:ehg": "node backend/scripts/check-ehg.mjs",
+    "test:fees": "node backend/scripts/check-fees.mjs",
+    "test:plan-storage": "node backend/scripts/check-plan-storage.mjs",
+    "test:dates": "node backend/scripts/check-dates.mjs",
+    "test:payment-timeline": "node backend/scripts/check-payment-timeline.mjs",
+    "test:payment-allocation": "node backend/scripts/check-payment-allocation.mjs",
+    "data:refresh": "npm run data:recordbto"
   }
 }

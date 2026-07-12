@@ -1,8 +1,13 @@
 import { useId, useMemo, useState } from "react";
 import { FLAT_TYPE_OPTIONS } from "../constants";
-import type { BtoFlatVariant, BtoProject } from "../policies/policyConfig";
+import {
+  POLICY_CONFIG,
+  type BtoFlatVariant,
+  type BtoProject,
+} from "../policies/policyConfig";
 import type {
   BtoDecisionScore,
+  BtoScoreComponentKey,
   BtoScorePreset,
   FlatType,
 } from "../types";
@@ -10,6 +15,7 @@ import {
   BTO_SCORE_COMPONENT_DETAILS,
   BTO_SCORE_PRESET_DETAILS,
   BTO_SCORE_PRESET_OPTIONS,
+  getAvailableBtoScoreComponents,
   scoreBtoProjects,
   type BtoScoreWeights,
 } from "../utils/btoScoring";
@@ -29,10 +35,11 @@ type BtoTabProps = {
   yearFilter: string;
   townQuery: string;
   filteredProjects: BtoProject[];
+  /** Same year scope as filteredProjects, but without the town presentation filter. */
+  scoringProjects: BtoProject[];
   selectedFlatType: FlatType;
-  loanAmount: number;
-  ehgGrant: number;
-  totalAffordability: number;
+  totalAffordability: number | null;
+  cashSigningRate: number | null;
   scorePreset: BtoScorePreset;
   scoreWeights: BtoScoreWeights;
   selectedProjectId: string | null;
@@ -49,6 +56,7 @@ type BtoTabProps = {
 type LaunchGroup = {
   key: string;
   projects: BtoProject[];
+  scoringCohort: BtoProject[];
   totalUnits: number;
   lowestPrice: number | null;
   pricedProjectCount: number;
@@ -93,10 +101,10 @@ export function BtoTab({
   yearFilter,
   townQuery,
   filteredProjects,
+  scoringProjects,
   selectedFlatType,
-  loanAmount,
-  ehgGrant,
   totalAffordability,
+  cashSigningRate,
   scorePreset,
   scoreWeights,
   selectedProjectId,
@@ -113,8 +121,23 @@ export function BtoTab({
   const [comparedProjectIds, setComparedProjectIds] = useState<string[]>([]);
   const hasActiveFilters = yearFilter !== "latest" || townQuery.trim().length > 0;
   const launchGroups = useMemo(
-    () => groupProjectsByLaunch(filteredProjects, selectedFlatType, loanAmount, ehgGrant, totalAffordability, scorePreset, scoreWeights),
-    [filteredProjects, selectedFlatType, loanAmount, ehgGrant, totalAffordability, scorePreset, scoreWeights]
+    () =>
+      groupProjectsByLaunch(
+        filteredProjects,
+        scoringProjects,
+        selectedFlatType,
+        totalAffordability,
+        scorePreset,
+        scoreWeights
+      ),
+    [
+      filteredProjects,
+      scoringProjects,
+      selectedFlatType,
+      totalAffordability,
+      scorePreset,
+      scoreWeights,
+    ]
   );
   const pricedProjectCount = useMemo(
     () =>
@@ -206,7 +229,7 @@ export function BtoTab({
                 className="control mt-2 w-full"
                 disabled={availableYears.length === 0}
               >
-                <option value="latest">Latest launch</option>
+                <option value="latest">Latest year</option>
                 <option value="all">All years</option>
                 {availableYears.map((year) => (
                   <option key={year} value={String(year)}>
@@ -287,9 +310,8 @@ export function BtoTab({
                   launch={selectedLaunch}
                   comparedProjectIds={activeComparedProjectIds}
                   selectedFlatType={selectedFlatType}
-                  loanAmount={loanAmount}
-                  ehgGrant={ehgGrant}
                   totalAffordability={totalAffordability}
+                  cashSigningRate={cashSigningRate}
                   scorePreset={scorePreset}
                   scoreWeights={scoreWeights}
                   onScorePresetChange={onScorePresetChange}
@@ -352,9 +374,8 @@ function ProjectDrilldown({
   launch,
   comparedProjectIds,
   selectedFlatType,
-  loanAmount,
-  ehgGrant,
   totalAffordability,
+  cashSigningRate,
   scorePreset,
   scoreWeights,
   onScorePresetChange,
@@ -366,9 +387,8 @@ function ProjectDrilldown({
   launch: LaunchGroup;
   comparedProjectIds: string[];
   selectedFlatType: FlatType;
-  loanAmount: number;
-  ehgGrant: number;
-  totalAffordability: number;
+  totalAffordability: number | null;
+  cashSigningRate: number | null;
   scorePreset: BtoScorePreset;
   scoreWeights: BtoScoreWeights;
   onScorePresetChange: (value: BtoScorePreset) => void;
@@ -386,18 +406,16 @@ function ProjectDrilldown({
         launch.projects,
         {
           flatType: selectedFlatType,
-          loanAmount,
-          ehgGrant,
           totalAffordability,
         },
         "buyer-fit",
         scorePreset,
-        scoreWeights
+        scoreWeights,
+        launch.scoringCohort
       ),
     [
-      ehgGrant,
       launch.projects,
-      loanAmount,
+      launch.scoringCohort,
       totalAffordability,
       scorePreset,
       scoreWeights,
@@ -423,6 +441,7 @@ function ProjectDrilldown({
           projects={comparedProjects}
           selectedFlatType={selectedFlatType}
           scores={projectScores}
+          cashSigningRate={cashSigningRate}
         />
 
         <div className="project-card-grid">
@@ -448,9 +467,13 @@ function ProjectDrilldown({
       <RadarSidePanel
         comparedProjects={comparedProjects}
         scores={projectScores}
-        selectedFlatType={selectedFlatType}
         scorePreset={scorePreset}
         scoreWeights={scoreWeights}
+        availableScoreComponents={getAvailableBtoScoreComponents(
+          launch.scoringCohort,
+          selectedFlatType,
+          totalAffordability
+        )}
         onScorePresetChange={onScorePresetChange}
         onScoreWeightsChange={onScoreWeightsChange}
       />
@@ -461,17 +484,17 @@ function ProjectDrilldown({
 function RadarSidePanel({
   comparedProjects,
   scores,
-  selectedFlatType,
   scorePreset,
   scoreWeights,
+  availableScoreComponents,
   onScorePresetChange,
   onScoreWeightsChange,
 }: {
   comparedProjects: BtoProject[];
   scores: Map<string, BtoDecisionScore>;
-  selectedFlatType: FlatType;
   scorePreset: BtoScorePreset;
   scoreWeights: BtoScoreWeights;
+  availableScoreComponents: Set<BtoScoreComponentKey>;
   onScorePresetChange: (value: BtoScorePreset) => void;
   onScoreWeightsChange: (value: BtoScoreWeights) => void;
 }) {
@@ -480,6 +503,7 @@ function RadarSidePanel({
       <ScoreSettingsCard
         scorePreset={scorePreset}
         scoreWeights={scoreWeights}
+        availableScoreComponents={availableScoreComponents}
         onScorePresetChange={onScorePresetChange}
         onScoreWeightsChange={onScoreWeightsChange}
       />
@@ -502,15 +526,6 @@ function RadarSidePanel({
             </div>
           ))}
         </div>
-        {comparedProjects.length >= 2 && (
-          <div className="mt-4">
-            <CompareTray
-              projects={comparedProjects}
-              selectedFlatType={selectedFlatType}
-              scores={scores}
-            />
-          </div>
-        )}
       </div>
     </aside>
   );
@@ -519,11 +534,13 @@ function RadarSidePanel({
 function ScoreSettingsCard({
   scorePreset,
   scoreWeights,
+  availableScoreComponents,
   onScorePresetChange,
   onScoreWeightsChange,
 }: {
   scorePreset: BtoScorePreset;
   scoreWeights: BtoScoreWeights;
+  availableScoreComponents: Set<BtoScoreComponentKey>;
   onScorePresetChange: (value: BtoScorePreset) => void;
   onScoreWeightsChange: (value: BtoScoreWeights) => void;
 }) {
@@ -565,6 +582,11 @@ function ScoreSettingsCard({
         <span>{BTO_SCORE_PRESET_DETAILS[scorePreset].focus}</span>
       </div>
 
+      <p className="mt-3 text-xs text-warm-stone">
+        Factors without usable data in this full launch are excluded. Score
+        coverage shows how much of your selected weighting could be applied.
+      </p>
+
       <div className="score-slider-list" aria-label="Radar score weights">
         {SCORE_COMPONENT_ORDER.map((key) => (
           <ScoreWeightSlider
@@ -573,6 +595,7 @@ function ScoreSettingsCard({
             label={BTO_SCORE_COMPONENT_DETAILS[key].label}
             description={BTO_SCORE_COMPONENT_DETAILS[key].description}
             value={scoreWeights[key]}
+            disabled={!availableScoreComponents.has(key)}
             onChange={(value) => handleWeightChange(key, value)}
           />
         ))}
@@ -587,17 +610,19 @@ function ScoreWeightSlider({
   icon,
   onChange,
   description,
+  disabled,
 }: {
   label: string;
   value: number;
   icon: IconName;
   onChange: (value: number) => void;
   description?: string;
+  disabled: boolean;
 }) {
   const [showTip, setShowTip] = useState(false);
   const tipId = useId();
   return (
-    <div className="score-weight-slider">
+    <div className={`score-weight-slider ${disabled ? "opacity-50" : ""}`}>
       <div className="score-weight-slider-head">
         <Icon name={icon} />
         <span>
@@ -621,7 +646,7 @@ function ScoreWeightSlider({
             </span>
           )}
         </span>
-        <strong>{value}%</strong>
+        <strong>{disabled ? "N/A" : `${value}%`}</strong>
       </div>
       <input
         type="range"
@@ -629,8 +654,12 @@ function ScoreWeightSlider({
         max={70}
         step={1}
         value={value}
+        disabled={disabled}
         onChange={(event) => onChange(Number(event.target.value))}
-        aria-label={`${label} weight`}
+        aria-label={
+          disabled ? `${label} unavailable for this launch` : `${label} weight`
+        }
+        title={disabled ? "No usable data for this factor in this launch" : undefined}
         className="interactive-slider score-mini-slider"
       />
     </div>
@@ -657,6 +686,11 @@ function ProjectCard({
   onSelectProject: (projectId: string) => void;
 }) {
   const selectedVariant = getSelectedVariant(project, selectedFlatType);
+  const isHistoricalReference =
+    project.status === "completed" ||
+    project.status === "construction" ||
+    (getLaunchMonthSortValue(project.launchMonth) > 0 &&
+      getLaunchMonthSortValue(project.launchMonth) < 2024 * 12 + 9);
   const scoreTotal = decisionScore?.total ?? null;
   const scoreColor = scoreTotal === null ? "" : scoreTotal >= 70 ? "bto-score-green" : scoreTotal >= 50 ? "bto-score-amber" : "bto-score-red";
 
@@ -693,6 +727,12 @@ function ProjectCard({
             <div className="bto-card-tags">
               <ProjectTypeBadge type={project.btoType} />
               <span className="bto-card-tag">{project.location}</span>
+              {project.status && (
+                <span className="bto-card-tag">
+                  {formatProjectStatus(project.status)}
+                  {isHistoricalReference ? " · reference only" : ""}
+                </span>
+              )}
               {project.nearestMrtDistanceMeters && project.nearestMrtDistanceMeters <= 800 && (
                 <span className="bto-card-tag bto-card-tag-accent">Near MRT</span>
               )}
@@ -700,9 +740,22 @@ function ProjectCard({
           </div>
 
           {decisionScore && (
-            <div className={`bto-score-badge ${scoreColor}`}>
-              <div className="bto-score-badge-value">{scoreTotal}</div>
-              <div className="bto-score-badge-label">/100</div>
+            <div
+              className={`bto-score-badge ${scoreColor}`}
+              title={`${decisionScore.confidence}; ${decisionScore.coverage}% weighted coverage`}
+            >
+              <div>
+                <div className="flex items-baseline gap-1">
+                  <div className="bto-score-badge-value">{scoreTotal ?? "—"}</div>
+                  <div className="bto-score-badge-label">
+                    {scoreTotal === null ? "No score" : "/100"}
+                  </div>
+                </div>
+                <div className="text-[10px] font-semibold leading-tight text-warm-stone">
+                  {decisionScore.confidence.replace(" data", "")} ·{" "}
+                  {decisionScore.coverage}% covered
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -712,8 +765,13 @@ function ProjectCard({
             type="button"
             className={`bto-btn-use-plan ${isSelected ? "bto-btn-use-plan-active" : ""}`}
             onClick={() => onSelectProject(project.id)}
+            aria-pressed={isSelected}
           >
-            {isSelected ? "Selected" : "Use in Plan"}
+            {isSelected
+              ? "Selected"
+              : isHistoricalReference
+                ? "Use as Reference"
+                : "Use in Plan"}
           </button>
           <button
             type="button"
@@ -753,12 +811,12 @@ function ProjectCard({
               aria-describedby={budgetTipId}
               tabIndex={0}
             >
-              {affordabilityGood ? "✓ Budget" : "⚠ Over"}
+              {affordabilityGood ? "Within budget" : "Over budget"}
               {showBudgetTip && (
                 <span id={budgetTipId} className="bto-tooltip" role="tooltip">
                   {affordabilityGood
-                    ? "This price is within your HDB loan + EHG grant estimate."
-                    : "This price exceeds your estimated budget. You may need additional cash or a larger loan."}
+                    ? "This price is within your entered funds and estimated loan budget."
+                    : "This price exceeds your entered funds and estimated loan budget. Additional funds may be required."}
                 </span>
               )}
             </span>
@@ -866,10 +924,12 @@ function CompareTray({
   projects,
   selectedFlatType,
   scores,
+  cashSigningRate,
 }: {
   projects: BtoProject[];
   selectedFlatType: FlatType;
   scores: Map<string, BtoDecisionScore>;
+  cashSigningRate: number | null;
 }) {
   if (projects.length < 2) {
     return (
@@ -879,7 +939,12 @@ function CompareTray({
     );
   }
 
-  const rows = buildCompareRows(projects, selectedFlatType, scores);
+  const rows = buildCompareRows(
+    projects,
+    selectedFlatType,
+    scores,
+    cashSigningRate
+  );
 
   return (
     <div className="border-b border-heritage-navy/10 p-4">
@@ -946,7 +1011,8 @@ function CompareTray({
 function buildCompareRows(
   projects: BtoProject[],
   selectedFlatType: FlatType,
-  scores: Map<string, BtoDecisionScore>
+  scores: Map<string, BtoDecisionScore>,
+  cashSigningRate: number | null
 ): CompareRow[] {
   return [
     plainCompareRow({
@@ -973,16 +1039,22 @@ function buildCompareRows(
       label: "Price per sqm",
       projects,
       direction: "low",
-      getScore: (project) => getSelectedVariant(project, selectedFlatType)?.pricePerSqm,
+      getScore: (project) =>
+        getPricePerSqm(getSelectedVariant(project, selectedFlatType)),
       format: (value) => (value === undefined ? "Not listed" : `${currency(value)}/sqm`),
     }),
     numericCompareRow({
-      label: "Cash at signing",
+      label: "Minimum cash at signing",
       projects,
       direction: "low",
       getScore: (project) => {
         const variant = getSelectedVariant(project, selectedFlatType);
-        return variant ? variant.basePrice * 0.1 : undefined;
+        if (!variant || cashSigningRate === null) return undefined;
+        return Math.max(
+          variant.basePrice * cashSigningRate -
+            POLICY_CONFIG.fees.optionFeeByFlatType[selectedFlatType],
+          0
+        );
       },
       format: (value) => (value === undefined ? "Not listed" : currency(value)),
     }),
@@ -1177,10 +1249,9 @@ function rebalanceScoreWeights(
 
 function groupProjectsByLaunch(
   projects: BtoProject[],
+  scoringProjects: BtoProject[],
   flatType: FlatType,
-  loanAmount: number,
-  ehgGrant: number,
-  totalAffordability: number,
+  totalAffordability: number | null,
   scorePreset: BtoScorePreset,
   scoreWeights: BtoScoreWeights
 ) {
@@ -1193,6 +1264,12 @@ function groupProjectsByLaunch(
 
   return Array.from(groups.entries())
     .map(([key, launchProjects]) => {
+      const matchingScoringProjects = scoringProjects.filter(
+        (project) => (project.launchMonth || "Launch date not listed") === key
+      );
+      const scoringCohort = matchingScoringProjects.length
+        ? matchingScoringProjects
+        : launchProjects;
       const variants = launchProjects
         .map((project) => getSelectedVariant(project, flatType))
         .filter((variant): variant is BtoFlatVariant => Boolean(variant));
@@ -1210,15 +1287,17 @@ function groupProjectsByLaunch(
 
       const scores = scoreBtoProjects(
         launchProjects,
-        { flatType, loanAmount, ehgGrant, totalAffordability },
+        { flatType, totalAffordability },
         "buyer-fit",
         scorePreset,
-        scoreWeights
+        scoreWeights,
+        scoringCohort
       );
 
       return {
         key,
         projects: [...launchProjects].sort(sortProjectsForLaunch(flatType, scores)),
+        scoringCohort,
         totalUnits,
         lowestPrice: prices.length ? Math.min(...prices) : null,
         pricedProjectCount: variants.length,
@@ -1240,8 +1319,16 @@ function sortProjectsForLaunch(
   scores: Map<string, BtoDecisionScore>
 ) {
   return (a: BtoProject, b: BtoProject) => {
-    const scoreA = scores.get(a.id)?.total;
-    const scoreB = scores.get(b.id)?.total;
+    const decisionA = scores.get(a.id);
+    const decisionB = scores.get(b.id);
+    const confidenceDifference =
+      getConfidenceRank(decisionB?.confidence) -
+      getConfidenceRank(decisionA?.confidence);
+
+    if (confidenceDifference !== 0) return confidenceDifference;
+
+    const scoreA = decisionA?.total;
+    const scoreB = decisionB?.total;
 
     if (typeof scoreB === "number" && typeof scoreA === "number") {
       return scoreB - scoreA;
@@ -1265,13 +1352,18 @@ function sortProjectsForLaunch(
   };
 }
 
+function getConfidenceRank(
+  confidence: BtoDecisionScore["confidence"] | undefined
+) {
+  if (confidence === "Strong data") return 3;
+  if (confidence === "Partial data") return 2;
+  if (confidence === "Limited data") return 1;
+  return 0;
+}
+
 function formatPrice(variant: BtoFlatVariant | undefined, flatType: FlatType) {
   if (!variant) return `No ${flatType} price`;
-  const pricePerSqm = variant.pricePerSqm
-    ? variant.pricePerSqm
-    : variant.floorAreaSqm
-      ? variant.basePrice / variant.floorAreaSqm
-      : null;
+  const pricePerSqm = getPricePerSqm(variant);
   const area = variant.floorAreaSqm && pricePerSqm
     ? `, ${variant.floorAreaSqm} sqm, ${currency(pricePerSqm)}/sqm`
     : "";
@@ -1280,6 +1372,20 @@ function formatPrice(variant: BtoFlatVariant | undefined, flatType: FlatType) {
 
 function getSelectedVariant(project: BtoProject, flatType: FlatType) {
   return project.flatVariants.find((variant) => variant.type === flatType);
+}
+
+function formatProjectStatus(status: string) {
+  return status
+    .replace(/[-_]+/g, " ")
+    .replace(/\b\w/g, (character) => character.toUpperCase());
+}
+
+function getPricePerSqm(variant: BtoFlatVariant | undefined) {
+  if (!variant) return undefined;
+  if (Number.isFinite(variant.pricePerSqm)) return variant.pricePerSqm;
+  if (!variant.floorAreaSqm || variant.floorAreaSqm <= 0) return undefined;
+
+  return variant.basePrice / variant.floorAreaSqm;
 }
 
 function formatFlatSizes(project: BtoProject) {
@@ -1338,7 +1444,7 @@ function formatLocationContext(project: BtoProject) {
 
 function formatDecisionScoreValue(score: BtoDecisionScore | null) {
   if (!score || score.total === null) return "Not enough data";
-  return `${score.total}/100`;
+  return `${score.total}/100 · ${score.confidence.replace(" data", "")} · ${score.coverage}% covered`;
 }
 
 function formatDecisionReasons(score: BtoDecisionScore | null) {
@@ -1352,7 +1458,7 @@ function formatDecisionReasons(score: BtoDecisionScore | null) {
       ? `; missing ${score.missingFields.slice(0, 2).join(", ")}`
       : "";
 
-  return `${score.confidence}: ${reasons}${missing}`;
+  return `${score.confidence} (${score.coverage}% weighted coverage): ${reasons}${missing}`;
 }
 
 function ProjectTypeBadge({ type }: { type: string | undefined }) {

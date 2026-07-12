@@ -46,6 +46,7 @@ export function Navigation({
                 type="button"
                 className={tabButtonClass(activeTab, tab.id)}
                 onClick={() => onSelectTab(tab.id)}
+                aria-current={activeTab === tab.id ? "page" : undefined}
               >
                 <Icon name={tabIcons[tab.id]} />
                 <span>{tab.label}</span>

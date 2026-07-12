@@ -1,5 +1,12 @@
 import type { BtoProject } from "../policies/policyConfig";
-import type { BtoDecisionScore, FlatType, TabKey, TimelineItem } from "../types";
+import type {
+  BtoDecisionScore,
+  FlatType,
+  TabKey,
+  TimelineItem,
+} from "../types";
+import type { FinancingEstimate } from "../utils/affordability";
+import type { EhgAssessment } from "../utils/ehg";
 import { currency } from "../utils/format";
 import { getBtoProjectSourceLabel } from "../utils/sourceCredits";
 import {
@@ -14,9 +21,11 @@ import {
 
 type OverviewTabProps = {
   combinedIncome: number;
-  loanAmount: number;
-  ehgGrant: number;
-  totalAffordability: number;
+  loanAmount: number | null;
+  ehgGrant: number | null;
+  totalAffordability: number | null;
+  financingEstimate: FinancingEstimate;
+  ehgAssessment: EhgAssessment;
   selectedProject: BtoProject | null;
   flatType: FlatType;
   flatPrice: number;
@@ -33,6 +42,8 @@ export function OverviewTab({
   loanAmount,
   ehgGrant,
   totalAffordability,
+  financingEstimate,
+  ehgAssessment,
   selectedProject,
   flatType,
   flatPrice,
@@ -92,8 +103,8 @@ export function OverviewTab({
                 <span className="overview-project-kpi-divider" />
                 <span className="overview-project-kpi">
                   <Icon name="calendar" />
-                  <strong>{selectedProject.expectedTop ?? "—"}</strong>
-                  <span>TOP</span>
+                  <strong>{selectedProject.expectedTop ?? "Not listed"}</strong>
+                  <span>Expected TOP</span>
                 </span>
                 <span className="overview-project-kpi-divider" />
                 <span className="overview-project-kpi">
@@ -101,14 +112,14 @@ export function OverviewTab({
                   <strong>
                     {selectedProject.nearestMrtDistanceMeters
                       ? `${(selectedProject.nearestMrtDistanceMeters / 1000).toFixed(1)} km`
-                      : "—"}
+                      : "Not listed"}
                   </strong>
                   <span>{selectedProject.nearestMrt ?? "MRT"}</span>
                 </span>
                 <span className="overview-project-kpi-divider" />
                 <span className="overview-project-kpi">
                   <Icon name="building" />
-                  <strong>{selectedProject.totalUnits?.toLocaleString("en-SG") ?? "—"}</strong>
+                  <strong>{selectedProject.totalUnits?.toLocaleString("en-SG") ?? "Not listed"}</strong>
                   <span>Units</span>
                 </span>
               </div>
@@ -134,7 +145,7 @@ export function OverviewTab({
           <div className="overview-card-content">
             {(() => {
               const nextMilestone = timeline.find(
-                (item) => item.payment && !completedMilestones.includes(item.label)
+                (item) => item.payment && !completedMilestones.includes(item.id)
               );
               if (!nextMilestone) {
                 return (
@@ -164,6 +175,24 @@ export function OverviewTab({
                         {nextMilestone.payment.cash > 0 && (
                           <span className="next-steps-tag next-steps-tag-cash">
                             Cash {currency(nextMilestone.payment.cash)}
+                          </span>
+                        )}
+                        {(nextMilestone.payment.grant ?? 0) > 0 && (
+                          <span className="next-steps-tag next-steps-tag-cpf">
+                            EHG {currency(nextMilestone.payment.grant ?? 0)}
+                          </span>
+                        )}
+                        {(nextMilestone.payment.unallocated ?? 0) > 0 && (
+                          <span className="next-steps-tag next-steps-tag-cash">
+                            Unallocated {currency(nextMilestone.payment.unallocated ?? 0)}
+                          </span>
+                        )}
+                        {(nextMilestone.payment.minimumCashShortfall ?? 0) >
+                          0 && (
+                          <span className="next-steps-tag next-steps-tag-cash">
+                            Cash shortfall {currency(
+                              nextMilestone.payment.minimumCashShortfall ?? 0
+                            )}
                           </span>
                         )}
                       </div>
@@ -206,7 +235,7 @@ export function OverviewTab({
               />
               <MetricRow
                 icon="calendar"
-                label="Estimated Key Collection"
+                label="Expected TOP"
                 value={selectedProject.expectedTop ?? "To be confirmed"}
               />
             </div>
@@ -236,11 +265,19 @@ export function OverviewTab({
                 <CircularProgress value={progressPercent} />
               </div>
               <div className="progress-list">
-                <ProgressLine label="Application" value={100} count="2/2" tone="green" />
-                <ProgressLine label="Plan Selection" value={35} count="1/3" />
-                <ProgressLine label="Financing" value={0} count="0/2" />
-                <ProgressLine label="Construction" value={0} count="0/5" />
-                <ProgressLine label="Completion" value={0} count="0/2" />
+                {timeline.map((item) => {
+                  const isComplete = completedMilestones.includes(item.id);
+
+                  return (
+                    <ProgressLine
+                      key={item.id}
+                      label={item.label}
+                      value={isComplete ? 100 : 0}
+                      count={isComplete ? "Done" : "Pending"}
+                      tone={isComplete ? "green" : "blue"}
+                    />
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -261,18 +298,47 @@ export function OverviewTab({
           <div className="overview-metrics-strip">
             <MetricMini label="Monthly income" value={currency(combinedIncome)} />
             <MetricMini label="Target flat price" value={currency(flatPrice)} />
-            <MetricMini label="Max loan" value={currency(loanAmount)} />
-            <MetricMini label="EHG grant" value={currency(ehgGrant)} tone="green" />
             <MetricMini
-              label="Total affordability"
-              value={currency(totalAffordability)}
-              tone="green"
+              label="Estimated loan limit"
+              value={formatMoneyOrPending(loanAmount)}
+              detail={
+                financingEstimate.completeness === "incomplete"
+                  ? "Complete the listed Plan inputs to calculate this estimate."
+                  : undefined
+              }
+            />
+            <MetricMini
+              label="EHG included"
+              value={formatMoneyOrPending(ehgGrant)}
+              detail={ehgAssessment.note}
+              tone={
+                ehgAssessment.status === "confirmed" ? "green" : undefined
+              }
+            />
+            <MetricMini
+              label="Estimated purchase budget"
+              value={formatMoneyOrPending(totalAffordability)}
+              detail="Includes modelled BSD/fees; excludes legal fees, ABSD and any resale levy."
+              tone={
+                financingEstimate.completeness === "complete" &&
+                financingEstimate.fundingGap === 0 &&
+                ehgAssessment.status !== "conditional-estimate" &&
+                combinedIncome <= 14000
+                  ? "green"
+                  : undefined
+              }
             />
             <MetricMini
               label="Radar score"
               value={formatOverviewScore(decisionScore)}
               detail={
-                selectedProject ? getBtoProjectSourceLabel(selectedProject) : undefined
+                decisionScore && selectedProject
+                  ? `${decisionScore.confidence}, ${decisionScore.coverage}% weighted coverage · ${getBtoProjectSourceLabel(
+                      selectedProject
+                    )}`
+                  : selectedProject
+                    ? getBtoProjectSourceLabel(selectedProject)
+                    : undefined
               }
             />
           </div>
@@ -348,4 +414,6 @@ function formatOverviewScore(score: BtoDecisionScore | null) {
   return `${score.total}/100`;
 }
 
-
+function formatMoneyOrPending(value: number | null) {
+  return value === null ? "Inputs needed" : currency(value);
+}

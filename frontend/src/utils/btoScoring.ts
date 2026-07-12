@@ -13,9 +13,7 @@ export type BtoScoreWeights = Record<BtoScoreComponentKey, number>;
 
 export type BtoScoreContext = {
   flatType: FlatType;
-  loanAmount: number;
-  ehgGrant: number;
-  totalAffordability: number;
+  totalAffordability: number | null;
   cohortProjects: BtoProject[];
 };
 
@@ -61,7 +59,7 @@ export const BTO_SCORE_PRESET_DETAILS: Record<
   },
   budget: {
     label: "Budget",
-    focus: "Pushes lower price and loan + grant fit to the front.",
+    focus: "Pushes lower prices and estimated purchase-budget fit to the front.",
     weights: {
       affordability: 52,
       commute: 14,
@@ -117,7 +115,7 @@ export const BTO_SCORE_COMPONENT_DETAILS: Record<
     label: "Affordability",
     shortLabel: "Budget",
     description:
-      "Checks selected flat price against the loan + EHG estimate, then compares price and price per sqm within the launch.",
+      "Checks the selected flat price against your entered funds and estimated loan budget, then compares price and price per sqm within the full launch.",
   },
   commute: {
     label: "MRT Proximity",
@@ -154,7 +152,14 @@ export function scoreBtoProject(
 ): BtoDecisionScore {
   const weights = customWeights ?? BTO_SCORE_PRESET_DETAILS[preset].weights;
   const components = buildComponents(project, context, weights);
+  const requestedWeight = Object.values(weights).reduce(
+    (sum, weight) =>
+      sum + (Number.isFinite(weight) ? Math.max(weight, 0) : 0),
+    0
+  );
   const availableWeight = components.reduce((sum, component) => sum + component.weight, 0);
+  const coverage =
+    requestedWeight > 0 ? Math.round((availableWeight / requestedWeight) * 100) : 0;
   const total =
     availableWeight > 0
       ? Math.round(
@@ -164,8 +169,8 @@ export function scoreBtoProject(
           ) / availableWeight
         )
       : null;
-  const missingFields = getMissingFields(project, context);
-  const confidence = getConfidence(components.length);
+  const missingFields = getMissingFields(project, context, weights);
+  const confidence = getConfidence(coverage, components.length);
 
   return {
     total,
@@ -173,6 +178,7 @@ export function scoreBtoProject(
     preset,
     label: "Fit",
     confidence,
+    coverage,
     components,
     missingFields,
     reasons: buildReasons(components, total),
@@ -184,11 +190,12 @@ export function scoreBtoProjects(
   context: Omit<BtoScoreContext, "cohortProjects">,
   mode: BtoScoreMode,
   preset: BtoScorePreset,
-  customWeights?: BtoScoreWeights
+  customWeights?: BtoScoreWeights,
+  cohortProjects: BtoProject[] = projects
 ) {
   const scoreContext = {
     ...context,
-    cohortProjects: projects,
+    cohortProjects,
   };
 
   return new Map(
@@ -197,6 +204,55 @@ export function scoreBtoProjects(
       scoreBtoProject(project, scoreContext, mode, preset, customWeights),
     ])
   );
+}
+
+export function getAvailableBtoScoreComponents(
+  projects: BtoProject[],
+  flatType: FlatType,
+  totalAffordability: number | null
+) {
+  const available = new Set<BtoScoreComponentKey>();
+  const hasBudget =
+    typeof totalAffordability === "number" &&
+    Number.isFinite(totalAffordability) &&
+    totalAffordability > 0;
+
+  if (
+    hasBudget &&
+    projects.some((project) =>
+      project.flatVariants.some((variant) => variant.type === flatType)
+    )
+  ) {
+    available.add("affordability");
+  }
+  if (
+    projects.some((project) =>
+      Number.isFinite(project.nearestMrtDistanceMeters)
+    )
+  ) {
+    available.add("commute");
+  }
+  if (
+    projects.some((project) =>
+      Number.isFinite(project.locationSignals?.centralityScore)
+    )
+  ) {
+    available.add("centrality");
+  }
+  if (
+    projects.some(
+      (project) => getLaunchMonthSortValue(project.expectedTop ?? "") > 0
+    )
+  ) {
+    available.add("wait");
+  }
+  if (
+    projects.some((project) => Number.isFinite(project.totalUnits))
+  ) {
+    available.add("supply");
+  }
+
+  return available;
 }
 
 function buildComponents(
@@ -210,7 +266,10 @@ function buildComponents(
     buildCentralityComponent(project, weights.centrality),
     buildWaitComponent(project, context, weights.wait),
     buildSupplyComponent(project, context, weights.supply),
-  ].filter((component): component is BtoScoreComponent => Boolean(component));
+  ].filter(
+    (component): component is BtoScoreComponent =>
+      Boolean(component && component.weight > 0)
+  );
 }
 
 function buildAffordabilityComponent(
@@ -230,24 +289,29 @@ function buildAffordabilityComponent(
     variant.basePrice,
     cohortVariants.map((candidate) => candidate.basePrice)
   );
+  const pricePerSqm = getPricePerSqm(variant);
   const sqmScore =
-    variant.pricePerSqm === undefined
+    pricePerSqm === null
       ? null
       : lowIsBetter(
-          variant.pricePerSqm,
+          pricePerSqm,
           cohortVariants
-            .map((candidate) => candidate.pricePerSqm)
+            .map(getPricePerSqm)
             .filter((value): value is number => Number.isFinite(value))
         );
 
   const estimatedBudget = context.totalAffordability;
-  if (!Number.isFinite(estimatedBudget) || estimatedBudget <= 0) return null;
+  if (
+    typeof estimatedBudget !== "number" ||
+    !Number.isFinite(estimatedBudget) ||
+    estimatedBudget <= 0
+  ) {
+    return null;
+  }
 
   const budgetRatio = variant.basePrice / estimatedBudget;
   const budgetScore =
-    budgetRatio <= 1
-      ? 100 - Math.min(20, (1 - budgetRatio) * 30)
-      : Math.max(0, 88 - (budgetRatio - 1) * 180);
+    budgetRatio <= 1 ? 100 : Math.max(0, 88 - (budgetRatio - 1) * 180);
 
   return {
     key: "affordability",
@@ -256,8 +320,8 @@ function buildAffordabilityComponent(
     weight,
     reason:
       budgetRatio <= 1
-        ? "Within loan + grant estimate"
-        : "Above loan + grant estimate",
+        ? "Within estimated budget"
+        : "Above estimated budget",
   };
 }
 
@@ -303,7 +367,7 @@ function buildCentralityComponent(
   return {
     key: "centrality",
     label: BTO_SCORE_COMPONENT_DETAILS.centrality.label,
-    score,
+    score: Math.round(clampScore(score)),
     weight,
     reason: project.locationSignals?.centralityLabel ?? "Location context available",
   };
@@ -355,20 +419,42 @@ function buildSupplyComponent(
   };
 }
 
-function getMissingFields(project: BtoProject, context: BtoScoreContext) {
+function getMissingFields(
+  project: BtoProject,
+  context: BtoScoreContext,
+  weights: BtoScoreWeights
+) {
   const fields: string[] = [];
   const variant = project.flatVariants.find((candidate) => candidate.type === context.flatType);
 
-  if (!variant) fields.push(`${context.flatType} price`);
-  if (context.totalAffordability <= 0) {
-    fields.push("affordability estimate");
+  if (weights.affordability > 0) {
+    if (!variant) fields.push(`${context.flatType} price`);
+    if (
+      context.totalAffordability === null ||
+      !Number.isFinite(context.totalAffordability) ||
+      context.totalAffordability <= 0
+    ) {
+      fields.push("affordability estimate");
+    }
   }
-  if (!Number.isFinite(project.nearestMrtDistanceMeters)) fields.push("MRT distance");
-  if (!Number.isFinite(project.locationSignals?.centralityScore)) {
+  if (weights.commute > 0 && !Number.isFinite(project.nearestMrtDistanceMeters)) {
+    fields.push("MRT distance");
+  }
+  if (
+    weights.centrality > 0 &&
+    !Number.isFinite(project.locationSignals?.centralityScore)
+  ) {
     fields.push("location centrality");
   }
-  if (!project.expectedTop) fields.push("expected TOP");
-  if (!Number.isFinite(project.totalUnits)) fields.push("unit count");
+  if (
+    weights.wait > 0 &&
+    getLaunchMonthSortValue(project.expectedTop ?? "") <= 0
+  ) {
+    fields.push("expected TOP");
+  }
+  if (weights.supply > 0 && !Number.isFinite(project.totalUnits)) {
+    fields.push("unit count");
+  }
 
   return fields;
 }
@@ -382,24 +468,39 @@ function buildReasons(components: BtoScoreComponent[], total: number | null) {
     .map((component) => component.reason);
 }
 
-function getConfidence(componentCount: number) {
-  if (componentCount >= 4) return "Strong data";
-  if (componentCount >= 3) return "Partial data";
+function getConfidence(coverage: number, componentCount: number) {
+  if (coverage >= 75 && componentCount >= 3) return "Strong data";
+  if (coverage >= 45 && componentCount >= 2) return "Partial data";
   return "Limited data";
+}
+
+function getPricePerSqm(variant: BtoProject["flatVariants"][number]) {
+  if (Number.isFinite(variant.pricePerSqm)) return variant.pricePerSqm ?? null;
+  if (!variant.floorAreaSqm || variant.floorAreaSqm <= 0) return null;
+
+  return variant.basePrice / variant.floorAreaSqm;
 }
 
 function lowIsBetter(value: number, values: number[]) {
   const range = getRange(values);
   if (!range) return 80;
   if (range.max === range.min) return 80;
-  return Math.round(100 - ((value - range.min) / (range.max - range.min)) * 70);
+  return Math.round(
+    clampScore(100 - ((value - range.min) / (range.max - range.min)) * 70)
+  );
 }
 
 function highIsBetter(value: number, values: number[]) {
   const range = getRange(values);
   if (!range) return 80;
   if (range.max === range.min) return 80;
-  return Math.round(30 + ((value - range.min) / (range.max - range.min)) * 70);
+  return Math.round(
+    clampScore(30 + ((value - range.min) / (range.max - range.min)) * 70)
+  );
+}
+
+function clampScore(value: number) {
+  return Math.min(Math.max(value, 0), 100);
 }
 
 function distanceScore(distanceMeters: number) {

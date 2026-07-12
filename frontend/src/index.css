@@ -1905,6 +1905,14 @@
     @apply min-h-11 w-full min-w-0 rounded-hdb border border-heritage-navy/15 bg-white px-4 py-2.5 text-sm font-semibold text-heritage-navy;
   }
 
+  .policy-confirmation {
+    @apply flex items-start gap-2 rounded-hdb border border-heritage-navy/10 bg-heritage-navy/[0.03] p-3 text-xs font-medium leading-5 text-warm-stone;
+  }
+
+  .input-field .policy-confirmation input[type="checkbox"] {
+    @apply mt-0.5 h-4 min-h-0 w-4 shrink-0 rounded border-heritage-navy/25 p-0;
+  }
+
   .select-field select {
     @apply appearance-none bg-futuristic-teal/[0.06] pr-10;
     background-image:
@@ -2187,6 +2195,7 @@
 
   .milestone-tag {
     @apply inline-flex items-center rounded px-1.5 py-0.5 text-[10px] font-semibold;
+    border: 0;
   }
 
   .milestone-tag-cpf {
@@ -2211,7 +2220,12 @@
 
   .milestone-amount-editable {
     cursor: pointer;
+    padding: 0;
+    border: 0;
     border-bottom: 1px dashed currentColor;
+    background: transparent;
+    color: inherit;
+    font: inherit;
     transition: opacity 150ms ease;
   }
 
@@ -2281,7 +2295,8 @@
       oklch(var(--color-futuristic-teal)) 0 var(--loan),
       oklch(70% 0.13 178) var(--loan) var(--cpf),
       oklch(68% 0.11 292) var(--cpf) var(--cash),
-      oklch(75% 0.12 95) var(--cash) 360deg
+      oklch(75% 0.12 95) var(--cash) var(--grant),
+      oklch(72% 0.02 250) var(--grant) 360deg
     );
   }
 
@@ -2935,6 +2950,37 @@
 
   to {
     transform: scaleX(1);
+  }
+}
+
+@media (max-width: 40rem) {
+  .bto-card-header {
+    padding: 1rem;
+  }
+
+  .bto-card-actions {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .bto-card-actions > * {
+    flex: 1 1 8rem;
+  }
+
+  .bto-kpi-strip {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    padding-inline: 1rem;
+  }
+
+  .bto-kpi {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  .bto-kpi-divider {
+    display: none;
   }
 }
 
