@@ -572,11 +572,6 @@ function ScoreSettingsCard({
         <span>{BTO_SCORE_PRESET_DETAILS[scorePreset].focus}</span>
       </div>
 
-      <p className="score-priority-help" id="score-priority-help">
-        Change each factor independently. Priorities are compared as ratios, so
-        they do not need to add up to 100.
-      </p>
-
       {!hasActivePriority && (
         <p className="score-priority-warning" role="status">
           Choose at least one factor to calculate a Radar score.
@@ -586,7 +581,6 @@ function ScoreSettingsCard({
       <div
         className="score-slider-list"
         aria-label="Radar ranking priorities"
-        aria-describedby="score-priority-help"
       >
         {SCORE_COMPONENT_ORDER.map((key) => (
           <ScoreWeightSlider

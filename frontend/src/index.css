@@ -2442,10 +2442,6 @@
     @apply mt-0.5 h-4 w-4 shrink-0 text-futuristic-teal;
   }
 
-  .score-priority-help {
-    @apply mt-4 text-xs leading-5 text-warm-stone;
-  }
-
   .score-priority-warning {
     @apply mt-3 rounded-hdb bg-amber-50 px-3 py-2 text-xs font-medium leading-5 text-amber-900;
   }
