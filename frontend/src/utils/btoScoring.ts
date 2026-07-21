@@ -11,6 +11,17 @@ import { getLaunchMonthSortValue } from "./date";
 
 export type BtoScoreWeights = Record<BtoScoreComponentKey, number>;
 
+export const BTO_SCORE_IMPORTANCE_LEVELS = [
+  { value: 0, label: "Ignore" },
+  { value: 1, label: "Low" },
+  { value: 2, label: "Medium" },
+  { value: 3, label: "High" },
+  { value: 4, label: "Essential" },
+] as const;
+
+export const BTO_SCORE_IMPORTANCE_MAX =
+  BTO_SCORE_IMPORTANCE_LEVELS[BTO_SCORE_IMPORTANCE_LEVELS.length - 1].value;
+
 export type BtoScoreContext = {
   flatType: FlatType;
   loanAmount: number;
@@ -52,55 +63,55 @@ export const BTO_SCORE_PRESET_DETAILS: Record<
     label: "Balanced",
     focus: "Good all-round shortlist for most buyers.",
     weights: {
-      affordability: 30,
-      commute: 20,
-      centrality: 20,
-      wait: 15,
-      supply: 15,
+      affordability: 4,
+      commute: 3,
+      centrality: 3,
+      wait: 2,
+      supply: 2,
     },
   },
   budget: {
     label: "Budget",
     focus: "Pushes lower price and loan + grant fit to the front.",
     weights: {
-      affordability: 52,
-      commute: 14,
-      centrality: 14,
-      wait: 10,
-      supply: 10,
+      affordability: 4,
+      commute: 1,
+      centrality: 1,
+      wait: 1,
+      supply: 1,
     },
   },
   commute: {
     label: "Commute",
     focus: "Prioritises MRT access and central station context before other tradeoffs.",
     weights: {
-      affordability: 20,
-      commute: 40,
-      centrality: 25,
-      wait: 8,
-      supply: 7,
+      affordability: 2,
+      commute: 4,
+      centrality: 3,
+      wait: 1,
+      supply: 1,
     },
   },
   "faster-top": {
     label: "Faster TOP",
     focus: "Favours projects expected to complete sooner.",
     weights: {
-      affordability: 25,
-      commute: 15,
-      centrality: 10,
-      wait: 40,
-      supply: 10,
+      affordability: 3,
+      commute: 2,
+      centrality: 1,
+      wait: 4,
+      supply: 1,
     },
   },
   custom: {
     label: "Custom",
-    focus: "You have manually adjusted the score weights.",
+    focus: "Your priorities are set independently.",
     weights: {
-      affordability: 20,
-      commute: 20,
-      centrality: 20,
-      wait: 20,
-      supply: 20,
+      affordability: 2,
+      commute: 2,
+      centrality: 2,
+      wait: 2,
+      supply: 2,
     },
   },
 };
@@ -164,8 +175,9 @@ export function scoreBtoProject(
           ) / availableWeight
         )
       : null;
-  const missingFields = getMissingFields(project, context);
-  const confidence = getConfidence(components.length);
+  const activeWeightCount = Object.values(weights).filter((weight) => weight > 0).length;
+  const missingFields = getMissingFields(project, context, weights);
+  const confidence = getConfidence(components.length, activeWeightCount);
 
   return {
     total,
@@ -210,7 +222,10 @@ function buildComponents(
     buildCentralityComponent(project, weights.centrality),
     buildWaitComponent(project, context, weights.wait),
     buildSupplyComponent(project, context, weights.supply),
-  ].filter((component): component is BtoScoreComponent => Boolean(component));
+  ].filter(
+    (component): component is BtoScoreComponent =>
+      Boolean(component && component.weight > 0)
+  );
 }
 
 function buildAffordabilityComponent(
@@ -355,20 +370,33 @@ function buildSupplyComponent(
   };
 }
 
-function getMissingFields(project: BtoProject, context: BtoScoreContext) {
+function getMissingFields(
+  project: BtoProject,
+  context: BtoScoreContext,
+  weights: BtoScoreWeights
+) {
   const fields: string[] = [];
   const variant = project.flatVariants.find((candidate) => candidate.type === context.flatType);
 
-  if (!variant) fields.push(`${context.flatType} price`);
-  if (context.totalAffordability <= 0) {
+  if (weights.affordability > 0 && !variant) {
+    fields.push(`${context.flatType} price`);
+  }
+  if (weights.affordability > 0 && context.totalAffordability <= 0) {
     fields.push("affordability estimate");
   }
-  if (!Number.isFinite(project.nearestMrtDistanceMeters)) fields.push("MRT distance");
-  if (!Number.isFinite(project.locationSignals?.centralityScore)) {
+  if (weights.commute > 0 && !Number.isFinite(project.nearestMrtDistanceMeters)) {
+    fields.push("MRT distance");
+  }
+  if (
+    weights.centrality > 0 &&
+    !Number.isFinite(project.locationSignals?.centralityScore)
+  ) {
     fields.push("location centrality");
   }
-  if (!project.expectedTop) fields.push("expected TOP");
-  if (!Number.isFinite(project.totalUnits)) fields.push("unit count");
+  if (weights.wait > 0 && !project.expectedTop) fields.push("expected TOP");
+  if (weights.supply > 0 && !Number.isFinite(project.totalUnits)) {
+    fields.push("unit count");
+  }
 
   return fields;
 }
@@ -382,9 +410,12 @@ function buildReasons(components: BtoScoreComponent[], total: number | null) {
     .map((component) => component.reason);
 }
 
-function getConfidence(componentCount: number) {
-  if (componentCount >= 4) return "Strong data";
-  if (componentCount >= 3) return "Partial data";
+function getConfidence(componentCount: number, activeWeightCount: number) {
+  if (activeWeightCount <= 0) return "Limited data";
+
+  const coverage = componentCount / activeWeightCount;
+  if (coverage >= 0.8) return "Strong data";
+  if (coverage >= 0.5) return "Partial data";
   return "Limited data";
 }
 

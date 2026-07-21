@@ -8,6 +8,8 @@ import type {
 } from "../types";
 import {
   BTO_SCORE_COMPONENT_DETAILS,
+  BTO_SCORE_IMPORTANCE_LEVELS,
+  BTO_SCORE_IMPORTANCE_MAX,
   BTO_SCORE_PRESET_DETAILS,
   BTO_SCORE_PRESET_OPTIONS,
   scoreBtoProjects,
@@ -534,16 +536,21 @@ function ScoreSettingsCard({
     if (scorePreset !== "custom") {
       onScorePresetChange("custom");
     }
-    onScoreWeightsChange(rebalanceScoreWeights(scoreWeights, key, value));
+    onScoreWeightsChange({
+      ...scoreWeights,
+      [key]: Math.min(Math.max(Math.round(value), 0), BTO_SCORE_IMPORTANCE_MAX),
+    });
   };
+
+  const hasActivePriority = Object.values(scoreWeights).some((weight) => weight > 0);
 
   return (
     <div className="panel bto-score-settings bto-score-card-open">
       <div className="bto-score-card-head">
-        <h3>Score Weights</h3>
+        <h3>Ranking priorities</h3>
       </div>
       <label className="score-control-group" htmlFor="side-score-preset">
-        <span>Priority</span>
+        <span>Starting point</span>
         <select
           id="side-score-preset"
           value={scorePreset}
@@ -565,7 +572,22 @@ function ScoreSettingsCard({
         <span>{BTO_SCORE_PRESET_DETAILS[scorePreset].focus}</span>
       </div>
 
-      <div className="score-slider-list" aria-label="Radar score weights">
+      <p className="score-priority-help" id="score-priority-help">
+        Change each factor independently. Priorities are compared as ratios, so
+        they do not need to add up to 100.
+      </p>
+
+      {!hasActivePriority && (
+        <p className="score-priority-warning" role="status">
+          Choose at least one factor to calculate a Radar score.
+        </p>
+      )}
+
+      <div
+        className="score-slider-list"
+        aria-label="Radar ranking priorities"
+        aria-describedby="score-priority-help"
+      >
         {SCORE_COMPONENT_ORDER.map((key) => (
           <ScoreWeightSlider
             key={key}
@@ -596,11 +618,15 @@ function ScoreWeightSlider({
 }) {
   const [showTip, setShowTip] = useState(false);
   const tipId = useId();
+  const importance =
+    BTO_SCORE_IMPORTANCE_LEVELS.find((level) => level.value === value) ??
+    BTO_SCORE_IMPORTANCE_LEVELS[0];
+
   return (
     <div className="score-weight-slider">
       <div className="score-weight-slider-head">
         <Icon name={icon} />
-        <span>
+        <div className="score-weight-label">
           {label}
           {description && (
             <span
@@ -620,19 +646,24 @@ function ScoreWeightSlider({
               )}
             </span>
           )}
-        </span>
-        <strong>{value}%</strong>
+        </div>
+        <strong>{importance.label}</strong>
       </div>
       <input
         type="range"
         min={0}
-        max={70}
+        max={BTO_SCORE_IMPORTANCE_MAX}
         step={1}
         value={value}
         onChange={(event) => onChange(Number(event.target.value))}
-        aria-label={`${label} weight`}
+        aria-label={`${label} priority`}
+        aria-valuetext={importance.label}
         className="interactive-slider score-mini-slider"
       />
+      <div className="score-mini-scale" aria-hidden="true">
+        <span>Ignore</span>
+        <span>Essential</span>
+      </div>
     </div>
   );
 }
@@ -1124,55 +1155,6 @@ function SourceCreditLinks() {
       ))}
     </div>
   );
-}
-
-function rebalanceScoreWeights(
-  weights: BtoScoreWeights,
-  changedKey: (typeof SCORE_COMPONENT_ORDER)[number],
-  value: number
-): BtoScoreWeights {
-  const nextValue = Math.min(Math.max(Math.round(value), 0), 100);
-  const otherKeys = SCORE_COMPONENT_ORDER.filter((key) => key !== changedKey);
-  const remainder = 100 - nextValue;
-  const otherTotal = otherKeys.reduce((sum, key) => sum + weights[key], 0);
-
-  const nextWeights: BtoScoreWeights = {
-    ...weights,
-    [changedKey]: nextValue,
-  };
-
-  if (otherTotal <= 0) {
-    const base = Math.floor(remainder / otherKeys.length);
-    let extra = remainder - base * otherKeys.length;
-
-    otherKeys.forEach((key) => {
-      nextWeights[key] = base + (extra > 0 ? 1 : 0);
-      extra -= 1;
-    });
-
-    return nextWeights;
-  }
-
-  const weightedShares = otherKeys.map((key) => {
-    const raw = (weights[key] / otherTotal) * remainder;
-
-    return {
-      key,
-      floor: Math.floor(raw),
-      fraction: raw - Math.floor(raw),
-    };
-  });
-  const allocated = weightedShares.reduce((sum, share) => sum + share.floor, 0);
-  let extra = remainder - allocated;
-
-  weightedShares
-    .sort((a, b) => b.fraction - a.fraction)
-    .forEach((share) => {
-      nextWeights[share.key] = share.floor + (extra > 0 ? 1 : 0);
-      if (extra > 0) extra -= 1;
-    });
-
-  return nextWeights;
 }
 
 function groupProjectsByLaunch(

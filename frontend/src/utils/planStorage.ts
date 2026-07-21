@@ -20,6 +20,7 @@ import type {
 import type { BtoScoreMode, BtoScorePreset } from "../types";
 import {
   BTO_SCORE_MODES,
+  BTO_SCORE_IMPORTANCE_MAX,
   BTO_SCORE_PRESETS,
   BTO_SCORE_PRESET_DETAILS,
   type BtoScoreWeights,
@@ -272,14 +273,38 @@ function parseScoreWeights(value: unknown, fallback: BtoScoreWeights): BtoScoreW
     return [key, parsed] as const;
   });
 
-  if (entries.some(([, parsed]) => !Number.isFinite(parsed) || parsed < 0 || parsed > 100)) {
+  if (entries.some(([, parsed]) => !Number.isFinite(parsed) || parsed < 0)) {
     return fallback;
   }
 
   const total = entries.reduce((sum, [, parsed]) => sum + parsed, 0);
-  if (total !== 100) return fallback;
+  const isLegacyPercentageScale = entries.some(
+    ([, parsed]) => parsed > BTO_SCORE_IMPORTANCE_MAX
+  );
 
-  return Object.fromEntries(entries) as BtoScoreWeights;
+  if (isLegacyPercentageScale) {
+    if (entries.some(([, parsed]) => parsed > 100) || total <= 0) return fallback;
+
+    const largestWeight = Math.max(...entries.map(([, parsed]) => parsed));
+    return Object.fromEntries(
+      entries.map(([key, parsed]) => [
+        key,
+        parsed <= 0
+          ? 0
+          : Math.max(
+              1,
+              Math.round((parsed / largestWeight) * BTO_SCORE_IMPORTANCE_MAX)
+            ),
+      ])
+    ) as BtoScoreWeights;
+  }
+
+  return Object.fromEntries(
+    entries.map(([key, parsed]) => [
+      key,
+      Math.min(Math.round(parsed), BTO_SCORE_IMPORTANCE_MAX),
+    ])
+  ) as BtoScoreWeights;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

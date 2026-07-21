@@ -233,6 +233,7 @@ function App() {
     flatType,
     loanAmount,
     selectedBtoProject,
+    totalAffordability,
   ]);
 
   const setActiveTab = (tab: TabKey) => {
