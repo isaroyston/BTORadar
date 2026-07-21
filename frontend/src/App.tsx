@@ -15,47 +15,34 @@ import {
   INCOME_MIN,
   LOAN_INTEREST_RATE_MAX,
   LOAN_INTEREST_RATE_MIN,
+  LOAN_MULTIPLIER,
   LOAN_TENURE_MIN,
 } from "./constants";
 import { useBtoProjects } from "./hooks/useBtoProjects";
-import {
-  getDownpaymentRule,
-  POLICY_CONFIG,
-} from "./policies/policyConfig";
+import { POLICY_CONFIG } from "./policies/policyConfig";
 import type {
   FinancingType,
   BtoDecisionScore,
   BtoScoreMode,
   BtoScorePreset,
-  EhgMode,
   FlatType,
   SchemeType,
   TabKey,
-  TimelinePaymentOverride,
 } from "./types";
 import {
   filterBtoProjects,
   getActiveYear,
   getAvailableYears,
+  getEhgBand,
 } from "./utils/bto";
 import {
   BTO_SCORE_PRESET_DETAILS,
   scoreBtoProject,
   type BtoScoreWeights,
 } from "./utils/btoScoring";
-import {
-  isSupportedApplicationMonth,
-  parseLaunchMonthInput,
-} from "./utils/date";
+import { parseLaunchMonthInput } from "./utils/date";
 import { clampNumber } from "./utils/format";
 import { buildPaymentTimeline } from "./utils/paymentTimeline";
-import { calculateFinancingEstimate } from "./utils/affordability";
-import { calculateEhgAssessment } from "./utils/ehg";
-import { calculateBuyerStampDuty } from "./utils/fees";
-import {
-  allocatePaymentStages,
-  constrainPaymentFunding,
-} from "./utils/paymentAllocation";
 import {
   createPlannerSnapshot,
   loadPlannerSnapshot,
@@ -84,9 +71,6 @@ function App() {
   );
   const [flatPrice, setFlatPrice] = useState(initialPlan?.flatPrice ?? 650000);
   const [flatType, setFlatType] = useState<FlatType>(
-    initialPlan?.flatType ?? "4-room"
-  );
-  const [radarFlatType, setRadarFlatType] = useState<FlatType>(
     initialPlan?.flatType ?? "4-room"
   );
   const [financing, setFinancing] = useState<FinancingType>(
@@ -135,294 +119,29 @@ function App() {
   const [confirmedMilestoneDates, setConfirmedMilestoneDates] = useState<
     Record<string, string>
   >(initialPlan?.confirmedMilestoneDates ?? {});
-  const [paymentOverrides, setPaymentOverrides] = useState<
-    Record<string, TimelinePaymentOverride>
-  >(initialPlan?.paymentOverrides ?? {});
-  const [availableCash, setAvailableCash] = useState<number | null>(
-    initialPlan?.availableCash ?? null
-  );
-  const [availableCpfOa, setAvailableCpfOa] = useState<number | null>(
-    initialPlan?.availableCpfOa ?? null
-  );
-  const [monthlyDebtPayments, setMonthlyDebtPayments] = useState<number | null>(
-    initialPlan?.monthlyDebtPayments ?? null
-  );
-  const [monthlyPropertyLoanPayments, setMonthlyPropertyLoanPayments] =
-    useState<number | null>(initialPlan?.monthlyPropertyLoanPayments ?? null);
-  const [bankThereafterRate, setBankThereafterRate] = useState<number | null>(
-    initialPlan?.bankThereafterRate ?? null
-  );
-  const [ageForLoanRules, setAgeForLoanRules] = useState<number | null>(
-    initialPlan?.ageForLoanRules ?? null
-  );
-  const [outstandingHousingLoans, setOutstandingHousingLoans] = useState<
-    0 | 1 | 2 | null
-  >(initialPlan?.outstandingHousingLoans ?? null);
-  const [ehgMode, setEhgMode] = useState<EhgMode>(
-    initialPlan?.ehgMode ?? "unassessed"
-  );
-  const [ehgAssessedIncome, setEhgAssessedIncome] = useState<number | null>(
-    initialPlan?.ehgAssessedIncome ?? null
-  );
-  const [ehgConfirmedAmount, setEhgConfirmedAmount] = useState<number | null>(
-    initialPlan?.ehgConfirmedAmount ?? null
-  );
-  const [ehgFamilyEligibilityConfirmed, setEhgFamilyEligibilityConfirmed] =
-    useState(initialPlan?.ehgFamilyEligibilityConfirmed ?? false);
 
   const {
     projects: btoProjects,
     isLoading: btoLoading,
     error: btoError,
-    generatedAt: btoGeneratedAt,
     retry: retryBto,
   } = useBtoProjects();
 
-  const ehgAssessment = useMemo(
-    () =>
-      calculateEhgAssessment({
-        mode: ehgMode,
-        assessedAverageMonthlyIncome: ehgAssessedIncome,
-        confirmedAmount: ehgConfirmedAmount,
-        familyEligibilityConfirmed: ehgFamilyEligibilityConfirmed,
-      }),
-    [
-      ehgAssessedIncome,
-      ehgConfirmedAmount,
-      ehgFamilyEligibilityConfirmed,
-      ehgMode,
-    ]
-  );
-  const ehgGrant = ehgAssessment.amount;
+  const loanAmount = combinedIncome * LOAN_MULTIPLIER;
+  const ehgBand = useMemo(() => getEhgBand(combinedIncome), [combinedIncome]);
+  const ehgGrant = ehgBand?.grantAmount ?? 0;
+
+  const downpaymentRule = POLICY_CONFIG.downpaymentRules[financing][scheme];
+  const downpaymentTotal = downpaymentRule.signing + downpaymentRule.key;
+  const totalAffordability = Math.round((loanAmount + ehgGrant) / (1 - downpaymentTotal));
+  const signingAmount = flatPrice * downpaymentRule.signing;
+  const keyAmount = flatPrice * downpaymentRule.key;
+  const minCashSigning = flatPrice * downpaymentRule.minCashSigning;
+  const signingCpf = Math.max(signingAmount - minCashSigning, 0);
+  const keyCpf = keyAmount;
   const optionFee = POLICY_CONFIG.fees.optionFeeByFlatType[flatType];
   const surveyFee = POLICY_CONFIG.fees.surveyFeeByFlatType[flatType];
-  const fireInsurance =
-    financing === "hdb"
-      ? POLICY_CONFIG.fees.fireInsuranceByFlatType[flatType]
-      : 0;
-  const registrationFees =
-    POLICY_CONFIG.fees.registrationFeeLeaseEscrow +
-    (financing === "hdb"
-      ? POLICY_CONFIG.fees.registrationFeeMortgageEscrow
-      : 0);
-  const buyerStampDuty = calculateBuyerStampDuty(flatPrice);
-  const baseKeyFeeAmount = surveyFee + fireInsurance + registrationFees;
-  const fixedAdditionalCosts =
-    POLICY_CONFIG.fees.applicationFee + baseKeyFeeAmount;
-  const modeledCashOnlyCosts =
-    POLICY_CONFIG.fees.applicationFee + fireInsurance;
-  const financingEstimate = useMemo(
-    () =>
-      calculateFinancingEstimate({
-        financing,
-        purchasePrice: flatPrice,
-        grossMonthlyIncome: combinedIncome,
-        availableCash,
-        availableCpfOa,
-        grantAmount: ehgGrant,
-        monthlyDebtPayments,
-        monthlyPropertyLoanPayments,
-        bankThereafterRatePercent: bankThereafterRate,
-        cashOnlyPurchaseAmount: optionFee,
-        fixedAdditionalCosts,
-        cashOnlyCosts: modeledCashOnlyCosts,
-        ageForLoanRules,
-        outstandingHousingLoans,
-        requestedTenureYears: loanTenureYears,
-        repaymentRatePercent: loanInterestRate,
-      }),
-    [
-      ageForLoanRules,
-      availableCash,
-      availableCpfOa,
-      combinedIncome,
-      ehgGrant,
-      financing,
-      flatPrice,
-      loanInterestRate,
-      loanTenureYears,
-      bankThereafterRate,
-      monthlyDebtPayments,
-      monthlyPropertyLoanPayments,
-      fixedAdditionalCosts,
-      modeledCashOnlyCosts,
-      optionFee,
-      outstandingHousingLoans,
-    ]
-  );
-  const deedOfAssignmentStampDuty =
-    financingEstimate.deedOfAssignmentStampDuty;
-  const modeledDeedOfAssignmentStampDuty =
-    deedOfAssignmentStampDuty ?? 0;
-  const keyFeeAmount =
-    baseKeyFeeAmount + modeledDeedOfAssignmentStampDuty;
-  const keyFeeLabel =
-    financing === "hdb"
-      ? deedOfAssignmentStampDuty === null
-        ? "Survey, HDB registration and fire insurance; deed stamp duty pending"
-        : "Survey, HDB registration, fire insurance and deed stamp duty"
-      : "Survey and lease-registration estimates";
-  const modeledAdditionalCosts =
-    fixedAdditionalCosts +
-    buyerStampDuty +
-    modeledDeedOfAssignmentStampDuty;
-  const radarOptionFee =
-    POLICY_CONFIG.fees.optionFeeByFlatType[radarFlatType];
-  const radarSurveyFee =
-    POLICY_CONFIG.fees.surveyFeeByFlatType[radarFlatType];
-  const radarFireInsurance =
-    financing === "hdb"
-      ? POLICY_CONFIG.fees.fireInsuranceByFlatType[radarFlatType]
-      : 0;
-  const radarFixedAdditionalCosts =
-    POLICY_CONFIG.fees.applicationFee +
-    radarSurveyFee +
-    radarFireInsurance +
-    registrationFees;
-  const radarCashOnlyCosts =
-    POLICY_CONFIG.fees.applicationFee + radarFireInsurance;
-  const radarFinancingEstimate = useMemo(
-    () =>
-      calculateFinancingEstimate({
-        financing,
-        purchasePrice: flatPrice,
-        grossMonthlyIncome: combinedIncome,
-        availableCash,
-        availableCpfOa,
-        grantAmount: ehgGrant,
-        monthlyDebtPayments,
-        monthlyPropertyLoanPayments,
-        bankThereafterRatePercent: bankThereafterRate,
-        cashOnlyPurchaseAmount: radarOptionFee,
-        fixedAdditionalCosts: radarFixedAdditionalCosts,
-        cashOnlyCosts: radarCashOnlyCosts,
-        ageForLoanRules,
-        outstandingHousingLoans,
-        requestedTenureYears: loanTenureYears,
-        repaymentRatePercent: loanInterestRate,
-      }),
-    [
-      ageForLoanRules,
-      availableCash,
-      availableCpfOa,
-      bankThereafterRate,
-      combinedIncome,
-      ehgGrant,
-      financing,
-      flatPrice,
-      loanInterestRate,
-      loanTenureYears,
-      monthlyDebtPayments,
-      monthlyPropertyLoanPayments,
-      outstandingHousingLoans,
-      radarCashOnlyCosts,
-      radarFixedAdditionalCosts,
-      radarOptionFee,
-    ]
-  );
-  const loanAmount = financingEstimate.estimatedLoanLimit;
-  const totalAffordability = financingEstimate.maxPurchasePrice;
-  const isBudgetConditional =
-    ehgAssessment.status === "conditional-estimate" || combinedIncome > 14000;
-  const scoreablePlanBudget = isBudgetConditional
-    ? null
-    : totalAffordability;
-  const scoreableRadarBudget = isBudgetConditional
-    ? null
-    : radarFinancingEstimate.maxPurchasePrice;
-  const downpaymentRule = getDownpaymentRule(
-    financing,
-    scheme,
-    financingEstimate.ltvLimit
-  );
-  const signingGrossAmount = flatPrice * downpaymentRule.signing;
-  const signingAmount = Math.max(
-    signingGrossAmount - optionFee,
-    0
-  );
-  const keyPaymentIsUnassessed = financingEstimate.loanForTarget === null;
-  const keyAmount =
-    financingEstimate.loanForTarget === null
-      ? Math.max(flatPrice - signingGrossAmount, 0)
-      : Math.max(
-          flatPrice - signingGrossAmount - financingEstimate.loanForTarget,
-          0
-        );
-  const minimumCashRate = financingEstimate.minimumCashRate;
-  const minCashSigning =
-    minimumCashRate === null
-      ? 0
-      : Math.max(
-          flatPrice * downpaymentRule.minCashSigning - optionFee,
-          0
-        );
-  const minCashKey =
-    minimumCashRate === null
-      ? 0
-      : Math.max(
-          flatPrice * downpaymentRule.minCashKey,
-          flatPrice * minimumCashRate - optionFee - minCashSigning,
-          0
-        );
-  const downpaymentNote =
-    financing === "bank" && minimumCashRate === null
-      ? "Bank LTV and minimum cash cannot be assessed until the bank-specific inputs are complete. The key settlement remains unallocated until those inputs are supplied."
-      : downpaymentRule.note;
-  const [
-    applicationAllocation,
-    bookingAllocation,
-    signingAllocation,
-    agreementFeeAllocation,
-    keyAllocation,
-    keyFeeAllocation,
-  ] = useMemo(
-    () =>
-      allocatePaymentStages({
-        stages: [
-          {
-            total: POLICY_CONFIG.fees.applicationFee,
-            minimumCash: POLICY_CONFIG.fees.applicationFee,
-            cashOnly: true,
-          },
-          { total: optionFee, minimumCash: optionFee, cashOnly: true },
-          {
-            total: signingAmount,
-            minimumCash: minCashSigning,
-            allowsGrant: scheme !== "dia",
-          },
-          {
-            total: buyerStampDuty,
-            minimumCash: 0,
-            allowsGrant: false,
-            fundingPriority: 1,
-          },
-          { total: keyAmount, minimumCash: minCashKey },
-          {
-            total: keyFeeAmount,
-            minimumCash: fireInsurance,
-            allowsGrant: false,
-            fundingPriority: 1,
-          },
-        ],
-        availableCash,
-        availableCpfOa,
-        grantAmount: financingEstimate.usableGrantAmount,
-      }),
-    [
-      availableCash,
-      availableCpfOa,
-      buyerStampDuty,
-      fireInsurance,
-      keyFeeAmount,
-      optionFee,
-      scheme,
-      financingEstimate.usableGrantAmount,
-      keyAmount,
-      minCashKey,
-      minCashSigning,
-      signingAmount,
-    ]
-  );
+  const fireInsurance = POLICY_CONFIG.fees.fireInsuranceByFlatType[flatType];
   const selectedBtoProject = useMemo(
     () =>
       selectedBtoProjectId
@@ -437,126 +156,42 @@ function App() {
         applicationMonth,
         expectedTop: selectedBtoProject?.expectedTop,
         flatType,
-        financing,
-        keyFeeLabel,
-        applicationAllocation,
-        bookingAllocation,
-        signingAllocation,
-        agreementFeeAllocation,
-        keyAllocation,
-        keyFeeAllocation,
-        keyPaymentIsUnassessed,
+        signingAmount,
+        signingCpf,
+        minCashSigning,
+        keyAmount,
+        keyCpf,
+        optionFee,
+        surveyFee,
+        fireInsurance,
       }),
     [
       applicationMonth,
-      applicationAllocation,
-      bookingAllocation,
+      fireInsurance,
       flatType,
-      financing,
-      agreementFeeAllocation,
-      keyAllocation,
-      keyFeeAllocation,
-      keyFeeLabel,
-      keyPaymentIsUnassessed,
+      keyAmount,
+      keyCpf,
+      minCashSigning,
+      optionFee,
       selectedBtoProject?.expectedTop,
-      signingAllocation,
+      signingAmount,
+      signingCpf,
+      surveyFee,
     ]
   );
   const activeCompletedMilestones = useMemo(() => {
-    const timelineIds = new Set<string>(timeline.map((item) => item.id));
-    return completedMilestones.filter((id) => timelineIds.has(id));
+    const timelineLabels = new Set(timeline.map((item) => item.label));
+    return completedMilestones.filter((label) => timelineLabels.has(label));
   }, [completedMilestones, timeline]);
   const activeConfirmedMilestoneDates = useMemo(() => {
-    const timelineIds = new Set<string>(timeline.map((item) => item.id));
+    const timelineLabels = new Set(timeline.map((item) => item.label));
 
     return Object.fromEntries(
-      Object.entries(confirmedMilestoneDates).filter(([id]) =>
-        timelineIds.has(id)
+      Object.entries(confirmedMilestoneDates).filter(([label]) =>
+        timelineLabels.has(label)
       )
     );
   }, [confirmedMilestoneDates, timeline]);
-  const activePaymentOverrides = useMemo(() => {
-    const active: Record<string, TimelinePaymentOverride> = {};
-    let cashUsed = timeline.reduce(
-      (sum, item) => sum + (item.payment?.cash ?? 0),
-      0
-    );
-    let cpfUsed = timeline.reduce(
-      (sum, item) => sum + (item.payment?.cpfOa ?? 0),
-      0
-    );
-
-    for (const item of timeline) {
-      const payment = item.payment;
-      const override = paymentOverrides[item.id];
-      if (
-        !payment ||
-        !override ||
-        (payment.grant ?? 0) > 0 ||
-        (payment.unallocated ?? 0) > 0
-      ) {
-        continue;
-      }
-
-      const requiredCash = Math.min(
-        payment.minimumCash ?? 0,
-        override.total
-      );
-      const cash = Math.min(
-        override.total,
-        Math.max(override.cash, requiredCash)
-      );
-      const cpf = override.total - cash;
-      const nextCashUsed = cashUsed - payment.cash + cash;
-      const nextCpfUsed = cpfUsed - payment.cpfOa + cpf;
-
-      if (
-        nextCashUsed <= (availableCash ?? 0) + 0.01 &&
-        nextCpfUsed <= (availableCpfOa ?? 0) + 0.01
-      ) {
-        active[item.id] = { total: override.total, cash, cpf };
-        cashUsed = nextCashUsed;
-        cpfUsed = nextCpfUsed;
-      }
-    }
-
-    return active;
-  }, [availableCash, availableCpfOa, paymentOverrides, timeline]);
-  const effectiveTimeline = useMemo(
-    () =>
-      timeline.map((item) => {
-        if (!item.payment) return item;
-        const override = activePaymentOverrides[item.id];
-        if (!override) return item;
-        if (
-          (item.payment.grant ?? 0) > 0 ||
-          (item.payment.unallocated ?? 0) > 0
-        ) {
-          return item;
-        }
-        const requiredCash = Math.min(
-          item.payment.minimumCash ?? 0,
-          override.total
-        );
-        const effectiveCash = Math.min(
-          override.total,
-          Math.max(override.cash, requiredCash)
-        );
-
-        return {
-          ...item,
-          payment: {
-            ...item.payment,
-            total: override.total,
-            cpfOa: override.total - effectiveCash,
-            cash: effectiveCash,
-            grant: 0,
-            unallocated: 0,
-          },
-        };
-      }),
-    [activePaymentOverrides, timeline]
-  );
 
   const availableYears = useMemo(
     () => getAvailableYears(btoProjects),
@@ -567,12 +202,8 @@ function App() {
     [availableYears, yearFilter]
   );
   const filteredProjects = useMemo(
-    () => filterBtoProjects(btoProjects, activeYear, townQuery, radarFlatType),
-    [activeYear, btoProjects, radarFlatType, townQuery]
-  );
-  const scoringProjects = useMemo(
-    () => filterBtoProjects(btoProjects, activeYear, "", radarFlatType),
-    [activeYear, btoProjects, radarFlatType]
+    () => filterBtoProjects(btoProjects, activeYear, townQuery, flatType),
+    [activeYear, btoProjects, flatType, townQuery]
   );
   const selectedDecisionScore = useMemo<BtoDecisionScore | null>(() => {
     if (!selectedBtoProject) return null;
@@ -585,7 +216,9 @@ function App() {
       selectedBtoProject,
       {
         flatType,
-        totalAffordability: scoreablePlanBudget,
+        loanAmount,
+        ehgGrant,
+        totalAffordability,
         cohortProjects,
       },
       "buyer-fit",
@@ -596,49 +229,11 @@ function App() {
     btoProjects,
     btoScorePreset,
     btoScoreWeights,
+    ehgGrant,
     flatType,
+    loanAmount,
     selectedBtoProject,
-    scoreablePlanBudget,
   ]);
-  const planFingerprint = JSON.stringify({
-    combinedIncome,
-    flatPrice,
-    flatType,
-    financing,
-    scheme,
-    loanTenureYears,
-    loanInterestRate,
-    yearFilter,
-    townQuery,
-    btoScorePreset,
-    btoScoreWeights,
-    selectedBtoProjectId,
-    applicationMonth,
-    completedMilestones: activeCompletedMilestones,
-    confirmedMilestoneDates: activeConfirmedMilestoneDates,
-    paymentOverrides: activePaymentOverrides,
-    availableCash,
-    availableCpfOa,
-    monthlyDebtPayments,
-    monthlyPropertyLoanPayments,
-    bankThereafterRate,
-    ageForLoanRules,
-    outstandingHousingLoans,
-    ehgMode,
-    ehgAssessedIncome,
-    ehgConfirmedAmount,
-    ehgFamilyEligibilityConfirmed,
-  });
-  const [savedPlanFingerprint, setSavedPlanFingerprint] = useState<
-    string
-  >(planFingerprint);
-  const [hasSavedPlan, setHasSavedPlan] = useState(Boolean(initialPlan));
-  const displayedPlanStorageStatus =
-    savedPlanFingerprint === planFingerprint
-      ? planStorageStatus
-      : hasSavedPlan
-        ? "Unsaved changes"
-        : "Unsaved plan";
 
   const setActiveTab = (tab: TabKey) => {
     setActiveTabState(tab);
@@ -663,7 +258,6 @@ function App() {
   const handleResetBtoFilters = () => {
     setYearFilter("latest");
     setTownQuery("");
-    setRadarFlatType("4-room");
   };
 
   const handleBtoScorePresetChange = (value: BtoScorePreset) => {
@@ -676,27 +270,14 @@ function App() {
     setActiveTab("bto");
   };
 
-  const clearPaymentOverrides = () => {
-    setPaymentOverrides((current) =>
-      Object.keys(current).length > 0 ? {} : current
-    );
-  };
-
   const handleIncomeChange = (value: number) => {
     if (Number.isNaN(value)) return;
     setCombinedIncome(clampNumber(value, INCOME_MIN, INCOME_MAX));
-    clearPaymentOverrides();
   };
 
   const handleFlatPriceChange = (value: number) => {
     if (Number.isNaN(value)) return;
     setFlatPrice(clampNumber(value, FLAT_MIN, FLAT_MAX));
-    clearPaymentOverrides();
-  };
-
-  const handleFlatTypeChange = (value: FlatType) => {
-    setFlatType(value);
-    clearPaymentOverrides();
   };
 
   const handleFinancingChange = (value: FinancingType) => {
@@ -704,12 +285,6 @@ function App() {
     setLoanTenureYears((current) =>
       clampNumber(current, LOAN_TENURE_MIN, getLoanTenureMax(value))
     );
-    clearPaymentOverrides();
-  };
-
-  const handleSchemeChange = (value: SchemeType) => {
-    setScheme(value);
-    clearPaymentOverrides();
   };
 
   const handleLoanTenureChange = (value: number) => {
@@ -717,7 +292,6 @@ function App() {
     setLoanTenureYears(
       clampNumber(value, LOAN_TENURE_MIN, getLoanTenureMax(financing))
     );
-    clearPaymentOverrides();
   };
 
   const handleLoanInterestRateChange = (value: number) => {
@@ -725,148 +299,28 @@ function App() {
     setLoanInterestRate(
       clampNumber(value, LOAN_INTEREST_RATE_MIN, LOAN_INTEREST_RATE_MAX)
     );
-    clearPaymentOverrides();
   };
 
-  const handleAvailableCashChange = (value: number | null) => {
-    setAvailableCash(value);
-    clearPaymentOverrides();
-  };
-
-  const handleAvailableCpfOaChange = (value: number | null) => {
-    setAvailableCpfOa(value);
-    clearPaymentOverrides();
-  };
-
-  const handleMonthlyDebtPaymentsChange = (value: number | null) => {
-    setMonthlyDebtPayments(value);
-    clearPaymentOverrides();
-  };
-
-  const handleMonthlyPropertyLoanPaymentsChange = (value: number | null) => {
-    setMonthlyPropertyLoanPayments(value);
-    clearPaymentOverrides();
-  };
-
-  const handleBankThereafterRateChange = (value: number | null) => {
-    setBankThereafterRate(value);
-    clearPaymentOverrides();
-  };
-
-  const handleAgeForLoanRulesChange = (value: number | null) => {
-    setAgeForLoanRules(value);
-    clearPaymentOverrides();
-  };
-
-  const handleOutstandingHousingLoansChange = (value: 0 | 1 | 2 | null) => {
-    setOutstandingHousingLoans(value);
-    clearPaymentOverrides();
-  };
-
-  const handleEhgModeChange = (value: EhgMode) => {
-    setEhgMode(value);
-    clearPaymentOverrides();
-  };
-
-  const handleEhgAssessedIncomeChange = (value: number | null) => {
-    setEhgAssessedIncome(value);
-    clearPaymentOverrides();
-  };
-
-  const handleEhgConfirmedAmountChange = (value: number | null) => {
-    setEhgConfirmedAmount(value);
-    clearPaymentOverrides();
-  };
-
-  const handleEhgFamilyEligibilityConfirmedChange = (value: boolean) => {
-    setEhgFamilyEligibilityConfirmed(value);
-    clearPaymentOverrides();
-  };
-
-  const handleToggleMilestoneComplete = (id: string) => {
+  const handleToggleMilestoneComplete = (label: string) => {
     setCompletedMilestones((current) =>
-      current.includes(id)
-        ? current.filter((item) => item !== id)
-        : [...current, id]
+      current.includes(label)
+        ? current.filter((item) => item !== label)
+        : [...current, label]
     );
   };
 
-  const handleApplicationMonthChange = (value: string) => {
-    const parsed = parseLaunchMonthInput(value);
-    if (parsed && isSupportedApplicationMonth(parsed)) {
-      setApplicationMonth(parsed);
-      setConfirmedMilestoneDates({});
-    }
-  };
-
-  const handleMilestoneDateChange = (id: string, value: string) => {
+  const handleMilestoneDateChange = (label: string, value: string) => {
     setConfirmedMilestoneDates((current) => {
       const next = { ...current };
 
       if (value) {
-        next[id] = value;
+        next[label] = value;
       } else {
-        delete next[id];
+        delete next[label];
       }
 
       return next;
     });
-  };
-
-  const handlePaymentOverrideChange = (
-    id: string,
-    override: TimelinePaymentOverride
-  ) => {
-    if (
-      !Number.isFinite(override.total) ||
-      !Number.isFinite(override.cash) ||
-      !Number.isFinite(override.cpf) ||
-      override.total < 0 ||
-      override.cash < 0 ||
-      override.cpf < 0 ||
-      override.total > FLAT_MAX * 2
-    ) {
-      return;
-    }
-    const payment = timeline.find((item) => item.id === id)?.payment;
-    const requiredCash = Math.min(
-      payment?.minimumCash ?? 0,
-      override.total
-    );
-    const otherSourceTotals = timeline.reduce(
-      (totals, item) => {
-        if (!item.payment || item.id === id) return totals;
-        const activeOverride = activePaymentOverrides[item.id];
-        return {
-          cash:
-            totals.cash +
-            (activeOverride?.cash ?? item.payment.cash),
-          cpf:
-            totals.cpf +
-            (activeOverride?.cpf ?? item.payment.cpfOa),
-        };
-      },
-      { cash: 0, cpf: 0 }
-    );
-    const constrained = constrainPaymentFunding({
-      total: override.total,
-      requestedCash: override.cash,
-      minimumCash: requiredCash,
-      otherCash: otherSourceTotals.cash,
-      otherCpf: otherSourceTotals.cpf,
-      availableCash: availableCash ?? 0,
-      availableCpf: availableCpfOa ?? 0,
-    });
-    if (!constrained) return;
-    const { cash } = constrained;
-    setPaymentOverrides((current) => ({
-      ...current,
-      [id]: {
-        total: override.total,
-        cash,
-        cpf: override.total - cash,
-      },
-    }));
   };
 
   const buildCurrentSnapshot = () =>
@@ -887,26 +341,12 @@ function App() {
       applicationMonth,
       completedMilestones: activeCompletedMilestones,
       confirmedMilestoneDates: activeConfirmedMilestoneDates,
-      paymentOverrides: activePaymentOverrides,
-      availableCash,
-      availableCpfOa,
-      monthlyDebtPayments,
-      monthlyPropertyLoanPayments,
-      bankThereafterRate,
-      ageForLoanRules,
-      outstandingHousingLoans,
-      ehgMode,
-      ehgAssessedIncome,
-      ehgConfirmedAmount,
-      ehgFamilyEligibilityConfirmed,
     });
 
   const handleSavePlan = () => {
     try {
       const snapshot = buildCurrentSnapshot();
       savePlannerSnapshot(snapshot);
-      setSavedPlanFingerprint(planFingerprint);
-      setHasSavedPlan(true);
       setPlanStorageStatus(`Saved locally at ${formatSavedAt(snapshot.savedAt)}`);
       setPlanStorageError(null);
     } catch (error) {
@@ -919,33 +359,13 @@ function App() {
     const project = btoProjects.find((candidate) => candidate.id === projectId);
     if (!project) return;
 
-    if (project.id === selectedBtoProjectId) {
-      setActiveTab("plan");
-      return;
-    }
-
-    const hasMilestoneProgress =
-      completedMilestones.length > 0 ||
-      Object.keys(confirmedMilestoneDates).length > 0 ||
-      Object.keys(paymentOverrides).length > 0;
-    if (
-      selectedBtoProjectId &&
-      hasMilestoneProgress &&
-      !window.confirm(
-        "Replace the selected project? Your milestone confirmations, dates, and payment edits will be cleared."
-      )
-    ) {
-      return;
-    }
-
     const preferredVariant =
-      project.flatVariants.find((variant) => variant.type === radarFlatType) ??
+      project.flatVariants.find((variant) => variant.type === flatType) ??
       project.flatVariants[0];
 
     setSelectedBtoProjectId(project.id);
     setCompletedMilestones([]);
     setConfirmedMilestoneDates({});
-    setPaymentOverrides({});
 
     if (preferredVariant) {
       setFlatType(preferredVariant.type);
@@ -953,15 +373,7 @@ function App() {
     }
 
     const launchMonth = parseLaunchMonthInput(project.launchMonth);
-    const isHistoricalReference =
-      project.status === "completed" ||
-      project.status === "construction" ||
-      Boolean(launchMonth && launchMonth < "2024-10");
-    setApplicationMonth(
-      isHistoricalReference
-        ? getDefaultApplicationMonth()
-        : launchMonth ?? getDefaultApplicationMonth()
-    );
+    if (launchMonth) setApplicationMonth(launchMonth);
 
     setActiveTab("plan");
   };
@@ -981,15 +393,13 @@ function App() {
             loanAmount={loanAmount}
             ehgGrant={ehgGrant}
             totalAffordability={totalAffordability}
-            financingEstimate={financingEstimate}
-            ehgAssessment={ehgAssessment}
             selectedProject={selectedBtoProject}
             flatType={flatType}
             flatPrice={flatPrice}
             decisionScore={selectedDecisionScore}
             completedMilestoneCount={activeCompletedMilestones.length}
             totalMilestoneCount={timeline.length}
-            timeline={effectiveTimeline}
+            timeline={timeline}
             completedMilestones={activeCompletedMilestones}
             onSelectTab={setActiveTab}
           />
@@ -1002,63 +412,36 @@ function App() {
             loanAmount={loanAmount}
             ehgGrant={ehgGrant}
             totalAffordability={totalAffordability}
-            financingEstimate={financingEstimate}
-            ehgAssessment={ehgAssessment}
-            availableCash={availableCash}
-            availableCpfOa={availableCpfOa}
-            monthlyDebtPayments={monthlyDebtPayments}
-            monthlyPropertyLoanPayments={monthlyPropertyLoanPayments}
-            bankThereafterRate={bankThereafterRate}
-            ageForLoanRules={ageForLoanRules}
-            outstandingHousingLoans={outstandingHousingLoans}
-            ehgMode={ehgMode}
-            ehgAssessedIncome={ehgAssessedIncome}
-            ehgConfirmedAmount={ehgConfirmedAmount}
-            ehgFamilyEligibilityConfirmed={ehgFamilyEligibilityConfirmed}
-            applicationMonth={applicationMonth}
-            modeledPlanTotal={flatPrice + modeledAdditionalCosts}
             flatPrice={flatPrice}
             flatType={flatType}
             financing={financing}
             scheme={scheme}
             loanTenureYears={loanTenureYears}
             loanInterestRate={loanInterestRate}
-            downpaymentNote={downpaymentNote}
-            timeline={effectiveTimeline}
+            signingAmount={signingAmount}
+            keyAmount={keyAmount}
+            minCashSigning={minCashSigning}
+            signingCpf={signingCpf}
+            keyCpf={keyCpf}
+            optionFee={optionFee}
+            surveyFee={surveyFee}
+            fireInsurance={fireInsurance}
+            downpaymentNote={downpaymentRule.note}
+            timeline={timeline}
             completedMilestones={activeCompletedMilestones}
             confirmedMilestoneDates={activeConfirmedMilestoneDates}
-            paymentOverrides={activePaymentOverrides}
-            planStorageStatus={displayedPlanStorageStatus}
+            planStorageStatus={planStorageStatus}
             planStorageError={planStorageError}
             onIncomeChange={handleIncomeChange}
             onFlatPriceChange={handleFlatPriceChange}
-            onFlatTypeChange={handleFlatTypeChange}
+            onFlatTypeChange={setFlatType}
             onFinancingChange={handleFinancingChange}
-            onSchemeChange={handleSchemeChange}
+            onSchemeChange={setScheme}
             onLoanTenureChange={handleLoanTenureChange}
             onLoanInterestRateChange={handleLoanInterestRateChange}
             onSavePlan={handleSavePlan}
             onToggleMilestoneComplete={handleToggleMilestoneComplete}
             onMilestoneDateChange={handleMilestoneDateChange}
-            onPaymentOverrideChange={handlePaymentOverrideChange}
-            onAvailableCashChange={handleAvailableCashChange}
-            onAvailableCpfOaChange={handleAvailableCpfOaChange}
-            onMonthlyDebtPaymentsChange={handleMonthlyDebtPaymentsChange}
-            onMonthlyPropertyLoanPaymentsChange={
-              handleMonthlyPropertyLoanPaymentsChange
-            }
-            onBankThereafterRateChange={handleBankThereafterRateChange}
-            onAgeForLoanRulesChange={handleAgeForLoanRulesChange}
-            onOutstandingHousingLoansChange={
-              handleOutstandingHousingLoansChange
-            }
-            onEhgModeChange={handleEhgModeChange}
-            onEhgAssessedIncomeChange={handleEhgAssessedIncomeChange}
-            onEhgConfirmedAmountChange={handleEhgConfirmedAmountChange}
-            onEhgFamilyEligibilityConfirmedChange={
-              handleEhgFamilyEligibilityConfirmedChange
-            }
-            onApplicationMonthChange={handleApplicationMonthChange}
           />
         )}
 
@@ -1070,17 +453,10 @@ function App() {
             yearFilter={yearFilter}
             townQuery={townQuery}
             filteredProjects={filteredProjects}
-            scoringProjects={scoringProjects}
-            selectedFlatType={radarFlatType}
-            totalAffordability={scoreableRadarBudget}
-            cashSigningRate={
-              minimumCashRate === null ||
-              (financing === "bank" &&
-                financingEstimate.ltvLimit !== 0.75 &&
-                financingEstimate.ltvLimit !== 0.55)
-                ? null
-                : downpaymentRule.minCashSigning
-            }
+            selectedFlatType={flatType}
+            loanAmount={loanAmount}
+            ehgGrant={ehgGrant}
+            totalAffordability={totalAffordability}
             scorePreset={btoScorePreset}
             scoreWeights={btoScoreWeights}
             onScorePresetChange={handleBtoScorePresetChange}
@@ -1088,19 +464,14 @@ function App() {
             onRetry={handleRetryBto}
             onYearFilterChange={handleYearFilterChange}
             onTownQueryChange={handleTownQueryChange}
-            onFlatTypeChange={setRadarFlatType}
+            onFlatTypeChange={setFlatType}
             selectedProjectId={selectedBtoProjectId}
             onSelectProject={handleSelectBtoProject}
             onResetFilters={handleResetBtoFilters}
           />
         )}
 
-        {activeTab === "sources" && (
-          <SourcesTab
-            datasetGeneratedAt={btoGeneratedAt}
-            projectCount={btoProjects.length}
-          />
-        )}
+        {activeTab === "sources" && <SourcesTab />}
         </div>
       </main>
     </div>

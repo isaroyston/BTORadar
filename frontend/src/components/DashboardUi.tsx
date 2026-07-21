@@ -160,10 +160,6 @@ export function CircularProgress({ value }: { value: number }) {
       className="circular-progress"
       style={{ ["--progress" as string]: `${safeValue * 3.6}deg` }}
       aria-label={`${safeValue}% complete`}
-      role="progressbar"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={safeValue}
     >
       <span>{safeValue}%</span>
     </div>

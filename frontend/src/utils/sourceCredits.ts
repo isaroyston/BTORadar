@@ -4,27 +4,34 @@ export const BTO_SOURCE_CREDITS = [
   {
     label: "RecordBTO",
     url: "https://recordbto.com/bto",
-    note: "community-maintained project records, listed price ranges, and MRT labels",
+    note: "project pages, listed price ranges, and MRT distance labels",
+  },
+  {
+    label: "BTOHQ",
+    url: "https://www.btohq.com/bto-sales-launch-list",
+    note: "launch and project context",
+  },
+  {
+    label: "data.gov.sg",
+    url: "https://data.gov.sg/datasets/d_8d886e3a83934d7447acdf5bc6959999/view",
+    note: "rail station layer for straight-line MRT distance estimates",
   },
 ] as const;
 
 export function getBtoProjectSourceLabel(project: BtoProject) {
-  return !project.dataSource || project.dataSource === "recordbto"
-    ? "RecordBTO"
-    : "Legacy source marker";
+  if (project.dataSource === "recordbto+btohq") return "RecordBTO + BTOHQ";
+  if (project.dataSource === "btohq") return "BTOHQ";
+  return "RecordBTO";
 }
 
 export function getBtoProjectSourceNote(project: BtoProject) {
-  if (project.dataSource && project.dataSource !== "recordbto") {
-    return "This record carries a legacy source marker and is not part of the current RecordBTO-only production dataset.";
+  if (project.dataSource === "recordbto+btohq") {
+    return "Prices from RecordBTO, project context enriched from BTOHQ.";
   }
 
-  const hasListedMrt = Boolean(
-    project.nearestMrt || project.nearestMrtDistanceMeters
-  );
-  const coverage = hasListedMrt
-    ? "project details, listed price ranges, and the supplied MRT label"
-    : "project details and listed price ranges";
+  if (project.dataSource === "btohq") {
+    return "Project context from BTOHQ. Price may be unavailable.";
+  }
 
-  return `Community data from RecordBTO: ${coverage}. Verify launch details and eligibility with HDB.`;
+  return "Project details, price ranges, and listed MRT distance from RecordBTO.";
 }

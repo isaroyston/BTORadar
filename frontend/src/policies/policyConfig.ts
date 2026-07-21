@@ -62,14 +62,6 @@ export interface BtoFlatVariant {
   priceNote?: string;
 }
 
-export type DownpaymentRule = {
-  signing: number;
-  key: number;
-  minCashSigning: number;
-  minCashKey: number;
-  note: string;
-};
-
 export interface BtoUnitSupply {
   projectId?: number;
   town?: string;
@@ -293,7 +285,7 @@ export const EHG_FAMILIES_POLICY_META: EhgFamiliesPolicyMeta = {
   sourceDocument: "backend/data/policies/EHG amount Couples and Families Aug 2024.pdf",
   sourceReference: "Local PDF, page 1",
   effectiveDate: "2024-08",
-  lastVerified: "2026-07-12",
+  lastVerified: "2026-04-24",
   incomeMeasure: "Average monthly household income",
   householdTypeRule: "Families only in this planner",
   firstTimerRule: "First-timer households",
@@ -321,7 +313,7 @@ export const EHG_FAMILIES_BANDS_2024: EhgFamiliesBand[] = [
 
 export const POLICY_CONFIG = {
   country: "Singapore",
-  lastVerified: "2026-07-12",
+  lastVerified: "2026-04-24",
   updateCadenceDays: 30,
   reviewProcess: "Manual monthly review of HDB, IRAS, and CPF sources",
   fees: {
@@ -357,21 +349,18 @@ export const POLICY_CONFIG = {
         signing: 0.1,
         key: 0.15,
         minCashSigning: 0,
-        minCashKey: 0,
         note: "HDB loan normal: 10% at signing, 15% at key collection.",
       },
       staggered: {
         signing: 0.05,
         key: 0.2,
         minCashSigning: 0,
-        minCashKey: 0,
         note: "Staggered scheme: 5% at signing, 20% at key collection.",
       },
       dia: {
         signing: 0.025,
         key: 0.225,
         minCashSigning: 0,
-        minCashKey: 0,
         note: "DIA pathway: 2.5% at signing, 22.5% at key collection.",
       },
     },
@@ -380,73 +369,39 @@ export const POLICY_CONFIG = {
         signing: 0.2,
         key: 0.05,
         minCashSigning: 0.05,
-        minCashKey: 0,
         note: "Bank loan normal: 20% at signing (minimum 5% cash), 5% at key collection.",
       },
       staggered: {
         signing: 0.1,
         key: 0.15,
         minCashSigning: 0.05,
-        minCashKey: 0,
         note: "Bank loan staggered: 10% at signing (minimum 5% cash), 15% at key collection.",
       },
       dia: {
         signing: 0.025,
         key: 0.225,
         minCashSigning: 0.025,
-        minCashKey: 0.025,
         note: "Bank loan DIA: 2.5% cash at signing, 22.5% at key collection.",
       },
     },
-    bank55: {
+    none: {
       normal: {
         signing: 0.2,
         key: 0.25,
         minCashSigning: 0.1,
-        minCashKey: 0,
-        note:
-          "Bank loan at 55% LTV: 20% at signing (minimum 10% cash), 25% at key collection.",
+        note: "No loan normal: 20% at signing (minimum 10% cash), 25% at key collection.",
       },
       staggered: {
         signing: 0.1,
         key: 0.35,
         minCashSigning: 0.1,
-        minCashKey: 0,
-        note:
-          "Bank loan at 55% LTV under the Staggered Downpayment Scheme: 10% cash at signing, 35% at key collection.",
+        note: "No loan staggered: 10% cash at signing, 35% at key collection.",
       },
       dia: {
         signing: 0.025,
         key: 0.425,
         minCashSigning: 0.025,
-        minCashKey: 0.075,
-        note:
-          "Bank loan at 55% LTV under deferred income assessment: 2.5% cash at signing, 42.5% at key collection (at least 7.5% cash at keys).",
-      },
-    },
-    none: {
-      normal: {
-        signing: 0.1,
-        key: 0.9,
-        minCashSigning: 0,
-        minCashKey: 0,
-        note: "No loan: 10% at signing and the remaining 90% at key collection.",
-      },
-      staggered: {
-        signing: 0.05,
-        key: 0.95,
-        minCashSigning: 0,
-        minCashKey: 0,
-        note:
-          "No loan under the Staggered Downpayment Scheme: 5% at signing and the remaining 95% at key collection.",
-      },
-      dia: {
-        signing: 0.025,
-        key: 0.975,
-        minCashSigning: 0,
-        minCashKey: 0,
-        note:
-          "No loan under deferred income assessment: 2.5% at signing and the remaining 97.5% at key collection.",
+        note: "No loan DIA: 2.5% cash at signing, 42.5% at key collection.",
       },
     },
   },
@@ -509,26 +464,6 @@ export const POLICY_CONFIG = {
       label: "Local PDF - EHG amount Couples and Families Aug 2024",
       url: "local://backend/data/policies/EHG amount Couples and Families Aug 2024.pdf",
     },
-    ehgFamilies: {
-      label: "HDB Enhanced CPF Housing Grant for Families",
-      url: "https://www.hdb.gov.sg/buying-a-flat/flat-grant-and-loan-eligibility/couples-and-families/enhanced-cpf-housing-grant",
-    },
-    housingFinance: {
-      label: "HDB Credit to Finance a Flat Purchase",
-      url: "https://www.hdb.gov.sg/buying-a-flat/financial-planning-for-a-flat-purchase/credit-to-finance-a-flat-purchase",
-    },
-    loanAssessmentFloors: {
-      label: "HDB Property Measures - Loan Assessment Rates",
-      url: "https://www.hdb.gov.sg/hdb-pulse/news/2022/property-measures2022",
-    },
-    bankLtvRules: {
-      label: "MOF Loan-to-Value Limits",
-      url: "https://www.mof.gov.sg/news-resources/newsroom/raising-additional-buyer-s-stamp-duty-rates-and-tightening-loan-to-value-limits-to-promote-a-stable-and-sustainable-property-market/",
-    },
-    cpfInterestRates: {
-      label: "CPF Interest Rate Computation",
-      url: "https://www.cpf.gov.sg/service/article/how-are-cpf-interest-rates-determined",
-    },
   },
 } as const;
 
@@ -562,34 +497,13 @@ export function getCpfDefaultsForAge(ageYears: number): CpfAgeDefaults {
 }
 
 export function lookupEhgFamiliesGrant(averageMonthlyIncome: number): EhgFamiliesBand | null {
-  const income = Math.max(0, averageMonthlyIncome);
+  const roundedIncome = Math.round(Math.max(0, averageMonthlyIncome));
 
   return (
     EHG_FAMILIES_BANDS_2024.find(
-      (band) => income <= band.maxIncome,
+      (band) => roundedIncome >= band.minIncome && roundedIncome <= band.maxIncome,
     ) || null
   );
-}
-
-export function getDownpaymentRule(
-  financing: "hdb" | "bank" | "none",
-  scheme: "normal" | "staggered" | "dia",
-  ltvLimit: number | null
-): DownpaymentRule {
-  if (financing === "bank" && ltvLimit !== null && ltvLimit <= 0.55) {
-    const rule = POLICY_CONFIG.downpaymentRules.bank55[scheme];
-    if (ltvLimit < 0.55) {
-      return {
-        ...rule,
-        note: `Estimated bank LTV is ${Math.round(
-          ltvLimit * 100
-        )}%. HDB does not publish a stage split for this tier; the planner uses the 55% tier signing pattern as an assumption and enforces the assessed total cash floor at keys. Confirm the split with the bank and HDB.`,
-      };
-    }
-    return rule;
-  }
-
-  return POLICY_CONFIG.downpaymentRules[financing][scheme];
 }
 
 export function getPolicyReviewMeta(lastVerified: string, cadenceDays: number): {

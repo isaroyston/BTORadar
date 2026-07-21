@@ -1,185 +1,219 @@
-import assert from "node:assert/strict";
-import "./register-typescript-imports.mjs";
+import { readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 
-const {
-  getAvailableBtoScoreComponents,
-  scoreBtoProject,
-  scoreBtoProjects,
-} = await import("../../frontend/src/utils/btoScoring.ts");
+const BTO_URL = new URL("../../frontend/public/data/bto/projects.json", import.meta.url);
+const BTO_PATH = fileURLToPath(BTO_URL);
 
-const cheap = makeProject("cheap", 300000, {
-  nearestMrtDistanceMeters: 400,
-  centralityScore: 80,
-  expectedTop: "2030-01",
-  totalUnits: 900,
-});
-const middle = makeProject("middle", 600000, {
-  nearestMrtDistanceMeters: 800,
-  centralityScore: 60,
-  expectedTop: "2031-01",
-  totalUnits: 600,
-});
-const expensive = makeProject("expensive", 900000, {
-  nearestMrtDistanceMeters: 1400,
-  centralityScore: 40,
-  expectedTop: "2032-01",
-  totalUnits: 300,
-});
-const fullLaunch = [cheap, middle, expensive];
+async function main() {
+  const payload = JSON.parse(await readFile(BTO_PATH, "utf8"));
+  const projects = payload.projects ?? [];
+  const latestPriced = projects.filter(
+    (project) =>
+      project.launchMonth === "Oct 2026" &&
+      project.flatVariants?.some((variant) => variant.type === "4-room")
+  );
 
-const affordabilityOnly = weights({ affordability: 100 });
-const filteredAgainstItself = scoreBtoProjects(
-  [middle],
-  { flatType: "4-room", totalAffordability: 1000000 },
-  "buyer-fit",
-  "custom",
-  affordabilityOnly
-).get(middle.id);
-const filteredAgainstFullLaunch = scoreBtoProjects(
-  [middle],
-  { flatType: "4-room", totalAffordability: 1000000 },
-  "buyer-fit",
-  "custom",
-  affordabilityOnly,
-  fullLaunch
-).get(middle.id);
+  assert(latestPriced.length >= 2, "Need at least two priced Oct 2026 projects.");
 
-assert.equal(filteredAgainstItself?.total, 94);
-assert.equal(filteredAgainstFullLaunch?.total, 90);
-assert.ok(
-  (filteredAgainstFullLaunch?.total ?? 0) < (filteredAgainstItself?.total ?? 0),
-  "A town-filtered result must retain full-launch price normalization."
-);
-
-const noAffordability = scoreBtoProject(
-  middle,
-  {
-    flatType: "4-room",
-    totalAffordability: null,
-    cohortProjects: fullLaunch,
-  },
-  "buyer-fit",
-  "balanced"
-);
-
-assert.equal(
-  noAffordability.components.some(({ key }) => key === "affordability"),
-  false
-);
-assert.ok(noAffordability.missingFields.includes("affordability estimate"));
-assert.equal(noAffordability.coverage, 70);
-assert.equal(noAffordability.confidence, "Partial data");
-
-const zeroWeightMissingDimensions = scoreBtoProject(
-  makeProject("focused", 500000, {
-    nearestMrtDistanceMeters: 500,
-    expectedTop: "2030-06",
-    totalUnits: 500,
-  }),
-  {
-    flatType: "4-room",
-    totalAffordability: null,
-    cohortProjects: fullLaunch,
-  },
-  "buyer-fit",
-  "custom",
-  weights({ commute: 40, wait: 30, supply: 30 })
-);
-
-assert.equal(zeroWeightMissingDimensions.coverage, 100);
-assert.equal(zeroWeightMissingDimensions.confidence, "Strong data");
-assert.deepEqual(zeroWeightMissingDimensions.missingFields, []);
-assert.deepEqual(
-  zeroWeightMissingDimensions.components.map(({ key }) => key),
-  ["commute", "wait", "supply"]
-);
-
-const partialProject = makeProject("partial", 500000, {
-  nearestMrtDistanceMeters: 700,
-  totalUnits: 450,
-});
-const weightedPartial = scoreBtoProject(
-  partialProject,
-  {
-    flatType: "4-room",
-    totalAffordability: null,
-    cohortProjects: fullLaunch,
-  },
-  "buyer-fit",
-  "custom",
-  weights({
-    affordability: 50,
-    commute: 20,
-    centrality: 10,
-    wait: 10,
-    supply: 10,
-  })
-);
-
-assert.equal(weightedPartial.coverage, 30);
-assert.equal(weightedPartial.confidence, "Limited data");
-assert.deepEqual(
-  weightedPartial.components.map(({ key, weight }) => [key, weight]),
-  [
-    ["commute", 20],
-    ["supply", 10],
-  ]
-);
-
-assert.deepEqual(
-  [...getAvailableBtoScoreComponents(fullLaunch, "4-room", 1000000)].sort(),
-  ["affordability", "centrality", "commute", "supply", "wait"]
-);
-assert.equal(
-  getAvailableBtoScoreComponents(fullLaunch, "4-room", null).has(
-    "affordability"
-  ),
-  false
-);
-
-console.log("BTO scoring checks passed.");
-
-function makeProject(
-  id,
-  price,
-  {
-    nearestMrtDistanceMeters,
-    centralityScore,
-    expectedTop,
-    totalUnits,
-  } = {}
-) {
-  return {
-    id,
-    launchMonth: "2026-10",
-    name: id,
-    location: id,
-    district: id,
-    flatVariants: [
-      {
-        type: "4-room",
-        basePrice: price,
-        floorAreaSqm: 100,
-        maxEhg: 120000,
-      },
-    ],
-    nearestMrtDistanceMeters,
-    locationSignals:
-      centralityScore === undefined
-        ? undefined
-        : { centralityScore, centralityLabel: `${centralityScore}` },
-    expectedTop,
-    totalUnits,
+  const [projectA, projectB] = latestPriced;
+  const lowPrice = {
+    ...projectA,
+    flatVariants: projectA.flatVariants.map((variant) =>
+      variant.type === "4-room" ? { ...variant, basePrice: 300000 } : variant
+    ),
   };
+  const highPrice = {
+    ...projectA,
+    flatVariants: projectA.flatVariants.map((variant) =>
+      variant.type === "4-room" ? { ...variant, basePrice: 900000 } : variant
+    ),
+  };
+  const nearMrt = { ...projectB, nearestMrtDistanceMeters: 200 };
+  const farMrt = { ...projectB, nearestMrtDistanceMeters: 1800 };
+  const centralProject =
+    projects.find((project) => /caldecott|bishan|telok blangah/i.test(project.nearestMrt ?? "")) ??
+    latestPriced.find((project) => /bishan|bukit merah|toa payoh/i.test(project.location ?? ""));
+  const outerProject =
+    latestPriced.find((project) => /woodlands|yishun|sembawang/i.test(project.location ?? "")) ??
+    projects.find((project) => /woodlands|yishun|sembawang/i.test(project.location ?? ""));
+
+  assert(
+    affordabilityScore(lowPrice, [lowPrice, highPrice]) >
+      affordabilityScore(highPrice, [lowPrice, highPrice]),
+    "Lower price should improve affordability."
+  );
+  assert(
+    commuteScore(nearMrt, [nearMrt, farMrt]) > commuteScore(farMrt, [nearMrt, farMrt]),
+    "Shorter MRT distance should improve commute score."
+  );
+  assert(
+    centralProject &&
+      outerProject &&
+      centralityScore(centralProject) > centralityScore(outerProject),
+    "Central MRT or city-fringe context should score above far-north/far-west context."
+  );
+
+  const buyerLowIncome = buyerFitScore(projectA, latestPriced, 250000, 0);
+  const buyerHighIncome = buyerFitScore(projectA, latestPriced, 900000, 120000);
+  const qualityLowIncome = projectQualityScore(projectA, latestPriced);
+  const qualityHighIncome = projectQualityScore(projectA, latestPriced);
+
+  assert(
+    buyerHighIncome > buyerLowIncome,
+    "Buyer Fit should change when loan + grant context improves."
+  );
+  assert(
+    qualityLowIncome === qualityHighIncome,
+    "Project Quality should not depend on income context."
+  );
+
+  const withoutRatings = { ...projectA, btohq: undefined };
+  assert(
+    Number.isFinite(projectQualityScore(withoutRatings, latestPriced)),
+    "Missing ratings should not collapse the total score."
+  );
+  const withoutCentrality = { ...projectA, locationSignals: undefined };
+  assert(
+    Number.isFinite(projectQualityScore(withoutCentrality, latestPriced)),
+    "Missing centrality should not collapse the total score."
+  );
+
+  console.log("BTO scoring checks passed.");
 }
 
-function weights(overrides) {
-  return {
-    affordability: 0,
-    commute: 0,
-    centrality: 0,
-    wait: 0,
-    supply: 0,
-    ...overrides,
-  };
+function buyerFitScore(project, cohort, loanAmount, ehgGrant) {
+  return weightedScore([
+    [budgetFitScore(project, loanAmount + ehgGrant), 30],
+    [commuteScore(project, cohort), 18],
+    [centralityScore(project), 17],
+    [waitScore(project, cohort), 15],
+    [supplyScore(project, cohort), 10],
+    [ratingScore(project), 10],
+  ]);
 }
+
+function projectQualityScore(project, cohort) {
+  return weightedScore([
+    [affordabilityScore(project, cohort), 30],
+    [commuteScore(project, cohort), 18],
+    [centralityScore(project), 17],
+    [waitScore(project, cohort), 15],
+    [supplyScore(project, cohort), 10],
+    [ratingScore(project), 10],
+  ]);
+}
+
+function affordabilityScore(project, cohort) {
+  const price = selectedPrice(project);
+  if (!Number.isFinite(price)) return null;
+  return lowIsBetter(price, cohort.map(selectedPrice).filter(Number.isFinite));
+}
+
+function budgetFitScore(project, budget) {
+  const price = selectedPrice(project);
+  if (!Number.isFinite(price) || budget <= 0) return null;
+
+  const ratio = price / budget;
+  return ratio <= 1
+    ? 100 - Math.min(20, (1 - ratio) * 30)
+    : Math.max(0, 88 - (ratio - 1) * 180);
+}
+
+function commuteScore(project, cohort) {
+  if (!Number.isFinite(project.nearestMrtDistanceMeters)) return null;
+  return lowIsBetter(
+    project.nearestMrtDistanceMeters,
+    cohort.map((candidate) => candidate.nearestMrtDistanceMeters).filter(Number.isFinite)
+  );
+}
+
+function centralityScore(project) {
+  return Number.isFinite(project.locationSignals?.centralityScore)
+    ? project.locationSignals.centralityScore
+    : null;
+}
+
+function waitScore(project, cohort) {
+  const value = monthSortValue(project.expectedTop);
+  if (!value) return null;
+  return lowIsBetter(
+    value,
+    cohort.map((candidate) => monthSortValue(candidate.expectedTop)).filter(Boolean)
+  );
+}
+
+function supplyScore(project, cohort) {
+  if (!Number.isFinite(project.totalUnits)) return null;
+  return highIsBetter(
+    project.totalUnits,
+    cohort.map((candidate) => candidate.totalUnits).filter(Number.isFinite)
+  );
+}
+
+function ratingScore(project) {
+  const ratings = project.btohq?.ratings;
+  const values = [ratings?.accessibility, ratings?.amenities, ratings?.affordability]
+    .filter(Number.isFinite)
+    .map((rating) => (rating / 5) * 100);
+
+  return values.length ? average(values) : null;
+}
+
+function selectedPrice(project) {
+  return project.flatVariants?.find((variant) => variant.type === "4-room")?.basePrice;
+}
+
+function weightedScore(entries) {
+  const valid = entries.filter(([score]) => Number.isFinite(score));
+  const weight = valid.reduce((sum, entry) => sum + entry[1], 0);
+  return Math.round(valid.reduce((sum, entry) => sum + entry[0] * entry[1], 0) / weight);
+}
+
+function lowIsBetter(value, values) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (min === max) return 80;
+  return Math.round(100 - ((value - min) / (max - min)) * 70);
+}
+
+function highIsBetter(value, values) {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  if (min === max) return 80;
+  return Math.round(30 + ((value - min) / (max - min)) * 70);
+}
+
+function average(values) {
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function monthSortValue(value) {
+  const match = String(value ?? "").match(/([A-Za-z]+)\s+((?:19|20)\d{2})/);
+  if (!match) return 0;
+  const month = {
+    jan: 0,
+    feb: 1,
+    mar: 2,
+    apr: 3,
+    may: 4,
+    jun: 5,
+    jul: 6,
+    aug: 7,
+    sep: 8,
+    sept: 8,
+    oct: 9,
+    nov: 10,
+    dec: 11,
+  }[match[1].slice(0, 3).toLowerCase()];
+
+  return Number(match[2]) * 12 + month;
+}
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+main().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

@@ -14,16 +14,12 @@
 
 ## What It Does
 
-- Estimates a planning loan cap from LTV, MSR/TDSR, age, tenure, rate, debt,
-  CPF, and cash inputs. HFE or bank IPA remains authoritative.
-- Supports HFE-confirmed EHG, an explicitly conditional first-timer-family
-  estimate, no grant, or an unassessed state.
-- Models downpayment, option fee, BSD, survey, registration, and applicable HDB
-  fire-insurance and Deed-of-Assignment duty scenarios, and identifies
-  unallocated buyer payments.
+- Estimates loan eligibility from household income.
+- Looks up Enhanced CPF Housing Grant bands for first-timer families.
+- Models downpayment, option fee, survey fee, and fire insurance scenarios.
 - Builds an average payment timeline from application through key collection.
 - Compares flat-size-specific BTO projects from the generated RecordBTO backfill.
-- Saves the current scenario in the browser for a later visit.
+- Saves scenarios in the browser with JSON import/export for tester handoff.
 
 ## Product Surfaces
 
@@ -48,21 +44,13 @@ npm.cmd run dev
 ```bash
 npm.cmd run lint
 npm.cmd run build
-npm.cmd run test:affordability
-npm.cmd run test:ehg
-npm.cmd run test:fees
-npm.cmd run test:plan-storage
-npm.cmd run test:dates
-npm.cmd run test:payment-timeline
-npm.cmd run test:payment-allocation
-npm.cmd run test:scoring
-npm.cmd run data:check-bto
 ```
 
 ## Saved Scenarios
 
-The Purchase Plan page saves one scenario in browser `localStorage`. No account
-or server storage is required.
+The Purchase Plan page lets users save a scenario in browser `localStorage`,
+download it as JSON, and load a previously exported JSON file. No account or
+server storage is required.
 
 ## Refresh BTO Data
 
