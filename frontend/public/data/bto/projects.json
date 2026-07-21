@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-06-07T12:11:18.476Z",
+  "generatedAt": "2026-07-21T18:25:32.457Z",
   "source": "merged",
   "sources": {
     "recordbto": {
       "source": "https://recordbto.com/bto",
-      "generatedAt": "2026-06-07T10:59:20.908Z",
-      "projectCount": 142
+      "generatedAt": "2026-07-21T18:22:38.515Z",
+      "projectCount": 140
     },
     "btohq": {
       "source": "https://www.btohq.com/bto-sales-launch-list",
@@ -15,9 +15,9 @@
     }
   },
   "mergeSummary": {
-    "projectCount": 550,
+    "projectCount": 548,
     "matchedProjectCount": 16,
-    "recordbtoOnlyProjectCount": 126,
+    "recordbtoOnlyProjectCount": 124,
     "btohqOnlyProjectCount": 408,
     "btohqOnlyLaunches": [
       "Feb 2026",
@@ -601,78 +601,25 @@
       }
     },
     {
-      "id": "ang-mo-kio-bto-at-ang-mo-kio-avenue-1",
+      "id": "kebun-baru-breeze",
       "launchMonth": "Jun 2026",
-      "name": "Ang Mo Kio BTO at Ang Mo Kio Avenue 1",
+      "name": "Kebun Baru Breeze",
       "location": "Ang Mo Kio",
       "district": "AMK",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
-      "flatVariants": [
-        {
-          "type": "2-room",
-          "basePrice": 225000,
-          "minPrice": 170000,
-          "maxPrice": 280000,
-          "floorAreaSqm": 44,
-          "maxEhg": 120000,
-          "suggestedOccupants": 2,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5114
-        },
-        {
-          "type": "3-room",
-          "basePrice": 425000,
-          "minPrice": 350000,
-          "maxPrice": 500000,
-          "floorAreaSqm": 68,
-          "maxEhg": 120000,
-          "suggestedOccupants": 3,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 6250
-        },
-        {
-          "type": "4-room",
-          "basePrice": 539500,
-          "minPrice": 459000,
-          "maxPrice": 620000,
-          "floorAreaSqm": 93,
-          "maxEhg": 120000,
-          "suggestedOccupants": 4,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5801
-        },
-        {
-          "type": "5-room",
-          "basePrice": 635000,
-          "minPrice": 550000,
-          "maxPrice": 720000,
-          "floorAreaSqm": 113,
-          "maxEhg": 120000,
-          "suggestedOccupants": 5,
-          "suggestedTenureYears": 30,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5619
-        }
-      ],
+      "flatVariants": [],
       "status": "launched",
       "address": "Ang Mo Kio Avenue 1",
       "btoType": "plus",
       "expectedTop": "Jun 2031",
-      "totalUnits": 570,
+      "totalUnits": 579,
       "nearestMrt": "Ang Mo Kio MRT",
       "nearestMrtDistanceMeters": 800,
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
-      "sourceUrl": "https://recordbto.com/bto/ang-mo-kio-bto-at-ang-mo-kio-avenue-1",
+      "sourceUrl": "https://recordbto.com/bto/kebun-baru-breeze",
       "locationSignals": {
         "centralityScore": 88,
         "centralityLabel": "Central / city fringe",
@@ -685,81 +632,34 @@
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "lowestPrice": 225000,
-        "lowestPricePerSqm": 5114,
         "topSortValue": 24378,
-        "totalUnits": 570,
+        "totalUnits": 579,
         "btoType": "plus",
         "nearestMrtDistanceMeters": 800,
         "centralityScore": 88,
-        "availableFlatTypes": [
-          "2-room",
-          "3-room",
-          "4-room",
-          "5-room"
-        ]
+        "availableFlatTypes": []
       }
     },
     {
-      "id": "ang-mo-kio-bto-at-ang-mo-kio-avenue-2",
+      "id": "kebun-baru-ridge",
       "launchMonth": "Jun 2026",
-      "name": "Ang Mo Kio BTO at Ang Mo Kio Avenue 2",
+      "name": "Kebun Baru Ridge",
       "location": "Ang Mo Kio",
       "district": "AMK",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
-      "flatVariants": [
-        {
-          "type": "2-room",
-          "basePrice": 225000,
-          "minPrice": 170000,
-          "maxPrice": 280000,
-          "floorAreaSqm": 44,
-          "maxEhg": 120000,
-          "suggestedOccupants": 2,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5114
-        },
-        {
-          "type": "3-room",
-          "basePrice": 425000,
-          "minPrice": 350000,
-          "maxPrice": 500000,
-          "floorAreaSqm": 68,
-          "maxEhg": 120000,
-          "suggestedOccupants": 3,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 6250
-        },
-        {
-          "type": "4-room",
-          "basePrice": 539500,
-          "minPrice": 459000,
-          "maxPrice": 620000,
-          "floorAreaSqm": 93,
-          "maxEhg": 120000,
-          "suggestedOccupants": 4,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5801
-        }
-      ],
+      "flatVariants": [],
       "status": "launched",
       "address": "Ang Mo Kio Avenue 2",
       "btoType": "plus",
-      "expectedTop": "Jun 2031",
-      "totalUnits": 480,
+      "expectedTop": "Jul 2029",
+      "totalUnits": 485,
       "nearestMrt": "Ang Mo Kio MRT",
       "nearestMrtDistanceMeters": 700,
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
-      "sourceUrl": "https://recordbto.com/bto/ang-mo-kio-bto-at-ang-mo-kio-avenue-2",
+      "sourceUrl": "https://recordbto.com/bto/kebun-baru-ridge",
       "locationSignals": {
         "centralityScore": 88,
         "centralityLabel": "Central / city fringe",
@@ -772,93 +672,34 @@
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "lowestPrice": 225000,
-        "lowestPricePerSqm": 5114,
-        "topSortValue": 24378,
-        "totalUnits": 480,
+        "topSortValue": 24355,
+        "totalUnits": 485,
         "btoType": "plus",
         "nearestMrtDistanceMeters": 700,
         "centralityScore": 88,
-        "availableFlatTypes": [
-          "2-room",
-          "3-room",
-          "4-room"
-        ]
+        "availableFlatTypes": []
       }
     },
     {
-      "id": "bishan-bto-at-upper-thomson-road",
+      "id": "lakeview-cascadia",
       "launchMonth": "Jun 2026",
-      "name": "Bishan BTO at Upper Thomson Road",
+      "name": "Lakeview Cascadia",
       "location": "Bishan",
       "district": "BS",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
-      "flatVariants": [
-        {
-          "type": "2-room",
-          "basePrice": 255000,
-          "minPrice": 200000,
-          "maxPrice": 310000,
-          "floorAreaSqm": 44,
-          "maxEhg": 120000,
-          "suggestedOccupants": 2,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5795
-        },
-        {
-          "type": "3-room",
-          "basePrice": 490000,
-          "minPrice": 400000,
-          "maxPrice": 580000,
-          "floorAreaSqm": 68,
-          "maxEhg": 120000,
-          "suggestedOccupants": 3,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 7206
-        },
-        {
-          "type": "4-room",
-          "basePrice": 650000,
-          "minPrice": 550000,
-          "maxPrice": 750000,
-          "floorAreaSqm": 93,
-          "maxEhg": 120000,
-          "suggestedOccupants": 4,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 6989
-        },
-        {
-          "type": "5-room",
-          "basePrice": 775000,
-          "minPrice": 650000,
-          "maxPrice": 900000,
-          "floorAreaSqm": 113,
-          "maxEhg": 120000,
-          "suggestedOccupants": 5,
-          "suggestedTenureYears": 30,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 6858
-        }
-      ],
+      "flatVariants": [],
       "status": "launched",
       "address": "Upper Thomson Road",
       "btoType": "prime",
       "expectedTop": "Sept 2031",
-      "totalUnits": 1210,
+      "totalUnits": 1221,
       "nearestMrt": "Marymount MRT",
       "nearestMrtDistanceMeters": 600,
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
-      "sourceUrl": "https://recordbto.com/bto/bishan-bto-at-upper-thomson-road",
+      "sourceUrl": "https://recordbto.com/bto/lakeview-cascadia",
       "locationSignals": {
         "centralityScore": 92,
         "centralityLabel": "Central / city fringe",
@@ -872,85 +713,25 @@
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "lowestPrice": 255000,
-        "lowestPricePerSqm": 5795,
         "topSortValue": 24381,
-        "totalUnits": 1210,
+        "totalUnits": 1221,
         "btoType": "prime",
         "nearestMrtDistanceMeters": 600,
         "centralityScore": 92,
-        "availableFlatTypes": [
-          "2-room",
-          "3-room",
-          "4-room",
-          "5-room"
-        ]
+        "availableFlatTypes": []
       }
     },
     {
-      "id": "bukit-merah-bto-at-berlayar-avenue",
+      "id": "berlayar-rise",
       "launchMonth": "Jun 2026",
-      "name": "Bukit Merah BTO at Berlayar Avenue",
+      "name": "Berlayar Rise",
       "location": "Bukit Merah",
       "district": "BM",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
-      "flatVariants": [
-        {
-          "type": "2-room",
-          "basePrice": 297500,
-          "minPrice": 220000,
-          "maxPrice": 375000,
-          "floorAreaSqm": 48,
-          "maxEhg": 120000,
-          "suggestedOccupants": 2,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 6198
-        },
-        {
-          "type": "3-room",
-          "basePrice": 495000,
-          "minPrice": 420000,
-          "maxPrice": 570000,
-          "floorAreaSqm": 67,
-          "maxEhg": 120000,
-          "suggestedOccupants": 3,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 7388
-        },
-        {
-          "type": "4-room",
-          "basePrice": 690000,
-          "minPrice": 580000,
-          "maxPrice": 800000,
-          "floorAreaSqm": 90,
-          "maxEhg": 120000,
-          "suggestedOccupants": 4,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 7667
-        },
-        {
-          "type": "5-room",
-          "basePrice": 825000,
-          "minPrice": 700000,
-          "maxPrice": 950000,
-          "floorAreaSqm": 113,
-          "maxEhg": 120000,
-          "suggestedOccupants": 5,
-          "suggestedTenureYears": 30,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 7301
-        }
-      ],
+      "flatVariants": [],
       "status": "launched",
       "address": "Berlayar Avenue",
       "btoType": "prime",
@@ -959,7 +740,7 @@
       "nearestMrt": "Telok Blangah MRT",
       "nearestMrtDistanceMeters": 100,
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
-      "sourceUrl": "https://recordbto.com/bto/bukit-merah-bto-at-berlayar-avenue",
+      "sourceUrl": "https://recordbto.com/bto/berlayar-rise",
       "locationSignals": {
         "centralityScore": 94,
         "centralityLabel": "Central / city fringe",
@@ -975,94 +756,34 @@
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "lowestPrice": 297500,
-        "lowestPricePerSqm": 6198,
         "topSortValue": 24381,
         "totalUnits": 1960,
         "btoType": "prime",
         "nearestMrtDistanceMeters": 100,
         "centralityScore": 94,
-        "availableFlatTypes": [
-          "2-room",
-          "3-room",
-          "4-room",
-          "5-room"
-        ]
+        "availableFlatTypes": []
       }
     },
     {
-      "id": "sembawang-bto-at-admiralty-street",
+      "id": "sembawang-brook",
       "launchMonth": "Jun 2026",
-      "name": "Sembawang BTO at Admiralty Street",
+      "name": "Sembawang Brook",
       "location": "Sembawang",
       "district": "SB",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
-      "flatVariants": [
-        {
-          "type": "2-room",
-          "basePrice": 180000,
-          "minPrice": 145000,
-          "maxPrice": 215000,
-          "floorAreaSqm": 36,
-          "maxEhg": 120000,
-          "suggestedOccupants": 2,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5000
-        },
-        {
-          "type": "3-room",
-          "basePrice": 310000,
-          "minPrice": 255000,
-          "maxPrice": 365000,
-          "floorAreaSqm": 67,
-          "maxEhg": 120000,
-          "suggestedOccupants": 3,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 4627
-        },
-        {
-          "type": "4-room",
-          "basePrice": 360000,
-          "minPrice": 295000,
-          "maxPrice": 425000,
-          "floorAreaSqm": 93,
-          "maxEhg": 120000,
-          "suggestedOccupants": 4,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 3871
-        },
-        {
-          "type": "5-room",
-          "basePrice": 502500,
-          "minPrice": 430000,
-          "maxPrice": 575000,
-          "floorAreaSqm": 113,
-          "maxEhg": 120000,
-          "suggestedOccupants": 5,
-          "suggestedTenureYears": 30,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 4447
-        }
-      ],
+      "flatVariants": [],
       "status": "launched",
-      "address": "Admiralty Street",
+      "address": "Admiralty Street / Sungei Sembawang",
       "btoType": "standard",
-      "expectedTop": "Jun 2031",
-      "totalUnits": 870,
-      "nearestMrt": "Admiralty MRT",
-      "nearestMrtDistanceMeters": 500,
+      "expectedTop": "Mar 2029",
+      "totalUnits": 1160,
+      "nearestMrt": "Canberra MRT",
+      "nearestMrtDistanceMeters": 800,
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
-      "sourceUrl": "https://recordbto.com/bto/sembawang-bto-at-admiralty-street",
+      "sourceUrl": "https://recordbto.com/bto/sembawang-brook",
       "locationSignals": {
         "centralityScore": 39,
         "centralityLabel": "Longer city access",
@@ -1070,99 +791,39 @@
           "North region"
         ],
         "nearestCentralAnchor": "Orchard",
-        "centralAnchorDistanceMeters": 15589,
-        "matchedStation": "Admiralty",
+        "centralAnchorDistanceMeters": 15487,
+        "matchedStation": "Canberra",
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "lowestPrice": 180000,
-        "lowestPricePerSqm": 3871,
-        "topSortValue": 24378,
-        "totalUnits": 870,
+        "topSortValue": 24351,
+        "totalUnits": 1160,
         "btoType": "standard",
-        "nearestMrtDistanceMeters": 500,
+        "nearestMrtDistanceMeters": 800,
         "centralityScore": 39,
-        "availableFlatTypes": [
-          "2-room",
-          "3-room",
-          "4-room",
-          "5-room"
-        ]
+        "availableFlatTypes": []
       }
     },
     {
-      "id": "sembawang-bto-at-sembawang-drive",
+      "id": "sembawang-portico",
       "launchMonth": "Jun 2026",
-      "name": "Sembawang BTO at Sembawang Drive",
+      "name": "Sembawang Portico",
       "location": "Sembawang",
       "district": "SB",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
-      "flatVariants": [
-        {
-          "type": "2-room",
-          "basePrice": 185000,
-          "minPrice": 150000,
-          "maxPrice": 220000,
-          "floorAreaSqm": 36,
-          "maxEhg": 120000,
-          "suggestedOccupants": 2,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5139
-        },
-        {
-          "type": "3-room",
-          "basePrice": 315000,
-          "minPrice": 260000,
-          "maxPrice": 370000,
-          "floorAreaSqm": 67,
-          "maxEhg": 120000,
-          "suggestedOccupants": 3,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 4701
-        },
-        {
-          "type": "4-room",
-          "basePrice": 365000,
-          "minPrice": 300000,
-          "maxPrice": 430000,
-          "floorAreaSqm": 93,
-          "maxEhg": 120000,
-          "suggestedOccupants": 4,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 3925
-        },
-        {
-          "type": "5-room",
-          "basePrice": 520000,
-          "minPrice": 440000,
-          "maxPrice": 600000,
-          "floorAreaSqm": 115,
-          "maxEhg": 120000,
-          "suggestedOccupants": 5,
-          "suggestedTenureYears": 30,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 4522
-        }
-      ],
+      "flatVariants": [],
       "status": "launched",
-      "address": "Sembawang Drive",
+      "address": "Admiralty Lane / Sembawang Drive",
       "btoType": "standard",
-      "expectedTop": "Jun 2031",
-      "totalUnits": 1130,
-      "nearestMrt": "Sembawang MRT",
-      "nearestMrtDistanceMeters": 1000,
+      "expectedTop": "Jan 2029",
+      "totalUnits": 875,
+      "nearestMrt": "Canberra MRT",
+      "nearestMrtDistanceMeters": 800,
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
-      "sourceUrl": "https://recordbto.com/bto/sembawang-bto-at-sembawang-drive",
+      "sourceUrl": "https://recordbto.com/bto/sembawang-portico",
       "locationSignals": {
         "centralityScore": 39,
         "centralityLabel": "Longer city access",
@@ -1170,125 +831,58 @@
           "North region"
         ],
         "nearestCentralAnchor": "Orchard",
-        "centralAnchorDistanceMeters": 16206,
-        "matchedStation": "Sembawang",
+        "centralAnchorDistanceMeters": 15487,
+        "matchedStation": "Canberra",
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "lowestPrice": 185000,
-        "lowestPricePerSqm": 3925,
-        "topSortValue": 24378,
-        "totalUnits": 1130,
+        "topSortValue": 24349,
+        "totalUnits": 875,
         "btoType": "standard",
-        "nearestMrtDistanceMeters": 1000,
+        "nearestMrtDistanceMeters": 800,
         "centralityScore": 39,
-        "availableFlatTypes": [
-          "2-room",
-          "3-room",
-          "4-room",
-          "5-room"
-        ]
+        "availableFlatTypes": []
       }
     },
     {
-      "id": "woodlands-bto-at-woodgrove-avenue",
+      "id": "woodgrove-acres",
       "launchMonth": "Jun 2026",
-      "name": "Woodlands BTO at Woodgrove Avenue",
+      "name": "Woodgrove Acres",
       "location": "Woodlands",
       "district": "WD",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
-      "flatVariants": [
-        {
-          "type": "2-room",
-          "basePrice": 180000,
-          "minPrice": 145000,
-          "maxPrice": 215000,
-          "floorAreaSqm": 36,
-          "maxEhg": 120000,
-          "suggestedOccupants": 2,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 5000
-        },
-        {
-          "type": "3-room",
-          "basePrice": 310000,
-          "minPrice": 255000,
-          "maxPrice": 365000,
-          "floorAreaSqm": 67,
-          "maxEhg": 120000,
-          "suggestedOccupants": 3,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 4627
-        },
-        {
-          "type": "4-room",
-          "basePrice": 357500,
-          "minPrice": 295000,
-          "maxPrice": 420000,
-          "floorAreaSqm": 93,
-          "maxEhg": 120000,
-          "suggestedOccupants": 4,
-          "suggestedTenureYears": 25,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 3844
-        },
-        {
-          "type": "5-room",
-          "basePrice": 500000,
-          "minPrice": 430000,
-          "maxPrice": 570000,
-          "floorAreaSqm": 113,
-          "maxEhg": 120000,
-          "suggestedOccupants": 5,
-          "suggestedTenureYears": 30,
-          "priceSource": "recordbto",
-          "priceNote": "RecordBTO project detail page price range",
-          "pricePerSqm": 4425
-        }
-      ],
+      "flatVariants": [],
       "status": "launched",
       "address": "Woodgrove Avenue",
       "btoType": "standard",
       "expectedTop": "Jun 2031",
-      "totalUnits": 640,
-      "nearestMrt": "Woodlands MRT",
-      "nearestMrtDistanceMeters": 600,
+      "totalUnits": 656,
+      "nearestMrt": "Marsiling MRT",
+      "nearestMrtDistanceMeters": 1300,
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
-      "sourceUrl": "https://recordbto.com/bto/woodlands-bto-at-woodgrove-avenue",
+      "sourceUrl": "https://recordbto.com/bto/woodgrove-acres",
       "locationSignals": {
-        "centralityScore": 52,
-        "centralityLabel": "Outer-town access",
+        "centralityScore": 44,
+        "centralityLabel": "Longer city access",
         "contextTags": [
           "Regional centre",
           "North region"
         ],
         "nearestCentralAnchor": "Orchard",
-        "centralAnchorDistanceMeters": 15652,
-        "matchedStation": "Woodlands Interchange",
+        "centralAnchorDistanceMeters": 15702,
+        "matchedStation": "Marsiling",
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "lowestPrice": 180000,
-        "lowestPricePerSqm": 3844,
         "topSortValue": 24378,
-        "totalUnits": 640,
+        "totalUnits": 656,
         "btoType": "standard",
-        "nearestMrtDistanceMeters": 600,
-        "centralityScore": 52,
-        "availableFlatTypes": [
-          "2-room",
-          "3-room",
-          "4-room",
-          "5-room"
-        ]
+        "nearestMrtDistanceMeters": 1300,
+        "centralityScore": 44,
+        "availableFlatTypes": []
       }
     },
     {
@@ -32134,8 +31728,8 @@
       "status": "completed",
       "address": "Hougang",
       "btoType": "standard",
-      "expectedTop": "To be announced",
-      "totalUnits": 550,
+      "expectedTop": "Mar 2025",
+      "totalUnits": 390,
       "nearestMrt": "Hougang MRT (NE14)",
       "sourceUrl": "https://recordbto.com/bto/hougang-olive",
       "locationSignals": {
@@ -32148,7 +31742,8 @@
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "totalUnits": 550,
+        "topSortValue": 24303,
+        "totalUnits": 390,
         "btoType": "standard",
         "centralityScore": 72,
         "availableFlatTypes": []
@@ -40753,62 +40348,39 @@
       }
     },
     {
-      "id": "bishan-towers",
+      "id": "dakota-one",
       "launchMonth": "Jul 2020",
-      "name": "Bishan Towers",
-      "location": "Bishan",
-      "district": "BS",
+      "name": "Dakota One",
+      "location": "Kallang/Whampoa",
+      "district": "KW",
       "suggestedFinancing": "hdb",
       "suggestedScheme": "normal",
       "dataSource": "recordbto",
       "schemeSource": "recordbto",
       "flatVariants": [],
       "status": "completed",
-      "address": "Bishan",
+      "address": "Dakota Crescent / Jalan Hock Keng",
       "btoType": "standard",
       "expectedTop": "To be announced",
-      "totalUnits": 690,
-      "nearestMrt": "Bishan MRT (NS17/CC15)",
-      "sourceUrl": "https://recordbto.com/bto/bishan-towers",
+      "totalUnits": 330,
+      "nearestMrt": "Dakota MRT (CC8)",
+      "sourceUrl": "https://recordbto.com/bto/dakota-one",
       "locationSignals": {
-        "centralityScore": 100,
+        "centralityScore": 94,
         "centralityLabel": "Central / city fringe",
         "contextTags": [
+          "City fringe",
           "Central mature town"
         ],
-        "nearestCentralAnchor": "Orchard",
-        "centralAnchorDistanceMeters": 5518,
-        "matchedStation": "Bishan Interchange",
+        "nearestCentralAnchor": "City Hall",
+        "centralAnchorDistanceMeters": 4331,
+        "matchedStation": "Dakota",
         "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
-        "totalUnits": 690,
+        "totalUnits": 330,
         "btoType": "standard",
-        "centralityScore": 100,
-        "availableFlatTypes": []
-      }
-    },
-    {
-      "id": "keat-hong-verge",
-      "launchMonth": "Jul 2020",
-      "name": "Keat Hong Verge",
-      "location": "Choa Chu Kang",
-      "district": "CCK",
-      "suggestedFinancing": "hdb",
-      "suggestedScheme": "normal",
-      "dataSource": "recordbto",
-      "schemeSource": "recordbto",
-      "flatVariants": [],
-      "status": "completed",
-      "address": "Choa Chu Kang",
-      "btoType": "standard",
-      "expectedTop": "To be announced",
-      "totalUnits": 650,
-      "nearestMrt": "Keat Hong LRT (BP3)",
-      "sourceUrl": "https://recordbto.com/bto/keat-hong-verge",
-      "comparisonMetrics": {
-        "totalUnits": 650,
-        "btoType": "standard",
+        "centralityScore": 94,
         "availableFlatTypes": []
       }
     },
@@ -40993,42 +40565,6 @@
         "totalUnits": 490,
         "btoType": "standard",
         "centralityScore": 46,
-        "availableFlatTypes": []
-      }
-    },
-    {
-      "id": "parc-residences-tengah",
-      "launchMonth": "Jul 2020",
-      "name": "Parc Residences @ Tengah",
-      "location": "Tengah",
-      "district": "TG",
-      "suggestedFinancing": "hdb",
-      "suggestedScheme": "normal",
-      "dataSource": "recordbto",
-      "schemeSource": "recordbto",
-      "flatVariants": [],
-      "status": "completed",
-      "address": "Tengah Garden District",
-      "btoType": "standard",
-      "expectedTop": "To be announced",
-      "totalUnits": 1140,
-      "nearestMrt": "Tengah MRT (JE2)",
-      "sourceUrl": "https://recordbto.com/bto/parc-residences-tengah",
-      "locationSignals": {
-        "centralityScore": 48,
-        "centralityLabel": "Outer-town access",
-        "contextTags": [
-          "Emerging estate"
-        ],
-        "nearestCentralAnchor": "Orchard",
-        "centralAnchorDistanceMeters": 13290,
-        "matchedStation": "Tengah",
-        "source": "Station centrality estimate from URA rail station geometry and curated town context"
-      },
-      "comparisonMetrics": {
-        "totalUnits": 1140,
-        "btoType": "standard",
-        "centralityScore": 48,
         "availableFlatTypes": []
       }
     },

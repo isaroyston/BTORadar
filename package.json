@@ -8,11 +8,12 @@
     "lint": "npm --prefix frontend run lint",
     "preview": "npm --prefix frontend run preview --",
     "data:rail-stations": "node backend/scripts/backfill-rail-stations.mjs",
-    "data:recordbto": "node backend/scripts/backfill-recordbto.mjs",
+    "data:recordbto:source": "node backend/scripts/backfill-recordbto.mjs",
+    "data:recordbto": "npm run data:recordbto:source && npm run data:merge-bto",
     "data:btohq": "node backend/scripts/backfill-btohq.mjs",
     "data:merge-bto": "node backend/scripts/merge-bto-datasets.mjs",
     "data:check-bto": "node backend/scripts/check-bto-data.mjs",
     "test:scoring": "node backend/scripts/check-bto-scoring.mjs",
-    "data:refresh": "npm run data:recordbto && npm run data:btohq && npm run data:rail-stations && npm run data:merge-bto"
+    "data:refresh": "npm run data:recordbto:source && npm run data:btohq && npm run data:rail-stations && npm run data:merge-bto"
   }
 }
