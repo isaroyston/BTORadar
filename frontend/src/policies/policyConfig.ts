@@ -497,11 +497,13 @@ export function getCpfDefaultsForAge(ageYears: number): CpfAgeDefaults {
 }
 
 export function lookupEhgFamiliesGrant(averageMonthlyIncome: number): EhgFamiliesBand | null {
-  const roundedIncome = Math.round(Math.max(0, averageMonthlyIncome));
+  // Bands are ascending and each ceiling is inclusive, so the first band whose ceiling covers the
+  // income applies. Income is not rounded: S$9,000.01 is above the S$9,000 ceiling.
+  const income = Math.max(0, averageMonthlyIncome);
 
   return (
     EHG_FAMILIES_BANDS_2024.find(
-      (band) => roundedIncome >= band.minIncome && roundedIncome <= band.maxIncome,
+      (band) => income <= band.maxIncome,
     ) || null
   );
 }

@@ -20,9 +20,8 @@ import { currency } from "../utils/format";
 import {
   BTO_SOURCE_CREDITS,
   getBtoProjectSourceLabel,
-  getBtoProjectSourceNote,
 } from "../utils/sourceCredits";
-import { Icon, PageHeader, Pill, type IconName } from "./DashboardUi";
+import { Icon, PageHeader, type IconName } from "./DashboardUi";
 
 type BtoTabProps = {
   btoLoading: boolean;
@@ -178,37 +177,38 @@ export function BtoTab({
 
       {!btoLoading && !btoError && (
         <>
-          <div className="panel bto-filter-panel">
-            <div className="bto-filter-fields">
-            <div>
-              <label className="field-label" htmlFor="flat-type-filter">
-                Price view
-              </label>
-              <select
-                id="flat-type-filter"
-                value={selectedFlatType}
-                onChange={(event) => onFlatTypeChange(event.target.value as FlatType)}
-                className="control mt-2 w-full"
-              >
+          <div className="radar-filters">
+            <div className="radar-filter">
+              <span className="radar-filter-label" id="flat-size-label">
+                Flat size
+              </span>
+              <div className="radar-segment" role="radiogroup" aria-labelledby="flat-size-label">
                 {FLAT_TYPE_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
+                  <button
+                    key={option.value}
+                    type="button"
+                    role="radio"
+                    aria-checked={selectedFlatType === option.value}
+                    className="radar-segment-option"
+                    onClick={() => onFlatTypeChange(option.value)}
+                  >
                     {option.label}
-                  </option>
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
-            <div>
-              <label className="field-label" htmlFor="year-filter">
-                Year
+            <div className="radar-filter">
+              <label className="radar-filter-label" htmlFor="year-filter">
+                Launches
               </label>
               <select
                 id="year-filter"
                 value={yearFilter}
                 onChange={(event) => onYearFilterChange(event.target.value)}
-                className="control mt-2 w-full"
+                className="radar-select"
                 disabled={availableYears.length === 0}
               >
-                <option value="latest">Latest launch</option>
+                <option value="latest">Latest</option>
                 <option value="all">All years</option>
                 {availableYears.map((year) => (
                   <option key={year} value={String(year)}>
@@ -217,70 +217,46 @@ export function BtoTab({
                 ))}
               </select>
             </div>
-            <div>
-              <label className="field-label" htmlFor="town-filter">
+            <div className="radar-filter radar-filter-grow">
+              <label className="radar-filter-label" htmlFor="town-filter">
                 Town
               </label>
               <input
                 id="town-filter"
-                type="text"
+                type="search"
                 value={townQuery}
                 onChange={(event) => onTownQueryChange(event.target.value)}
-                placeholder="Search by town"
-                className="control mt-2 w-full"
+                placeholder="e.g. Punggol"
+                className="radar-search"
               />
             </div>
-
-            <div className="flex items-center justify-between gap-3 lg:justify-end">
-              <span className="bto-filter-count">
-                {launchGroups.length} launches, {filteredProjects.length} projects,
-                {" "}
-                {pricedProjectCount} priced
-              </span>
-              {hasActiveFilters && (
-                <button type="button" className="btn-secondary" onClick={onResetFilters}>
-                  Reset
-                </button>
-              )}
-            </div>
-            </div>
-            <div className="active-filter-row">
-              <span>Active filters:</span>
-              <Pill tone="blue">
-                {FLAT_TYPE_OPTIONS.find((option) => option.value === selectedFlatType)?.label ??
-                  selectedFlatType}
-              </Pill>
-              {townQuery.trim() && <Pill tone="blue">{townQuery.trim()}</Pill>}
-              {hasActiveFilters && (
-                <button type="button" onClick={onResetFilters}>
-                  Clear all
-                </button>
-              )}
-            </div>
+            <p className="radar-count">
+              {filteredProjects.length} projects in {launchGroups.length}{" "}
+              {launchGroups.length === 1 ? "launch" : "launches"}, {pricedProjectCount} with prices
+            </p>
+            {hasActiveFilters && (
+              <button type="button" className="budget-link" onClick={onResetFilters}>
+                Clear filters
+              </button>
+            )}
           </div>
 
           {launchGroups.length === 0 ? (
-            <div className="panel p-5 text-sm text-warm-stone">
-              No projects match the current filters.
+            <div className="radar-empty">
+              <h3>No projects match</h3>
+              <p>Try another town, a different flat size, or all years.</p>
             </div>
           ) : (
-            <div className="bto-results-layout">
-              <div className="panel overflow-hidden">
-                <div className="border-b border-heritage-navy/10 p-4">
-                  <h3 className="text-base font-semibold text-heritage-navy">
-                    Launches
-                  </h3>
-                </div>
-                <div className="launch-list-grid">
-                  {launchGroups.map((group) => (
-                    <LaunchButton
-                      key={group.key}
-                      group={group}
-                      isActive={group.key === selectedLaunch?.key}
-                      onClick={() => setActiveLaunch(group.key)}
-                    />
-                  ))}
-                </div>
+            <>
+              <div className="radar-launches" role="tablist" aria-label="Launches">
+                {launchGroups.map((group) => (
+                  <LaunchTab
+                    key={group.key}
+                    group={group}
+                    isActive={group.key === selectedLaunch?.key}
+                    onClick={() => setActiveLaunch(group.key)}
+                  />
+                ))}
               </div>
 
               {selectedLaunch && (
@@ -301,7 +277,7 @@ export function BtoTab({
                   onSelectProject={onSelectProject}
                 />
               )}
-            </div>
+            </>
           )}
         </>
       )}
@@ -309,7 +285,7 @@ export function BtoTab({
   );
 }
 
-function LaunchButton({
+function LaunchTab({
   group,
   isActive,
   onClick,
@@ -318,36 +294,42 @@ function LaunchButton({
   isActive: boolean;
   onClick: () => void;
 }) {
+  const status = getLaunchStatus(group.key);
+  const count = `${group.projects.length} ${group.projects.length === 1 ? "project" : "projects"}`;
+
   return (
     <button
       type="button"
-      className={`launch-list-button ${
-        isActive
-          ? "launch-list-button-active"
-          : "launch-list-button-idle"
-      }`}
-      title={`Show projects launched in ${group.key}`}
+      role="tab"
+      aria-selected={isActive}
+      className="radar-launch"
       onClick={onClick}
-      aria-pressed={isActive}
     >
-      <span className="launch-list-main">
-        <strong>{group.key}</strong>
-        <span>
-          {group.projects.length} {group.projects.length === 1 ? "project" : "projects"}
-        </span>
-      </span>
-      <span className="launch-list-price">
-        {group.lowestPrice
-          ? `From ${currency(group.lowestPrice)}`
-          : "Price not listed"}
-      </span>
-      <span className="launch-list-meta">
-        <span>{formatNumber(group.totalUnits)} units</span>
-        <span>{group.pricedProjectCount}/{group.projects.length} priced</span>
-        <span>{group.distanceProjectCount}/{group.projects.length} MRT</span>
+      <strong>{group.key}</strong>
+      <span>{status ? `${count}, ${status}` : count}</span>
+      <span>
+        {group.pricedProjectCount === 0
+          ? "No prices listed"
+          : group.lowestPrice
+            ? `From ${currency(group.lowestPrice)}`
+            : "No prices listed"}
       </span>
     </button>
   );
+}
+
+// HDB takes applications for about a week in the launch month, so an earlier month is closed.
+function getLaunchStatus(launchKey: string) {
+  const parsed = new Date(`1 ${launchKey}`);
+  if (Number.isNaN(parsed.getTime())) return null;
+
+  const today = new Date();
+  const launchIndex = parsed.getFullYear() * 12 + parsed.getMonth();
+  const todayIndex = today.getFullYear() * 12 + today.getMonth();
+
+  if (launchIndex < todayIndex) return "applications closed";
+  if (launchIndex === todayIndex) return "this month";
+  return "upcoming";
 }
 
 function ProjectDrilldown({
@@ -407,114 +389,59 @@ function ProjectDrilldown({
     ]
   );
 
-  return (
-    <div className="bto-launch-content bto-reveal">
-      <div className="panel overflow-hidden">
-        <div className="project-list-head">
-          <div>
-            <h3>{launch.key}</h3>
-            <p>Choose one for Plan, or compare 2 to 4 projects.</p>
-          </div>
-          <div className="project-list-count">
-            <span>{launch.projects.length} projects</span>
-            <span>{formatNumber(launch.totalUnits)} units</span>
-          </div>
-        </div>
+  const presetLabel =
+    BTO_SCORE_PRESET_OPTIONS.find((option) => option.value === scorePreset)?.label ?? "Custom";
 
-        <CompareTray
-          projects={comparedProjects}
-          selectedFlatType={selectedFlatType}
-          scores={projectScores}
+  return (
+    <div className="radar-launch-body bto-reveal">
+      <div className="radar-launch-head">
+        <h3>{launch.key}</h3>
+        <p>
+          {launch.projects.length} {launch.projects.length === 1 ? "project" : "projects"},{" "}
+          {formatNumber(launch.totalUnits)} flats. Best match first.
+        </p>
+      </div>
+
+      <details className="radar-ranking">
+        <summary>Ranked for: {presetLabel}. Change what matters</summary>
+        <ScoreSettingsCard
+          scorePreset={scorePreset}
+          scoreWeights={scoreWeights}
+          onScorePresetChange={onScorePresetChange}
+          onScoreWeightsChange={onScoreWeightsChange}
         />
+      </details>
 
-        <div className="project-card-grid">
-          {launch.projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              selectedFlatType={selectedFlatType}
-              decisionScore={projectScores.get(project.id) ?? null}
-              isSelected={project.id === selectedProjectId}
-              isCompareSelected={comparedProjectIds.includes(project.id)}
-              isCompareDisabled={
-                comparedProjectIds.length >= MAX_COMPARE_PROJECTS &&
-                !comparedProjectIds.includes(project.id)
-              }
-              onToggleCompareProject={onToggleCompareProject}
-              onSelectProject={onSelectProject}
-            />
-          ))}
+      {comparedProjects.length > 0 && (
+        <div className="radar-compare">
+          <CompareTray
+            projects={comparedProjects}
+            selectedFlatType={selectedFlatType}
+            scores={projectScores}
+          />
         </div>
-      </div>
+      )}
 
-      <RadarSidePanel
-        comparedProjects={comparedProjects}
-        scores={projectScores}
-        selectedFlatType={selectedFlatType}
-        scorePreset={scorePreset}
-        scoreWeights={scoreWeights}
-        onScorePresetChange={onScorePresetChange}
-        onScoreWeightsChange={onScoreWeightsChange}
-      />
+      <div className="radar-card-list">
+        {launch.projects.map((project) => (
+          <ProjectCard
+            key={project.id}
+            project={project}
+            selectedFlatType={selectedFlatType}
+            budgetCeiling={totalAffordability}
+            decisionScore={projectScores.get(project.id) ?? null}
+            isSelected={project.id === selectedProjectId}
+            isCompareSelected={comparedProjectIds.includes(project.id)}
+            isCompareDisabled={
+              comparedProjectIds.length >= MAX_COMPARE_PROJECTS &&
+              !comparedProjectIds.includes(project.id)
+            }
+            onToggleCompareProject={onToggleCompareProject}
+            onSelectProject={onSelectProject}
+          />
+        ))}
+      </div>
     </div>
-  );
-}
-
-function RadarSidePanel({
-  comparedProjects,
-  scores,
-  selectedFlatType,
-  scorePreset,
-  scoreWeights,
-  onScorePresetChange,
-  onScoreWeightsChange,
-}: {
-  comparedProjects: BtoProject[];
-  scores: Map<string, BtoDecisionScore>;
-  selectedFlatType: FlatType;
-  scorePreset: BtoScorePreset;
-  scoreWeights: BtoScoreWeights;
-  onScorePresetChange: (value: BtoScorePreset) => void;
-  onScoreWeightsChange: (value: BtoScoreWeights) => void;
-}) {
-  return (
-    <aside className="bto-side-panel">
-      <ScoreSettingsCard
-        scorePreset={scorePreset}
-        scoreWeights={scoreWeights}
-        onScorePresetChange={onScorePresetChange}
-        onScoreWeightsChange={onScoreWeightsChange}
-      />
-
-      <div className="panel bto-compare-card">
-        <h3>Shortlist & Compare</h3>
-        <p>Add projects to compare up to 4 at a time.</p>
-        <div className="compare-slot-list">
-          {comparedProjects.map((project, index) => (
-            <div key={project.id}>
-              <span>{index + 1}</span>
-              <strong>{project.name}</strong>
-              <em>{scores.get(project.id)?.total ?? "-"}</em>
-            </div>
-          ))}
-          {Array.from({ length: Math.max(0, 4 - comparedProjects.length) }).map((_, index) => (
-            <div key={`empty-${index}`} className="compare-slot-empty">
-              <span>+</span>
-              <strong>Add project to compare</strong>
-            </div>
-          ))}
-        </div>
-        {comparedProjects.length >= 2 && (
-          <div className="mt-4">
-            <CompareTray
-              projects={comparedProjects}
-              selectedFlatType={selectedFlatType}
-              scores={scores}
-            />
-          </div>
-        )}
-      </div>
-    </aside>
   );
 }
 
@@ -665,6 +592,7 @@ function ScoreWeightSlider({
 function ProjectCard({
   project,
   selectedFlatType,
+  budgetCeiling,
   decisionScore,
   isSelected,
   isCompareSelected,
@@ -674,6 +602,7 @@ function ProjectCard({
 }: {
   project: BtoProject;
   selectedFlatType: FlatType;
+  budgetCeiling: number;
   decisionScore: BtoDecisionScore | null;
   isSelected: boolean;
   isCompareSelected: boolean;
@@ -682,13 +611,20 @@ function ProjectCard({
   onSelectProject: (projectId: string) => void;
 }) {
   const selectedVariant = getSelectedVariant(project, selectedFlatType);
+  const flatLabel =
+    FLAT_TYPE_OPTIONS.find((option) => option.value === selectedFlatType)?.label ?? selectedFlatType;
   const scoreTotal = decisionScore?.total ?? null;
-  const scoreColor = scoreTotal === null ? "" : scoreTotal >= 70 ? "bto-score-green" : scoreTotal >= 50 ? "bto-score-amber" : "bto-score-red";
-
-  const [showBudgetTip, setShowBudgetTip] = useState(false);
-  const budgetTipId = useId();
-  const affordabilityComp = decisionScore?.components.find((c) => c.key === "affordability");
-  const affordabilityGood = affordabilityComp && affordabilityComp.score >= 70 && affordabilityComp.reason.toLowerCase().includes("within");
+  const scoreTone =
+    scoreTotal === null
+      ? ""
+      : scoreTotal >= 70
+        ? "radar-score-high"
+        : scoreTotal >= 50
+          ? "radar-score-mid"
+          : "radar-score-low";
+  // The Budget screen shows the ceiling rounded down to the thousand, so compare against the same figure.
+  const shownCeiling = Math.floor(budgetCeiling / 1000) * 1000;
+  const overBy = selectedVariant ? Math.round(selectedVariant.basePrice - shownCeiling) : 0;
 
   const strengths = decisionScore
     ? decisionScore.components
@@ -705,183 +641,114 @@ function ProjectCard({
     : [];
 
   return (
-    <article
-      className={`bto-project-card ${
-        isSelected ? "bto-project-card-selected" : ""
-      }`}
-    >
-      {/* HEADER */}
-      <div className="bto-card-header">
-        <div className="bto-card-header-main">
-          <div className="bto-card-header-text">
-            <h4 className="bto-card-title">{project.name}</h4>
-            <div className="bto-card-tags">
-              <ProjectTypeBadge type={project.btoType} />
-              <span className="bto-card-tag">{project.location}</span>
-              {project.nearestMrtDistanceMeters && project.nearestMrtDistanceMeters <= 800 && (
-                <span className="bto-card-tag bto-card-tag-accent">Near MRT</span>
-              )}
-            </div>
+    <article className={`radar-card ${isSelected ? "radar-card-selected" : ""}`}>
+      <div className="radar-card-top">
+        <div className="radar-card-id">
+          <h4>{project.name}</h4>
+          <p>
+            <ProjectTypeBadge type={project.btoType} />
+            <span>{project.location}</span>
+          </p>
+        </div>
+        {scoreTotal !== null && (
+          <div
+            className={`radar-score ${scoreTone}`}
+            title="Match out of 100, from what you said matters"
+          >
+            <strong>{scoreTotal}</strong>
+            <span>match</span>
           </div>
-
-          {decisionScore && (
-            <div className={`bto-score-badge ${scoreColor}`}>
-              <div className="bto-score-badge-value">{scoreTotal}</div>
-              <div className="bto-score-badge-label">/100</div>
-            </div>
-          )}
-        </div>
-
-        <div className="bto-card-actions">
-          <button
-            type="button"
-            className={`bto-btn-use-plan ${isSelected ? "bto-btn-use-plan-active" : ""}`}
-            onClick={() => onSelectProject(project.id)}
-          >
-            {isSelected ? "Selected" : "Use in Plan"}
-          </button>
-          <button
-            type="button"
-            className={`bto-btn-compare ${isCompareSelected ? "bto-btn-compare-active" : ""}`}
-            disabled={isCompareDisabled}
-            aria-pressed={isCompareSelected}
-            onClick={() => onToggleCompareProject(project.id)}
-          >
-            {isCompareSelected ? "Comparing" : "Compare"}
-          </button>
-          {project.sourceUrl && (
-            <a
-              href={project.sourceUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="bto-btn-view"
-            >
-              View Details
-            </a>
-          )}
-        </div>
+        )}
       </div>
 
-      {/* KPI STRIP */}
-      <div className="bto-kpi-strip">
-        <span className="bto-kpi">
-          <Icon name="home" />
-          <strong>{selectedVariant ? currency(selectedVariant.basePrice) : `No ${selectedFlatType} price`}</strong>
-          <span className="bto-kpi-sublabel">est.</span>
-          {affordabilityComp && (
-            <span
-              className={`bto-kpi-badge ${affordabilityGood ? "bto-kpi-badge-good" : "bto-kpi-badge-warn"}`}
-              onMouseEnter={() => setShowBudgetTip(true)}
-              onMouseLeave={() => setShowBudgetTip(false)}
-              onFocus={() => setShowBudgetTip(true)}
-              onBlur={() => setShowBudgetTip(false)}
-              aria-describedby={budgetTipId}
-              tabIndex={0}
-            >
-              {affordabilityGood ? "✓ Budget" : "⚠ Over"}
-              {showBudgetTip && (
-                <span id={budgetTipId} className="bto-tooltip" role="tooltip">
-                  {affordabilityGood
-                    ? "This price is within your HDB loan + EHG grant estimate."
-                    : "This price exceeds your estimated budget. You may need additional cash or a larger loan."}
-                </span>
-              )}
-            </span>
+      {selectedVariant ? (
+        <div className="radar-card-price">
+          <p className="radar-price">
+            {currency(selectedVariant.basePrice)}
+            <span>{flatLabel}, estimated</span>
+          </p>
+          {overBy > 0 ? (
+            <p className="radar-fit radar-fit-over">
+              <Icon name="alert" />
+              {currency(overBy)} over your budget
+            </p>
+          ) : (
+            <p className="radar-fit radar-fit-good">
+              <Icon name="check" />
+              Within your budget
+            </p>
           )}
-        </span>
-        <span className="bto-kpi-divider" />
-        <span className="bto-kpi">
-          <Icon name="calendar" />
-          <strong>{project.expectedTop ?? "—"}</strong>
-          <span>TOP</span>
-        </span>
-        <span className="bto-kpi-divider" />
-        <span className="bto-kpi">
-          <Icon name="metro" />
-          <strong>{project.nearestMrtDistanceMeters ? formatDistance(project.nearestMrtDistanceMeters) : "—"}</strong>
-          <span>{project.nearestMrt ?? "MRT"}</span>
-        </span>
-        <span className="bto-kpi-divider" />
-        <span className="bto-kpi">
-          <Icon name="building" />
-          <strong>{formatNumber(project.totalUnits)}</strong>
-          <span>Units</span>
-        </span>
-      </div>
-
-      {/* INSIGHTS + DETAILS */}
-      {decisionScore && (
-        <div className="bto-insights-row">
-          {/* Insights */}
-          <div className="bto-insights">
-            {strengths.length > 0 && (
-              <div className="bto-insight-group">
-                <span className="bto-insight-title">Strengths</span>
-                <div className="bto-insight-chips">
-                  {strengths.map((c) => (
-                    <span key={c.key} className="bto-insight-chip bto-insight-strength">
-                      <Icon name="check" />
-                      {c.reason}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {tradeoffs.length > 0 && (
-              <div className="bto-insight-group">
-                <span className="bto-insight-title">Tradeoffs</span>
-                <div className="bto-insight-chips">
-                  {tradeoffs.map((c) => (
-                    <span key={c.key} className="bto-insight-chip bto-insight-tradeoff">
-                      <Icon name="alert" />
-                      {c.reason}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {strengths.length === 0 && tradeoffs.length === 0 && (
-              <div className="bto-insight-empty">
-                <Icon name="info" />
-                Not enough data to generate insights
-              </div>
-            )}
-          </div>
-
-          {/* Details */}
-          <div className="bto-details-panel">
-            <div className="bto-detail-item">
-              <span className="bto-detail-item-label">Category</span>
-              <span className="bto-detail-item-value">{formatProjectType(project.btoType) || "—"}</span>
-            </div>
-            <div className="bto-detail-item">
-              <span className="bto-detail-item-label">Flat sizes</span>
-              <span className="bto-detail-item-value">{formatFlatSizes(project)}</span>
-            </div>
-            <div className="bto-detail-item">
-              <span className="bto-detail-item-label">Source</span>
-              <span className="bto-detail-item-value">{getBtoProjectSourceLabel(project)}</span>
-            </div>
-          </div>
+        </div>
+      ) : (
+        <div className="radar-card-price">
+          <p className="radar-price-missing">No {flatLabel} price listed yet</p>
         </div>
       )}
 
-      {/* FOOTER */}
-      <div className="bto-card-footer">
-        <span className="bto-card-footer-note">
-          <Icon name="info" />
-          {getBtoProjectSourceNote(project)}
-        </span>
-        {project.sourceUrl ? (
-          <a
-            href={project.sourceUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="bto-card-footer-link"
-          >
-            View source <Icon name="external" />
+      <dl className="radar-facts">
+        <div>
+          <dt>Keys, estimated</dt>
+          <dd>{project.expectedTop ?? "Not listed"}</dd>
+        </div>
+        <div>
+          <dt>Nearest MRT</dt>
+          <dd>
+            {project.nearestMrtDistanceMeters
+              ? `${formatDistance(project.nearestMrtDistanceMeters)}${project.nearestMrt ? ` to ${project.nearestMrt}` : ""}`
+              : "Not listed"}
+          </dd>
+        </div>
+        <div>
+          <dt>Flats</dt>
+          <dd>{formatNumber(project.totalUnits)}</dd>
+        </div>
+        <div>
+          <dt>Sizes</dt>
+          <dd>{formatFlatSizes(project)}</dd>
+        </div>
+      </dl>
+
+      {(strengths.length > 0 || tradeoffs.length > 0) && (
+        <div className="radar-notes">
+          {strengths.length > 0 && (
+            <p>
+              <strong>Good</strong>
+              {strengths.map((c) => c.reason).join(", ")}
+            </p>
+          )}
+          {tradeoffs.length > 0 && (
+            <p>
+              <strong>Watch</strong>
+              {tradeoffs.map((c) => c.reason).join(", ")}
+            </p>
+          )}
+        </div>
+      )}
+
+      <div className="radar-card-actions">
+        <button
+          type="button"
+          className="radar-plan-btn"
+          aria-pressed={isSelected}
+          onClick={() => onSelectProject(project.id)}
+        >
+          {isSelected ? "In your plan" : "Plan this flat"}
+        </button>
+        <button
+          type="button"
+          className="radar-compare-btn"
+          disabled={isCompareDisabled}
+          aria-pressed={isCompareSelected}
+          onClick={() => onToggleCompareProject(project.id)}
+        >
+          {isCompareSelected ? "Comparing" : "Compare"}
+        </button>
+        {project.sourceUrl && (
+          <a href={project.sourceUrl} target="_blank" rel="noreferrer" className="radar-source">
+            {getBtoProjectSourceLabel(project)}
+            <Icon name="external" />
           </a>
-        ) : null}
+        )}
       </div>
     </article>
   );

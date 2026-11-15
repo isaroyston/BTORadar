@@ -7,7 +7,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', "Inter", "sans-serif"],
+        sans: ["Inter", "sans-serif"],
       },
       colors: {
         "hdb-bg": "oklch(var(--color-hdb-bg) / <alpha-value>)",
@@ -17,7 +17,7 @@ module.exports = {
         "electric-mint": "oklch(var(--color-electric-mint) / <alpha-value>)",
       },
       borderRadius: {
-        hdb: "8px",
+        hdb: "14px",
       },
       boxShadow: {
         card: "0 1px 2px rgb(15 23 42 / 0.05)",

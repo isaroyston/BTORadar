@@ -8,6 +8,7 @@ type NavigationProps = {
 };
 
 const tabIcons: Record<TabKey, IconName> = {
+  budget: "wallet",
   overview: "home",
   plan: "clipboard",
   bto: "building",
@@ -57,25 +58,28 @@ export function Navigation({
 
       </nav>
 
-      <nav className="mobile-nav lg:hidden">
+      <header className="mobile-nav lg:hidden">
         <div className="flex items-center gap-2">
           <div className="brand-radar brand-radar-small" aria-hidden="true">
             <span />
           </div>
           <strong>BTO RADAR</strong>
         </div>
-        <select
-          value={activeTab}
-          onChange={(event) => onSelectTab(event.target.value as TabKey)}
-          className="control"
-          aria-label="Current section"
-        >
-          {TABS.map((tab) => (
-            <option key={tab.id} value={tab.id}>
-              {tab.label}
-            </option>
-          ))}
-        </select>
+      </header>
+
+      <nav className="mobile-tabs lg:hidden" aria-label="Sections">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            type="button"
+            className="mobile-tab"
+            aria-current={activeTab === tab.id ? "page" : undefined}
+            onClick={() => onSelectTab(tab.id)}
+          >
+            <Icon name={tabIcons[tab.id]} />
+            <span>{tab.id === "bto" ? "Radar" : tab.label}</span>
+          </button>
+        ))}
       </nav>
     </>
   );

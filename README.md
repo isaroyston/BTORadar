@@ -14,7 +14,8 @@
 
 ## What It Does
 
-- Estimates loan eligibility from household income.
+- Works out a price ceiling from income, age, CPF and cash savings, using HDB's
+  loan-to-value and income limits. HFE remains authoritative.
 - Looks up Enhanced CPF Housing Grant bands for first-timer families.
 - Models downpayment, option fee, survey fee, and fire insurance scenarios.
 - Builds an average payment timeline from application through key collection.
@@ -23,9 +24,10 @@
 
 ## Product Surfaces
 
-- **Overview**: selected BTO, target flat price, policy basis, and milestone state.
-- **Plan**: assumptions, loan/downpayment math, money snapshot, and saved plan flow.
-- **BTO Radar**: launch filters, project cards, price record counts, and send-to-plan action.
+- **Budget**: five questions, one price ceiling, and what sets it.
+- **BTO Radar**: launches, project cards measured against the ceiling, compare, and send-to-plan.
+- **Plan**: target price, loan and downpayment choices, whether it fits, and payment milestones.
+- **Overview**: the next payment and where each step stands.
 
 ## Structure
 
@@ -44,7 +46,10 @@ npm.cmd run dev
 ```bash
 npm.cmd run lint
 npm.cmd run build
+npm.cmd test
 ```
+
+`npm test` runs the scoring, affordability, grant, fee and payment-allocation checks.
 
 ## Saved Scenarios
 

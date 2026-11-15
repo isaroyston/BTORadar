@@ -1,35 +1,28 @@
-import { useMemo, useState, useEffect, useId, type ChangeEvent } from "react";
+import { useMemo, useState, type ChangeEvent } from "react";
 import {
   BANK_LOAN_TENURE_MAX,
   FLAT_MAX,
   FLAT_MIN,
   FLAT_TYPE_OPTIONS,
   HDB_LOAN_TENURE_MAX,
-  INCOME_MAX,
-  INCOME_MIN,
   LOAN_INTEREST_RATE_MAX,
   LOAN_INTEREST_RATE_MIN,
   LOAN_TENURE_MIN,
 } from "../constants";
-import { POLICY_CONFIG } from "../policies/policyConfig";
 import type { BtoProject } from "../policies/policyConfig";
 import type { FinancingType, FlatType, SchemeType, TimelineItem } from "../types";
+import type { FinancingEstimate } from "../utils/affordability";
+import type { BudgetInputs } from "../utils/budgetStorage";
 import { formatDateInputDisplay } from "../utils/date";
 import { currency } from "../utils/format";
-import {
-  Card,
-  Icon,
-  MetricRow,
-  PageHeader,
-  Pill,
-} from "./DashboardUi";
+import { Icon, PageHeader } from "./DashboardUi";
 
 type PurchasePlanTabProps = {
   selectedProject: BtoProject | null;
-  combinedIncome: number;
-  loanAmount: number;
   ehgGrant: number;
-  totalAffordability: number;
+  targetEstimate: FinancingEstimate;
+  budgetKnown: boolean;
+  budget: BudgetInputs;
   flatPrice: number;
   flatType: FlatType;
   financing: FinancingType;
@@ -41,16 +34,14 @@ type PurchasePlanTabProps = {
   minCashSigning: number;
   signingCpf: number;
   keyCpf: number;
-  optionFee: number;
-  surveyFee: number;
-  fireInsurance: number;
   downpaymentNote: string;
   timeline: TimelineItem[];
   completedMilestones: string[];
   confirmedMilestoneDates: Record<string, string>;
   planStorageStatus: string;
   planStorageError: string | null;
-  onIncomeChange: (value: number) => void;
+  onOpenBudget: () => void;
+  onOpenRadar: () => void;
   onFlatPriceChange: (value: number) => void;
   onFlatTypeChange: (value: FlatType) => void;
   onFinancingChange: (value: FinancingType) => void;
@@ -63,23 +54,30 @@ type PurchasePlanTabProps = {
 };
 
 const FINANCING_OPTIONS: { value: FinancingType; label: string }[] = [
-  { value: "hdb", label: "HDB Loan" },
-  { value: "bank", label: "Bank Loan" },
-  { value: "none", label: "No Loan" },
+  { value: "hdb", label: "HDB loan" },
+  { value: "bank", label: "Bank loan" },
+  { value: "none", label: "No loan" },
 ];
 
 const SCHEME_OPTIONS: { value: SchemeType; label: string }[] = [
-  { value: "normal", label: "Normal" },
+  { value: "normal", label: "Standard" },
   { value: "staggered", label: "Staggered" },
-  { value: "dia", label: "DIA" },
+  { value: "dia", label: "Deferred" },
 ];
+
+const SCHEME_HELP: Record<SchemeType, string> = {
+  normal: "Standard: the downpayment is split between signing the lease and collecting keys.",
+  staggered:
+    "Staggered Downpayment Scheme: a smaller part at signing and the rest at key collection. Check with HDB whether you qualify.",
+  dia: "Deferred Income Assessment: for couples who are still studying or serving NS. HDB assesses income closer to key collection. Check with HDB whether you qualify.",
+};
 
 export function PurchasePlanTab({
   selectedProject,
-  combinedIncome,
-  loanAmount,
   ehgGrant,
-  totalAffordability,
+  targetEstimate,
+  budgetKnown,
+  budget,
   flatPrice,
   flatType,
   financing,
@@ -91,16 +89,14 @@ export function PurchasePlanTab({
   minCashSigning,
   signingCpf,
   keyCpf,
-  optionFee,
-  surveyFee,
-  fireInsurance,
   downpaymentNote,
   timeline,
   completedMilestones,
   confirmedMilestoneDates,
   planStorageStatus,
   planStorageError,
-  onIncomeChange,
+  onOpenBudget,
+  onOpenRadar,
   onFlatPriceChange,
   onFlatTypeChange,
   onFinancingChange,
@@ -111,30 +107,33 @@ export function PurchasePlanTab({
   onToggleMilestoneComplete,
   onMilestoneDateChange,
 }: PurchasePlanTabProps) {
-  const immediateCostsTotal =
-    POLICY_CONFIG.fees.applicationFee +
-    optionFee +
-    surveyFee +
-    fireInsurance +
-    POLICY_CONFIG.fees.registrationFeeLeaseEscrow;
-  const downpaymentTotal = signingAmount + keyAmount;
-  const estimatedTotalPrice = flatPrice;
-  const balanceAfterUpfront = Math.max(flatPrice - downpaymentTotal - ehgGrant, 0);
-  const loanPrincipalNeeded = financing === "none" ? 0 : balanceAfterUpfront;
-  const monthlyPayment = calculateMonthlyPayment(
-    loanPrincipalNeeded,
-    loanInterestRate,
-    loanTenureYears
+  // With a budget set, the figures come from the financing estimate. Without one, the plan
+  // falls back to the downpayment rule alone and says so.
+  const known = budgetKnown && targetEstimate.completeness === "complete";
+  const fallbackLoan =
+    financing === "none" ? 0 : Math.max(flatPrice - signingAmount - keyAmount - ehgGrant, 0);
+  const loan = known ? Math.round(targetEstimate.loanForTarget ?? 0) : fallbackLoan;
+  const grant = known ? Math.round(targetEstimate.usableGrantAmount ?? 0) : ehgGrant;
+  const gap = known ? Math.round(targetEstimate.fundingGap ?? 0) : 0;
+  const tenure = known ? targetEstimate.effectiveTenureYears ?? loanTenureYears : loanTenureYears;
+  const monthlyPayment = known
+    ? targetEstimate.estimatedMonthlyPayment ?? 0
+    : calculateMonthlyPayment(fallbackLoan, loanInterestRate, loanTenureYears);
+  const ownNeeded = Math.max(flatPrice - loan - grant, 0);
+  const cpfUsed = known ? Math.min(budget.cpfOa ?? 0, ownNeeded) : signingCpf + keyCpf;
+  const cashUsed = known ? Math.max(ownNeeded - cpfUsed - gap, 0) : minCashSigning;
+  const fundingParts = [
+    { key: "loan", tone: "budget-part-loan", label: financing === "bank" ? "Bank loan" : "HDB loan", amount: loan },
+    { key: "grant", tone: "budget-part-grant", label: "Housing grant", amount: grant },
+    { key: "cpf", tone: "budget-part-cpf", label: "CPF savings", amount: cpfUsed },
+    { key: "cash", tone: "budget-part-cash", label: "Cash", amount: cashUsed },
+    { key: "short", tone: "plan-part-short", label: "Not covered", amount: gap },
+  ].filter((part) => part.amount > 0);
+  const fundingTotal = Math.max(
+    fundingParts.reduce((sum, part) => sum + part.amount, 0),
+    1
   );
-  const cpfTotal = signingCpf + keyCpf;
-  const cashTotal = minCashSigning + immediateCostsTotal;
-  const fundingTotal = Math.max(loanPrincipalNeeded + cpfTotal + cashTotal + ehgGrant, 1);
-  const hdbLoanShare = Math.min(100, Math.round((loanPrincipalNeeded / fundingTotal) * 100));
-  const cpfShare = Math.min(100, Math.round((cpfTotal / fundingTotal) * 100));
-  const cashShare = Math.min(100, Math.round((cashTotal / fundingTotal) * 100));
-  const grantShare = Math.max(0, 100 - hdbLoanShare - cpfShare - cashShare);
-  const [showAffordTip, setShowAffordTip] = useState(false);
-  const affordTipId = useId();
+  const projectVariant = selectedProject?.flatVariants.find((variant) => variant.type === flatType);
   const [paymentOverrides, setPaymentOverrides] = useState<Record<string, { total: number; cpf: number; cash: number }>>({});
 
   const effectiveTimeline = useMemo(() => {
@@ -203,14 +202,13 @@ export function PurchasePlanTab({
     <section className="dashboard-page">
       <PageHeader
         title="Plan"
-        subtitle="Build and adjust your financial plan for a confident home journey."
+        subtitle="The flat you are aiming for, how you will pay, and what is due when."
         action={
           <div className="plan-actions">
             <button type="button" className="btn-primary" onClick={onSavePlan}>
-              Save Plan
+              Save plan
             </button>
             <span className={planStorageError ? "form-error" : ""}>
-              <Icon name="calendar" />
               {planStorageError ? planStorageError : planStorageStatus}
             </span>
           </div>
@@ -219,115 +217,71 @@ export function PurchasePlanTab({
 
       <div className="plan-layout">
         <div className="plan-main">
-          {selectedProject && (
-            <Card className="plan-section-card plan-project-card">
-              <div className="plan-project-header">
+          <section className="plan-block">
+            <h2>Your flat</h2>
+            {selectedProject ? (
+              <div className="plan-flat">
                 <div>
                   <h3>{selectedProject.name}</h3>
-                  <div className="plan-project-meta">
-                    <span className="plan-project-tag">{selectedProject.location}</span>
-                    {selectedProject.btoType && (
-                      <span className={`plan-project-badge plan-project-badge-${selectedProject.btoType.toLowerCase()}`}>
-                        {selectedProject.btoType.charAt(0).toUpperCase() + selectedProject.btoType.slice(1)}
-                      </span>
-                    )}
-                  </div>
+                  <p>
+                    {selectedProject.location}
+                    {selectedProject.expectedTop ? `, keys estimated ${selectedProject.expectedTop}` : ""}
+                    {projectVariant ? `, ${flatType} from ${currency(projectVariant.basePrice)}` : ""}
+                  </p>
                 </div>
-                {selectedProject.sourceUrl && (
-                  <a
-                    href={selectedProject.sourceUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="plan-project-link"
-                  >
-                    View Details <Icon name="external" />
-                  </a>
-                )}
+                <button type="button" className="budget-link" onClick={onOpenRadar}>
+                  Choose another
+                </button>
               </div>
-              <div className="plan-project-kpis">
-                <span className="plan-project-kpi">
-                  <Icon name="home" />
-                  <strong>
-                    {selectedProject.flatVariants.find((v) => v.type === flatType)
-                      ? currency(selectedProject.flatVariants.find((v) => v.type === flatType)!.basePrice)
-                      : "No price"}
-                  </strong>
-                  <span className="plan-project-kpi-sublabel">est.</span>
-                  <span>{flatType}</span>
-                </span>
-                <span className="plan-project-kpi-divider" />
-                <span className="plan-project-kpi">
-                  <Icon name="calendar" />
-                  <strong>{selectedProject.expectedTop ?? "—"}</strong>
-                  <span>TOP</span>
-                </span>
-                <span className="plan-project-kpi-divider" />
-                <span className="plan-project-kpi">
-                  <Icon name="metro" />
-                  <strong>
-                    {selectedProject.nearestMrtDistanceMeters
-                      ? `${(selectedProject.nearestMrtDistanceMeters / 1000).toFixed(1)} km`
-                      : "—"}
-                  </strong>
-                  <span>{selectedProject.nearestMrt ?? "MRT"}</span>
-                </span>
-                <span className="plan-project-kpi-divider" />
-                <span className="plan-project-kpi">
-                  <Icon name="building" />
-                  <strong>{selectedProject.totalUnits?.toLocaleString("en-SG") ?? "—"}</strong>
-                  <span>Units</span>
-                </span>
-              </div>
-              <p className="plan-project-footer">
-                <Icon name="info" />
-                {selectedProject.flatVariants.length > 0
-                  ? `Available: ${selectedProject.flatVariants.map((v) => v.type).join(", ")}`
-                  : "Flat types not listed"}
+            ) : (
+              <p className="plan-explain">
+                No project chosen. You can plan around a target price alone, or{" "}
+                <button type="button" className="budget-link" onClick={onOpenRadar}>
+                  pick a project
+                </button>
+                .
               </p>
-            </Card>
-          )}
-
-          <Card className="plan-section-card">
-            <PlanStepHeader
-              step={1}
-              title="Assumptions"
-              description="These inputs help us customise your plan and estimates."
-            />
-            <div className="assumption-grid primary-assumption-grid">
+            )}
+            <div className="plan-fields">
               <MoneyInput
-                label="Monthly Household Income"
-                value={combinedIncome}
-                min={INCOME_MIN}
-                max={INCOME_MAX}
-                onChange={onIncomeChange}
+                label="Target price"
+                value={flatPrice}
+                min={FLAT_MIN}
+                max={FLAT_MAX}
+                onChange={onFlatPriceChange}
               />
               <SelectField
-                label="Flat"
+                label="Flat size"
                 value={flatType}
                 onChange={(value) => onFlatTypeChange(value as FlatType)}
                 options={FLAT_TYPE_OPTIONS}
-                className="segmented-field-flat"
               />
+            </div>
+          </section>
+
+          <section className="plan-block">
+            <h2>How you will pay</h2>
+            <div className="plan-fields">
               <SegmentedField
-                label="Financing"
+                label="Loan"
                 value={financing}
                 onChange={(value) => onFinancingChange(value as FinancingType)}
                 options={FINANCING_OPTIONS}
-                className="segmented-field-financing"
               />
               <SegmentedField
-                label="Payment"
+                label="Downpayment timing"
                 value={scheme}
                 onChange={(value) => onSchemeChange(value as SchemeType)}
                 options={SCHEME_OPTIONS}
-                className="segmented-field-payment"
               />
             </div>
+            <p className="plan-explain">{SCHEME_HELP[scheme]}</p>
+            <p className="plan-explain">{downpaymentNote}</p>
             <details className="assumption-more">
-              <summary>Show more assumptions</summary>
+              <summary>Loan length and interest rate</summary>
               <div className="assumption-grid assumption-grid-small">
                 <NumberInput
-                  label="Loan tenure"
+                  label="Loan length"
                   value={loanTenureYears}
                   min={LOAN_TENURE_MIN}
                   max={getLoanTenureMax(financing)}
@@ -340,201 +294,136 @@ export function PurchasePlanTab({
                   min={LOAN_INTEREST_RATE_MIN}
                   max={LOAN_INTEREST_RATE_MAX}
                   step={0.05}
-                  suffix="% p.a."
+                  suffix="% a year"
                   onChange={onLoanInterestRateChange}
-                />
-                <MetricRow
-                  icon="building"
-                  label="Project"
-                  value={selectedProject?.name ?? "No project selected"}
-                  detail={selectedProject?.location}
                 />
               </div>
             </details>
-            <p className="policy-note">
-              {downpaymentNote} CPF OA usage is applied automatically where eligible.
-            </p>
-          </Card>
-
-          <Card className="plan-section-card">
-            <PlanStepHeader
-              step={2}
-              title="Target Flat Price"
-              description="Set your own target price. BTO prices shown elsewhere are estimates based on past launches."
-            />
-            <div className="target-price-grid">
-              <div>
-                <MoneyInput
-                  label="Target Flat Price (your estimate)"
-                  value={flatPrice}
-                  min={FLAT_MIN}
-                  max={FLAT_MAX}
-                  onChange={onFlatPriceChange}
-                />
-                <p className={`inline-help ${selectedProject && flatPrice > totalAffordability ? "inline-help-warn" : ""}`}>
-                  {selectedProject ? <Icon name="check" /> : <Icon name="building" />}
-                  {selectedProject
-                    ? flatPrice <= totalAffordability
-                      ? "Target price is within your estimated affordability"
-                      : "Target price exceeds your estimated affordability"
-                    : "Choose a BTO project to compare against a launch price range"}
-                </p>
-              </div>
-              <div className="affordability-callout">
-                <div>
-                  <p>
-                    Based on your inputs, your estimated total affordability is
-                    <span
-                      className="bto-breakdown-info"
-                      onMouseEnter={() => setShowAffordTip(true)}
-                      onMouseLeave={() => setShowAffordTip(false)}
-                      onFocus={() => setShowAffordTip(true)}
-                      onBlur={() => setShowAffordTip(false)}
-                      aria-describedby={affordTipId}
-                      tabIndex={0}
-                    >
-                      <Icon name="info" />
-                      {showAffordTip && (
-                        <span id={affordTipId} className="bto-tooltip" role="tooltip">
-                          Total affordability = (Loan + Grant) / (1 - Downpayment). Assumes downpayment is covered by CPF/cash savings.
-                        </span>
-                      )}
-                    </span>
-                  </p>
-                  <strong>{currency(totalAffordability)}</strong>
-                  <span className="affordability-note">Loan + grant: {currency(loanAmount + ehgGrant)}</span>
-                  {selectedProject && (
-                    (selectedProject.flatVariants.find((v) => v.type === flatType)?.basePrice ?? 0) > totalAffordability
-                  ) && (
-                    <span className="affordability-warning">
-                      <Icon name="alert" />
-                      Selected project exceeds your affordability
-                    </span>
-                  )}
-                </div>
-                <div className="affordability-illustration" aria-hidden="true">
-                  <svg viewBox="0 0 160 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    {/* Left building */}
-                    <rect x="12" y="48" width="42" height="62" rx="2" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.5" />
-                    <rect x="18" y="56" width="10" height="10" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    <rect x="34" y="56" width="10" height="10" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    <rect x="18" y="72" width="10" height="10" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    <rect x="34" y="72" width="10" height="10" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    {/* Main house */}
-                    <rect x="58" y="28" width="80" height="82" rx="2" fill="#f8fafc" stroke="#cbd5e1" strokeWidth="1.5" />
-                    {/* Roof */}
-                    <path d="M55 28 L98 4 L141 28 Z" fill="#f1f5f9" stroke="#94a3b8" strokeWidth="2" strokeLinejoin="round" />
-                    {/* Top windows */}
-                    <rect x="68" y="38" width="14" height="14" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    <rect x="92" y="38" width="14" height="14" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    <rect x="116" y="38" width="14" height="14" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    {/* Bottom left window */}
-                    <rect x="68" y="62" width="14" height="14" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    {/* Door/Garage */}
-                    <rect x="90" y="58" width="28" height="52" rx="1" fill="#e2e8f0" stroke="#cbd5e1" strokeWidth="1" />
-                    <line x1="104" y1="58" x2="104" y2="110" stroke="#cbd5e1" strokeWidth="1" />
-                    <line x1="90" y1="72" x2="118" y2="72" stroke="#cbd5e1" strokeWidth="1" />
-                    <line x1="90" y1="86" x2="118" y2="86" stroke="#cbd5e1" strokeWidth="1" />
-                    <line x1="90" y1="100" x2="118" y2="100" stroke="#cbd5e1" strokeWidth="1" />
-                    {/* Bushes */}
-                    <circle cx="20" cy="112" r="8" fill="#bbf7d0" />
-                    <circle cx="40" cy="115" r="10" fill="#86efac" />
-                    <circle cx="70" cy="113" r="7" fill="#bbf7d0" />
-                    <circle cx="135" cy="114" r="9" fill="#bbf7d0" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="plan-section-card">
-            <PlanStepHeader
-              step={3}
-              title="Milestones & Payments"
-              description="Review the key milestones, estimated amounts and select your expected dates."
-            />
-            <div className="milestone-table-wrap">
-              <table className="milestone-table">
-                <thead>
-                  <tr>
-                    <th>Milestone</th>
-                    <th>Description</th>
-                    <th>Amount</th>
-                    <th>Your Expected Date</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {effectiveTimeline.map((item, index) => (
-                    <MilestoneRow
-                      key={item.label}
-                      item={item}
-                      index={index}
-                      confirmedDate={confirmedMilestoneDates[item.label]}
-                      isComplete={completedMilestones.includes(item.label)}
-                      onToggleComplete={onToggleMilestoneComplete}
-                      onMilestoneDateChange={onMilestoneDateChange}
-                      onTogglePaymentFunding={handleTogglePaymentFunding}
-                      onPaymentTotalChange={handlePaymentTotalChange}
-                    />
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="milestone-footer">
-              <span>Dates are estimates only. Click any amount to edit it to your actual figure.</span>
-            </div>
-          </Card>
+          </section>
         </div>
 
         <aside className="plan-side">
-          <Card className="summary-card">
-            <div className="summary-head">
-              <h2>Plan Summary</h2>
-              <Pill tone="green">On Track</Pill>
-            </div>
-            <div className="summary-price">
-              <span>Target Flat Price</span>
-              <strong>{currency(flatPrice)}</strong>
-            </div>
-            <SummaryLine label="Estimated Total Price" value={currency(estimatedTotalPrice)} />
-            <SummaryLine
-              label="Estimated Monthly Payment"
-              value={currency(monthlyPayment)}
-              tooltip="Monthly Payment = Loan Principal × [Monthly Rate × (1 + Monthly Rate)^Months] / [(1 + Monthly Rate)^Months − 1]"
-            />
-            <FundingBreakdown
-              hdbLoan={loanPrincipalNeeded}
-              hdbLoanShare={hdbLoanShare}
-              cpf={cpfTotal}
-              cpfShare={cpfShare}
-              cash={cashTotal}
-              cashShare={cashShare}
-              ehgGrant={ehgGrant}
-              grantShare={grantShare}
-            />
-          </Card>
+          <div className="plan-summary">
+            <p className="budget-lead">Target price</p>
+            <p className="plan-summary-figure">{currency(flatPrice)}</p>
 
-          <Card title="Key Dates" icon="calendar">
-            <div className="key-date-list">
+            {!known ? (
+              <p className="plan-status plan-status-unknown">
+                <Icon name="info" />
+                Not checked against your budget yet
+              </p>
+            ) : gap > 0 ? (
+              <p className="plan-status plan-status-short">
+                <Icon name="alert" />
+                {currency(gap)} short
+              </p>
+            ) : (
+              <p className="plan-status plan-status-good">
+                <Icon name="check" />
+                Fits your budget
+              </p>
+            )}
+
+            {loan > 0 && (
+              <p className="budget-monthly">
+                About <strong>{currency(Math.round(monthlyPayment))} a month</strong> for {tenure} years.
+              </p>
+            )}
+
+            <div
+              className="budget-bar"
+              role="img"
+              aria-label={`Paid for by ${fundingParts.map((part) => `${part.label} ${currency(part.amount)}`).join(", ")}`}
+            >
+              {fundingParts.map((part) => (
+                <span
+                  key={part.key}
+                  className={`budget-bar-part ${part.tone}`}
+                  style={{ flexGrow: part.amount / fundingTotal }}
+                />
+              ))}
+            </div>
+            <dl className="budget-legend">
+              {fundingParts.map((part) => (
+                <div key={part.key} className="budget-legend-row">
+                  <dt>
+                    <span className={`budget-swatch ${part.tone}`} aria-hidden="true" />
+                    {part.label}
+                  </dt>
+                  <dd>{currency(part.amount)}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {known && gap > 0 && (
+              <p className="plan-explain">
+                Your loan, grant and savings do not reach this price. A lower target, more savings or a different
+                project would close the gap.
+              </p>
+            )}
+            {!known && (
+              <p className="plan-explain">
+                These figures use the downpayment rule alone. Add your age and savings to check what you can
+                borrow.
+              </p>
+            )}
+            <button type="button" className="budget-link" onClick={onOpenBudget}>
+              {known ? "Change income or savings" : "Set your budget"}
+            </button>
+          </div>
+
+          <div className="plan-dates">
+            <h2>Key dates</h2>
+            <dl>
               {timeline.slice(0, 4).map((item) => (
                 <div key={item.label}>
-                  <span>
-                    <Icon name="calendar" />
-                    {item.label}
-                  </span>
-                  <strong>
+                  <dt>{item.label}</dt>
+                  <dd>
                     {confirmedMilestoneDates[item.label]
                       ? formatDateInputDisplay(confirmedMilestoneDates[item.label])
                       : item.date}
-                  </strong>
+                  </dd>
                 </div>
               ))}
-            </div>
-          </Card>
-
-
+            </dl>
+          </div>
         </aside>
+
+        <section className="plan-block plan-payments">
+          <h2>Payments along the way</h2>
+          <p className="plan-explain">
+            Dates are estimates. Select an amount to replace it with your actual figure, and tick each step off
+            as you finish it.
+          </p>
+          <div className="milestone-table-wrap">
+            <table className="milestone-table">
+              <thead>
+                <tr>
+                  <th>Step</th>
+                  <th>What you pay</th>
+                  <th>Amount</th>
+                  <th>Your date</th>
+                  <th>Done</th>
+                </tr>
+              </thead>
+              <tbody>
+                {effectiveTimeline.map((item, index) => (
+                  <MilestoneRow
+                    key={item.label}
+                    item={item}
+                    index={index}
+                    confirmedDate={confirmedMilestoneDates[item.label]}
+                    isComplete={completedMilestones.includes(item.label)}
+                    onToggleComplete={onToggleMilestoneComplete}
+                    onMilestoneDateChange={onMilestoneDateChange}
+                    onTogglePaymentFunding={handleTogglePaymentFunding}
+                    onPaymentTotalChange={handlePaymentTotalChange}
+                  />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
       </div>
     </section>
   );
@@ -554,10 +443,13 @@ function MoneyInput({
   onChange: (value: number) => void;
 }) {
   const [text, setText] = useState(String(value));
+  const [syncedValue, setSyncedValue] = useState(value);
 
-  useEffect(() => {
+  // Follow the value when it changes from outside, such as choosing a project.
+  if (value !== syncedValue) {
+    setSyncedValue(value);
     setText(String(value));
-  }, [value]);
+  }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value;
@@ -695,26 +587,6 @@ function SegmentedField({
   );
 }
 
-function PlanStepHeader({
-  step,
-  title,
-  description,
-}: {
-  step: number;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="plan-step-header">
-      <span>{step}</span>
-      <div>
-        <h2>{title}</h2>
-        <p>{description}</p>
-      </div>
-    </div>
-  );
-}
-
 function MilestoneRow({
   item,
   index,
@@ -837,96 +709,10 @@ function MilestoneRow({
           <span className="milestone-status-box">
             {isComplete ? <Icon name="check" /> : <span className="milestone-status-empty" />}
           </span>
-          {isComplete ? "Done" : "Confirm"}
+          {isComplete ? "Done" : "Mark done"}
         </button>
       </td>
     </tr>
-  );
-}
-
-function FundingBreakdown({
-  hdbLoan,
-  hdbLoanShare,
-  cpf,
-  cpfShare,
-  cash,
-  cashShare,
-  ehgGrant,
-  grantShare,
-}: {
-  hdbLoan: number;
-  hdbLoanShare: number;
-  cpf: number;
-  cpfShare: number;
-  cash: number;
-  cashShare: number;
-  ehgGrant: number;
-  grantShare: number;
-}) {
-  return (
-    <div className="funding-box">
-      <h3>Estimated Funding Breakdown</h3>
-      <div className="funding-content">
-        <div
-          className="donut"
-          style={{
-            ["--loan" as string]: `${hdbLoanShare * 3.6}deg`,
-            ["--cpf" as string]: `${(hdbLoanShare + cpfShare) * 3.6}deg`,
-            ["--cash" as string]: `${(hdbLoanShare + cpfShare + cashShare) * 3.6}deg`,
-          }}
-          aria-hidden="true"
-        />
-        <div className="funding-lines">
-          <FundingLegendItem label={`HDB Loan (${hdbLoanShare}%)`} value={currency(hdbLoan)} color="oklch(var(--color-futuristic-teal))" />
-          <FundingLegendItem label={`CPF Usage (${cpfShare}%)`} value={currency(cpf)} color="oklch(70% 0.13 178)" />
-          <FundingLegendItem label={`Cash (${cashShare}%)`} value={currency(cash)} color="oklch(68% 0.11 292)" />
-          <FundingLegendItem label={`EHG Grant (${grantShare}%)`} value={currency(ehgGrant)} color="oklch(75% 0.12 95)" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function SummaryLine({ label, value, tooltip }: { label: string; value: string; tooltip?: string }) {
-  const [showTip, setShowTip] = useState(false);
-  const tipId = useId();
-  return (
-    <div className="summary-line">
-      <span>
-        {label}
-        {tooltip && (
-          <span
-            className="bto-breakdown-info"
-            onMouseEnter={() => setShowTip(true)}
-            onMouseLeave={() => setShowTip(false)}
-            onFocus={() => setShowTip(true)}
-            onBlur={() => setShowTip(false)}
-            aria-describedby={tipId}
-            tabIndex={0}
-          >
-            <Icon name="info" />
-            {showTip && (
-              <span id={tipId} className="bto-tooltip" role="tooltip">
-                {tooltip}
-              </span>
-            )}
-          </span>
-        )}
-      </span>
-      <strong>{value}</strong>
-    </div>
-  );
-}
-
-function FundingLegendItem({ label, value, color }: { label: string; value: string; color: string }) {
-  return (
-    <div className="funding-legend-item">
-      <div className="funding-legend-row">
-        <span className="funding-legend-dot" style={{ backgroundColor: color }} />
-        <span>{label}</span>
-      </div>
-      <strong>{value}</strong>
-    </div>
   );
 }
 

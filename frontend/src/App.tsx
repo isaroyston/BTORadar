@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { BtoTab } from "./components/BtoTab";
+import { BudgetTab } from "./components/BudgetTab";
 import { Navigation } from "./components/Navigation";
 import { OverviewTab } from "./components/OverviewTab";
 import { PurchasePlanTab } from "./components/PurchasePlanTab";
@@ -22,7 +23,6 @@ import { useBtoProjects } from "./hooks/useBtoProjects";
 import { POLICY_CONFIG } from "./policies/policyConfig";
 import type {
   FinancingType,
-  BtoDecisionScore,
   BtoScoreMode,
   BtoScorePreset,
   FlatType,
@@ -33,11 +33,19 @@ import {
   filterBtoProjects,
   getActiveYear,
   getAvailableYears,
-  getEhgBand,
 } from "./utils/bto";
 import {
+  calculateFinancingEstimate,
+  type FinancingEstimateInput,
+} from "./utils/affordability";
+import {
+  loadBudgetInputs,
+  saveBudgetInputs,
+  type BudgetInputs,
+} from "./utils/budgetStorage";
+import { calculateEhgAssessment } from "./utils/ehg";
+import {
   BTO_SCORE_PRESET_DETAILS,
-  scoreBtoProject,
   type BtoScoreWeights,
 } from "./utils/btoScoring";
 import { parseLaunchMonthInput } from "./utils/date";
@@ -48,6 +56,8 @@ import {
   loadPlannerSnapshot,
   savePlannerSnapshot,
 } from "./utils/planStorage";
+
+const APPLICATION_FEE = 10;
 
 function App() {
   const [initialPlanResult] = useState(() => {
@@ -65,7 +75,10 @@ function App() {
   });
   const initialPlan = initialPlanResult.snapshot;
 
-  const [activeTab, setActiveTabState] = useState<TabKey>(getInitialTab());
+  const [activeTab, setActiveTabState] = useState<TabKey>(() =>
+    getInitialTab(Boolean(initialPlan?.selectedBtoProjectId))
+  );
+  const [budget, setBudget] = useState<BudgetInputs>(loadBudgetInputs);
   const [combinedIncome, setCombinedIncome] = useState(
     initialPlan?.combinedIncome ?? 6000
   );
@@ -127,13 +140,20 @@ function App() {
     retry: retryBto,
   } = useBtoProjects();
 
-  const loanAmount = combinedIncome * LOAN_MULTIPLIER;
-  const ehgBand = useMemo(() => getEhgBand(combinedIncome), [combinedIncome]);
-  const ehgGrant = ehgBand?.grantAmount ?? 0;
+  const ehgAssessment = useMemo(
+    () =>
+      calculateEhgAssessment({
+        mode: budget.firstTimer ? "family-estimate" : "none",
+        assessedAverageMonthlyIncome: combinedIncome,
+        confirmedAmount: null,
+        familyEligibilityConfirmed: true,
+      }),
+    [budget.firstTimer, combinedIncome]
+  );
+  const ehgGrant = ehgAssessment.amount ?? 0;
 
   const downpaymentRule = POLICY_CONFIG.downpaymentRules[financing][scheme];
   const downpaymentTotal = downpaymentRule.signing + downpaymentRule.key;
-  const totalAffordability = Math.round((loanAmount + ehgGrant) / (1 - downpaymentTotal));
   const signingAmount = flatPrice * downpaymentRule.signing;
   const keyAmount = flatPrice * downpaymentRule.key;
   const minCashSigning = flatPrice * downpaymentRule.minCashSigning;
@@ -142,6 +162,59 @@ function App() {
   const optionFee = POLICY_CONFIG.fees.optionFeeByFlatType[flatType];
   const surveyFee = POLICY_CONFIG.fees.surveyFeeByFlatType[flatType];
   const fireInsurance = POLICY_CONFIG.fees.fireInsuranceByFlatType[flatType];
+
+  // The price ceiling comes from the financing estimate once age and savings are known.
+  // Until then the old income-only rule stands in, and BTO Radar says so.
+  const budgetInput = useMemo<FinancingEstimateInput>(
+    () => ({
+      financing,
+      purchasePrice: flatPrice,
+      grossMonthlyIncome: combinedIncome,
+      availableCash: budget.cash,
+      availableCpfOa: budget.cpfOa,
+      grantAmount: ehgGrant,
+      monthlyDebtPayments: 0,
+      monthlyPropertyLoanPayments: 0,
+      bankThereafterRatePercent: loanInterestRate,
+      cashOnlyPurchaseAmount: optionFee,
+      fixedAdditionalCosts: APPLICATION_FEE + surveyFee + fireInsurance,
+      cashOnlyCosts: APPLICATION_FEE,
+      ageForLoanRules: budget.age,
+      outstandingHousingLoans: 0,
+      requestedTenureYears: loanTenureYears,
+      repaymentRatePercent: loanInterestRate,
+    }),
+    [
+      budget.age,
+      budget.cash,
+      budget.cpfOa,
+      combinedIncome,
+      ehgGrant,
+      financing,
+      fireInsurance,
+      flatPrice,
+      loanInterestRate,
+      loanTenureYears,
+      optionFee,
+      surveyFee,
+    ]
+  );
+  const targetEstimate = useMemo(() => calculateFinancingEstimate(budgetInput), [budgetInput]);
+  const budgetMaxPrice = targetEstimate.maxPurchasePrice;
+  const budgetAtMax = useMemo(
+    () =>
+      budgetMaxPrice === null
+        ? null
+        : calculateFinancingEstimate({ ...budgetInput, purchasePrice: budgetMaxPrice }),
+    [budgetInput, budgetMaxPrice]
+  );
+  const budgetKnown = budgetMaxPrice !== null && budgetAtMax !== null;
+  const loanAmount = budgetKnown
+    ? Math.round(budgetAtMax.loanForTarget ?? 0)
+    : combinedIncome * LOAN_MULTIPLIER;
+  const totalAffordability = budgetKnown
+    ? Math.round(budgetMaxPrice)
+    : Math.round((loanAmount + ehgGrant) / (1 - downpaymentTotal));
   const selectedBtoProject = useMemo(
     () =>
       selectedBtoProjectId
@@ -205,42 +278,11 @@ function App() {
     () => filterBtoProjects(btoProjects, activeYear, townQuery, flatType),
     [activeYear, btoProjects, flatType, townQuery]
   );
-  const selectedDecisionScore = useMemo<BtoDecisionScore | null>(() => {
-    if (!selectedBtoProject) return null;
-
-    const cohortProjects = btoProjects.filter(
-      (project) => project.launchMonth === selectedBtoProject.launchMonth
-    );
-
-    return scoreBtoProject(
-      selectedBtoProject,
-      {
-        flatType,
-        loanAmount,
-        ehgGrant,
-        totalAffordability,
-        cohortProjects,
-      },
-      "buyer-fit",
-      btoScorePreset,
-      btoScoreWeights
-    );
-  }, [
-    btoProjects,
-    btoScorePreset,
-    btoScoreWeights,
-    ehgGrant,
-    flatType,
-    loanAmount,
-    selectedBtoProject,
-    totalAffordability,
-  ]);
-
   const setActiveTab = (tab: TabKey) => {
     setActiveTabState(tab);
 
     const url = new URL(window.location.href);
-    if (tab === "overview") {
+    if (tab === "budget") {
       url.searchParams.delete("tab");
     } else {
       url.searchParams.set("tab", tab);
@@ -269,6 +311,14 @@ function App() {
   const handleRetryBto = () => {
     retryBto();
     setActiveTab("bto");
+  };
+
+  const handleBudgetChange = (patch: Partial<BudgetInputs>) => {
+    setBudget((current) => {
+      const next = { ...current, ...patch };
+      saveBudgetInputs(next);
+      return next;
+    });
   };
 
   const handleIncomeChange = (value: number) => {
@@ -386,20 +436,31 @@ function App() {
         onSelectTab={setActiveTab}
       />
 
-      <main className="min-w-0 overflow-x-hidden px-5 pb-14 pt-24 md:px-8 lg:ml-[280px] lg:px-8 lg:pt-8 xl:px-10">
+      <main className="min-w-0 overflow-x-hidden px-5 pb-28 pt-24 md:px-8 lg:pb-14 lg:ml-[280px] lg:px-8 lg:pt-8 xl:px-10">
         <div className="mx-auto w-full max-w-[1720px] space-y-8">
+        {activeTab === "budget" && (
+          <BudgetTab
+            combinedIncome={combinedIncome}
+            budget={budget}
+            financing={financing}
+            loanTenureYears={loanTenureYears}
+            estimateAtMax={budgetAtMax}
+            maxPrice={budgetMaxPrice}
+            ehg={ehgAssessment}
+            onIncomeChange={handleIncomeChange}
+            onBudgetChange={handleBudgetChange}
+            onSeeProjects={() => setActiveTab("bto")}
+            onOpenPlan={() => setActiveTab("plan")}
+          />
+        )}
+
         {activeTab === "overview" && (
           <OverviewTab
-            combinedIncome={combinedIncome}
-            loanAmount={loanAmount}
-            ehgGrant={ehgGrant}
-            totalAffordability={totalAffordability}
+            budgetKnown={budgetKnown}
+            budgetCeiling={totalAffordability}
             selectedProject={selectedBtoProject}
-            flatType={flatType}
             flatPrice={flatPrice}
-            decisionScore={selectedDecisionScore}
-            completedMilestoneCount={activeCompletedMilestones.length}
-            totalMilestoneCount={timeline.length}
+            fundingGap={budgetKnown ? targetEstimate.fundingGap : null}
             timeline={timeline}
             completedMilestones={activeCompletedMilestones}
             onSelectTab={setActiveTab}
@@ -409,10 +470,10 @@ function App() {
         {activeTab === "plan" && (
           <PurchasePlanTab
             selectedProject={selectedBtoProject}
-            combinedIncome={combinedIncome}
-            loanAmount={loanAmount}
             ehgGrant={ehgGrant}
-            totalAffordability={totalAffordability}
+            targetEstimate={targetEstimate}
+            budgetKnown={budgetKnown}
+            budget={budget}
             flatPrice={flatPrice}
             flatType={flatType}
             financing={financing}
@@ -424,16 +485,14 @@ function App() {
             minCashSigning={minCashSigning}
             signingCpf={signingCpf}
             keyCpf={keyCpf}
-            optionFee={optionFee}
-            surveyFee={surveyFee}
-            fireInsurance={fireInsurance}
             downpaymentNote={downpaymentRule.note}
             timeline={timeline}
             completedMilestones={activeCompletedMilestones}
             confirmedMilestoneDates={activeConfirmedMilestoneDates}
             planStorageStatus={planStorageStatus}
             planStorageError={planStorageError}
-            onIncomeChange={handleIncomeChange}
+            onOpenBudget={() => setActiveTab("budget")}
+            onOpenRadar={() => setActiveTab("bto")}
             onFlatPriceChange={handleFlatPriceChange}
             onFlatTypeChange={setFlatType}
             onFinancingChange={handleFinancingChange}
@@ -444,6 +503,18 @@ function App() {
             onToggleMilestoneComplete={handleToggleMilestoneComplete}
             onMilestoneDateChange={handleMilestoneDateChange}
           />
+        )}
+
+        {activeTab === "bto" && !budgetKnown && (
+          <div className="budget-notice" role="note">
+            <p>
+              The budget labels below use a rough guess from income alone. Add your age and savings for a real
+              price ceiling.
+            </p>
+            <button type="button" className="budget-link" onClick={() => setActiveTab("budget")}>
+              Set your budget
+            </button>
+          </div>
         )}
 
         {activeTab === "bto" && (
@@ -496,9 +567,11 @@ function getDefaultApplicationMonth() {
   )}`;
 }
 
-function getInitialTab(): TabKey {
+// New visitors start at the budget; someone returning to a chosen project lands on their overview.
+function getInitialTab(hasSavedProject: boolean): TabKey {
   const tab = new URLSearchParams(window.location.search).get("tab");
-  return tab === "plan" || tab === "bto" || tab === "sources" || tab === "overview" ? tab : "overview";
+  if (tab === "plan" || tab === "bto" || tab === "sources" || tab === "overview" || tab === "budget") return tab;
+  return hasSavedProject ? "overview" : "budget";
 }
 
 function getLoanTenureMax(financing: FinancingType) {
