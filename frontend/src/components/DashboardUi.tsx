@@ -49,17 +49,27 @@ type PillProps = {
 
 export function PageHeader({
   title,
+  accent,
   subtitle,
   action,
 }: {
   title: string;
+  accent?: string;
   subtitle: string;
   action?: ReactNode;
 }) {
   return (
     <header className="page-header">
       <div>
-        <h1>{title}</h1>
+        <h1>
+          {title}
+          {accent && (
+            <>
+              {" "}
+              <em>{accent}</em>
+            </>
+          )}
+        </h1>
         <p>{subtitle}</p>
       </div>
       {action && <div className="page-header-action">{action}</div>}

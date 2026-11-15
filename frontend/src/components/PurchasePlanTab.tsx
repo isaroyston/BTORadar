@@ -201,7 +201,8 @@ export function PurchasePlanTab({
   return (
     <section className="dashboard-page">
       <PageHeader
-        title="Plan"
+        title="Make it"
+        accent="add up."
         subtitle="The flat you are aiming for, how you will pay, and what is due when."
         action={
           <div className="plan-actions">

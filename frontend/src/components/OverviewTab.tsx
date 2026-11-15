@@ -38,7 +38,7 @@ export function OverviewTab({
 
   return (
     <section className="dashboard-page">
-      <PageHeader title="Overview" subtitle="Where you are, and what comes next." />
+      <PageHeader title="Where you" accent="stand." subtitle="What is done, and what comes next." />
 
       {selectedProject && nextStep && (
         <div className="overview-next">

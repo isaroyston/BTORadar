@@ -47,7 +47,8 @@ export function SourcesTab() {
   return (
     <section className="dashboard-page">
       <PageHeader
-        title="Sources"
+        title="Where the numbers"
+        accent="come from."
         subtitle="Official links and policy documents that power this planner."
       />
 

@@ -53,7 +53,8 @@ export function BudgetTab({
   return (
     <>
       <PageHeader
-        title="Your budget"
+        title="What can you"
+        accent="afford?"
         subtitle="Four answers give you a price ceiling. Everything else in BTO Radar is measured against it."
       />
 
@@ -211,7 +212,7 @@ function BudgetAnswer({
   return (
     <>
       <p className="budget-lead">You could buy a flat priced up to</p>
-      <p className="budget-figure">{currency(ceiling)}</p>
+      <p key={ceiling} className="budget-figure">{currency(ceiling)}</p>
       {monthly !== null && tenure !== null && loan > 0 && (
         <p className="budget-monthly">
           That is about <strong>{currency(Math.round(monthly))} a month</strong> for {tenure} years.

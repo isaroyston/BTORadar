@@ -8,7 +8,7 @@
     --color-hdb-bg: 98.6% 0.006 75;
     --color-heritage-navy: 22% 0.04 35;
     --color-warm-stone: 44% 0.03 45;
-    --color-futuristic-teal: 58% 0.18 260;
+    --color-futuristic-teal: 52% 0.21 18;
     --color-electric-mint: 68% 0.16 250;
     --surface: oklch(100% 0 0);
     --surface-raised: oklch(98.6% 0.008 75);
@@ -28,8 +28,8 @@
     --badge-standard-text: oklch(29% 0.075 154);
     --nav-bg: oklch(99.4% 0.004 75);
     --page-bg: oklch(var(--color-hdb-bg));
-    --blue-soft: oklch(95.2% 0.035 255);
-    --blue-line: oklch(58% 0.18 260 / 0.24);
+    --blue-soft: oklch(95.5% 0.03 20);
+    --blue-line: oklch(52% 0.21 18 / 0.24);
     --soft-shadow: 0 1px 2px oklch(24% 0.05 258 / 0.08);
   }
 
@@ -4178,5 +4178,371 @@
 
   .milestone-table .milestone-status {
     white-space: nowrap;
+  }
+}
+
+/* The bold layer: a chocolate sidebar and answer panels, one vivid accent, big headlines, radar rings. */
+@layer components {
+  :root {
+    --cocoa: oklch(22% 0.04 35);
+    --cocoa-lift: oklch(29% 0.045 35);
+    --cream: oklch(96% 0.02 80);
+    --accent-bright: oklch(66% 0.21 18);
+    --gold: oklch(80% 0.11 78);
+  }
+
+  /* Headlines */
+  .page-header h1 {
+    max-width: 16ch;
+    font-size: clamp(2.5rem, 5.2vw, 4.25rem);
+    font-weight: 800;
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+  }
+
+  .page-header h1 em {
+    font-style: normal;
+    color: oklch(var(--color-futuristic-teal));
+  }
+
+  .page-header p {
+    margin-top: 1rem;
+    font-size: 1.125rem;
+  }
+
+  /* Sidebar and phone bars */
+  .app-nav {
+    border-right: 0;
+    background: var(--cocoa);
+  }
+
+  .app-nav .brand-radar,
+  .mobile-nav .brand-radar {
+    --surface: transparent;
+    border-color: var(--cream);
+    color: var(--cream);
+  }
+
+  .app-nav .brand-wordmark {
+    color: var(--cream);
+  }
+
+  .app-nav .brand-wordmark strong:first-child {
+    color: var(--accent-bright);
+  }
+
+  .nav-item-idle {
+    color: oklch(96% 0.02 80 / 0.78);
+  }
+
+  .nav-item-idle:hover {
+    background: oklch(100% 0 0 / 0.08);
+    color: var(--cream);
+  }
+
+  .nav-item-active {
+    background: oklch(var(--color-futuristic-teal));
+    color: oklch(100% 0 0);
+  }
+
+  .mobile-nav {
+    border-bottom: 0;
+    background: var(--cocoa);
+    color: var(--cream);
+  }
+
+  .mobile-tabs {
+    border-top: 0;
+    background: var(--cocoa);
+  }
+
+  .mobile-tab {
+    color: oklch(96% 0.02 80 / 0.7);
+  }
+
+  .mobile-tab[aria-current="page"] {
+    background: oklch(var(--color-futuristic-teal));
+    color: oklch(100% 0 0);
+  }
+
+  /* Primary actions take the accent */
+  .budget-cta,
+  .radar-plan-btn,
+  .btn-primary {
+    background: oklch(var(--color-futuristic-teal));
+    color: oklch(100% 0 0);
+  }
+
+  .budget-cta:hover,
+  .radar-plan-btn:hover,
+  .btn-primary:hover {
+    background: var(--cocoa);
+  }
+
+  .radar-plan-btn[aria-pressed="true"] {
+    background: var(--cocoa);
+  }
+
+  /* Answer panels: chocolate ground, cream type, radar rings and a blip */
+  .budget-answer,
+  .plan-summary,
+  .overview-next {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    border: 0;
+    background: var(--cocoa);
+    color: var(--cream);
+    box-shadow: 0 36px 64px -40px oklch(22% 0.04 35 / 0.75);
+  }
+
+  .budget-answer::before,
+  .plan-summary::before,
+  .overview-next::before {
+    content: "";
+    position: absolute;
+    top: -11rem;
+    right: -11rem;
+    z-index: -1;
+    width: 26rem;
+    height: 26rem;
+    border-radius: 50%;
+    background: repeating-radial-gradient(
+      circle,
+      transparent 0 2.4rem,
+      oklch(100% 0 0 / 0.06) 2.4rem 2.55rem
+    );
+  }
+
+  .budget-answer::after,
+  .plan-summary::after,
+  .overview-next::after {
+    content: "";
+    position: absolute;
+    top: 1.6rem;
+    right: 1.7rem;
+    z-index: -1;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: var(--accent-bright);
+    animation: radar-blip 2.6s ease-out infinite;
+  }
+
+  @keyframes radar-blip {
+    0% {
+      box-shadow: 0 0 0 0 oklch(66% 0.21 18 / 0.55);
+    }
+    70%,
+    100% {
+      box-shadow: 0 0 0 1.5rem oklch(66% 0.21 18 / 0);
+    }
+  }
+
+  @keyframes figure-pop {
+    from {
+      opacity: 0.4;
+      transform: translateY(0.4rem) scale(0.97);
+    }
+  }
+
+  .budget-figure {
+    transform-origin: left center;
+    animation: figure-pop 420ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .budget-answer .budget-lead,
+  .plan-summary .budget-lead,
+  .overview-next .budget-lead {
+    color: var(--gold);
+  }
+
+  .budget-answer .budget-figure,
+  .plan-summary .plan-summary-figure,
+  .overview-next .overview-next-figure {
+    color: oklch(100% 0 0);
+  }
+
+  .budget-answer .budget-monthly,
+  .plan-summary .budget-monthly {
+    color: var(--cream);
+  }
+
+  .budget-answer .budget-monthly strong,
+  .plan-summary .budget-monthly strong {
+    color: oklch(100% 0 0);
+  }
+
+  .budget-answer .budget-legend-row,
+  .plan-summary .budget-legend-row {
+    border-bottom-color: oklch(100% 0 0 / 0.14);
+  }
+
+  .budget-answer .budget-legend-row dt,
+  .plan-summary .budget-legend-row dt {
+    color: oklch(96% 0.02 80 / 0.86);
+  }
+
+  .budget-answer .budget-legend-row dd,
+  .plan-summary .budget-legend-row dd {
+    color: oklch(100% 0 0);
+  }
+
+  .budget-part-loan {
+    background: var(--accent-bright);
+  }
+
+  .budget-part-grant {
+    background: var(--gold);
+  }
+
+  .budget-part-cpf {
+    background: var(--cream);
+  }
+
+  .budget-part-cash {
+    background: oklch(80% 0.08 20);
+  }
+
+  .plan-part-short {
+    background: repeating-linear-gradient(135deg, oklch(100% 0 0 / 0.55) 0 4px, oklch(100% 0 0 / 0.14) 4px 8px);
+  }
+
+  .budget-answer .budget-limit h2,
+  .budget-answer .budget-waiting h2 {
+    color: oklch(100% 0 0);
+  }
+
+  .budget-answer .budget-limit p,
+  .budget-answer .budget-waiting p,
+  .plan-summary .plan-explain,
+  .overview-next .overview-next-detail {
+    color: oklch(96% 0.02 80 / 0.76);
+  }
+
+  .budget-answer .budget-link,
+  .plan-summary .budget-link {
+    color: var(--gold);
+  }
+
+  .budget-answer .budget-cta:hover,
+  .overview-next .budget-cta:hover {
+    background: var(--cream);
+    color: var(--cocoa);
+  }
+
+  .budget-answer .budget-disclosure {
+    border-top-color: oklch(100% 0 0 / 0.14);
+    color: oklch(96% 0.02 80 / 0.72);
+  }
+
+  .budget-answer .budget-disclosure summary {
+    color: var(--cream);
+  }
+
+  .plan-summary .plan-status-good {
+    background: oklch(46% 0.135 152 / 0.3);
+    color: oklch(88% 0.12 152);
+  }
+
+  .plan-summary .plan-status-short {
+    background: oklch(66% 0.21 18 / 0.26);
+    color: oklch(90% 0.07 20);
+  }
+
+  .plan-summary .plan-status-unknown {
+    background: oklch(100% 0 0 / 0.1);
+    color: var(--cream);
+  }
+
+  /* Radar: a little more presence */
+  .radar-launch-head h3 {
+    font-size: clamp(1.75rem, 3vw, 2.25rem);
+  }
+
+  .radar-card:hover {
+    transform: translateY(-3px);
+  }
+
+  .radar-card {
+    transition: border-color 160ms ease-out, box-shadow 200ms ease-out, transform 240ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .overview-step-text h2 {
+    font-size: 1.25rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .budget-answer::after,
+    .plan-summary::after,
+    .overview-next::after,
+    .budget-figure {
+      animation: none;
+    }
+
+    .radar-card:hover {
+      transform: none;
+    }
+  }
+}
+
+@layer components {
+  .radar-launch-head {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    overflow: hidden;
+    padding: clamp(1.4rem, 3vw, 2.25rem);
+    border-radius: 28px;
+    background: var(--cocoa);
+    color: var(--cream);
+  }
+
+  .radar-launch-head::before {
+    content: "";
+    position: absolute;
+    top: -12rem;
+    right: -8rem;
+    z-index: -1;
+    width: 30rem;
+    height: 30rem;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle, transparent 0 2.4rem, oklch(100% 0 0 / 0.06) 2.4rem 2.55rem);
+  }
+
+  .radar-launch-head h3 {
+    color: oklch(100% 0 0);
+  }
+
+  .radar-launch-head p {
+    color: oklch(96% 0.02 80 / 0.76);
+  }
+
+  .radar-launch-head .radar-launch-fit {
+    font-size: 1.0625rem;
+    color: var(--cream);
+  }
+
+  .radar-launch-fit strong {
+    display: block;
+    font-family: Gabarito, Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--gold);
+  }
+}
+
+@layer components {
+  .budget-answer .budget-lead,
+  .plan-summary .budget-lead,
+  .overview-next .budget-lead {
+    padding-right: 2rem;
   }
 }

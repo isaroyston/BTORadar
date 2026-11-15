@@ -151,8 +151,9 @@ export function BtoTab({
   return (
     <section className="dashboard-page bto-dashboard">
       <PageHeader
-        title="BTO Radar"
-        subtitle="Discover and compare BTO projects based on what matters to you."
+        title="Find a flat that"
+        accent="fits."
+        subtitle="Every project, measured against your budget and what matters to you."
         action={
           <div className="bto-header-actions">
             <SourceCreditLinks />
@@ -392,13 +393,33 @@ function ProjectDrilldown({
   const presetLabel =
     BTO_SCORE_PRESET_OPTIONS.find((option) => option.value === scorePreset)?.label ?? "Custom";
 
+  const shownCeiling = Math.floor(totalAffordability / 1000) * 1000;
+  const pricedProjects = launch.projects.filter((project) => getSelectedVariant(project, selectedFlatType));
+  const fittingCount = pricedProjects.filter(
+    (project) => (getSelectedVariant(project, selectedFlatType)?.basePrice ?? Infinity) <= shownCeiling
+  ).length;
+
   return (
     <div className="radar-launch-body bto-reveal">
       <div className="radar-launch-head">
-        <h3>{launch.key}</h3>
-        <p>
-          {launch.projects.length} {launch.projects.length === 1 ? "project" : "projects"},{" "}
-          {formatNumber(launch.totalUnits)} flats. Best match first.
+        <div>
+          <h3>{launch.key}</h3>
+          <p>
+            {launch.projects.length} {launch.projects.length === 1 ? "project" : "projects"},{" "}
+            {formatNumber(launch.totalUnits)} flats. Best match first.
+          </p>
+        </div>
+        <p className="radar-launch-fit">
+          {pricedProjects.length === 0 ? (
+            "No prices listed for this flat size yet"
+          ) : (
+            <>
+              <strong>
+                {fittingCount} of {pricedProjects.length}
+              </strong>{" "}
+              fit your {currency(shownCeiling)} budget
+            </>
+          )}
         </p>
       </div>
 
