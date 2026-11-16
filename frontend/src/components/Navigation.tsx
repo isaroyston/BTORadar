@@ -1,86 +1,106 @@
 import { TABS } from "../constants";
-import { Icon, type IconName } from "./DashboardUi";
 import type { TabKey } from "../types";
+import { Icon, type IconName } from "./DashboardUi";
 
 type NavigationProps = {
   activeTab: TabKey;
+  doneTabs: Set<TabKey>;
   onSelectTab: (tab: TabKey) => void;
 };
 
 const tabIcons: Record<TabKey, IconName> = {
   budget: "wallet",
-  overview: "home",
-  plan: "clipboard",
   bto: "building",
+  plan: "clipboard",
+  overview: "home",
   sources: "document",
 };
 
-const tabButtonClass = (activeTab: TabKey, tab: TabKey) =>
-  `nav-item ${
-    activeTab === tab
-      ? "nav-item-active"
-      : "nav-item-idle"
-  }`;
+// The first three sections are the journey, in order; the rest are places to check in.
+const JOURNEY: TabKey[] = ["budget", "bto", "plan"];
 
-export function Navigation({
-  activeTab,
-  onSelectTab,
-}: NavigationProps) {
+export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps) {
+  const journey = TABS.filter((tab) => JOURNEY.includes(tab.id));
+  const other = TABS.filter((tab) => !JOURNEY.includes(tab.id));
+
   return (
     <>
-      <nav className="app-nav hidden lg:flex">
-        <div>
-          <div className="brand-lockup">
-            <div className="brand-radar" aria-hidden="true">
-              <span />
-            </div>
-            <div className="brand-wordmark">
-              <strong>BTO</strong>
-              <strong>RADAR</strong>
-            </div>
-          </div>
-
-          <div className="nav-section">
-            {TABS.map((tab) => (
-              <button
-                key={tab.id}
-                type="button"
-                className={tabButtonClass(activeTab, tab.id)}
-                onClick={() => onSelectTab(tab.id)}
-              >
+      <nav className="side-nav" aria-label="Sections">
+        <Brand />
+        <ol className="side-steps">
+          {journey.map((tab, index) => {
+            const done = doneTabs.has(tab.id);
+            return (
+              <li key={tab.id}>
+                <button
+                  type="button"
+                  className="side-item"
+                  aria-current={activeTab === tab.id ? "page" : undefined}
+                  onClick={() => onSelectTab(tab.id)}
+                >
+                  <span className={done ? "side-step side-step-done" : "side-step"} aria-hidden="true">
+                    {done ? <Icon name="check" /> : index + 1}
+                  </span>
+                  <span>{tab.label}</span>
+                  {done && <span className="sr-only">(done)</span>}
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+        <div className="side-other">
+          {other.map((tab) => (
+            <button
+              key={tab.id}
+              type="button"
+              className="side-item side-item-quiet"
+              aria-current={activeTab === tab.id ? "page" : undefined}
+              onClick={() => onSelectTab(tab.id)}
+            >
+              <span className="side-icon" aria-hidden="true">
                 <Icon name={tabIcons[tab.id]} />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
+              </span>
+              <span>{tab.label}</span>
+            </button>
+          ))}
         </div>
-
-
+        <p className="side-note">Estimates only. HDB's HFE letter is the final word.</p>
       </nav>
 
-      <header className="mobile-nav lg:hidden">
-        <div className="flex items-center gap-2">
-          <div className="brand-radar brand-radar-small" aria-hidden="true">
-            <span />
-          </div>
-          <strong>BTO RADAR</strong>
-        </div>
+      <header className="top-bar">
+        <Brand />
       </header>
 
-      <nav className="mobile-tabs lg:hidden" aria-label="Sections">
+      <nav className="tab-bar" aria-label="Sections">
         {TABS.map((tab) => (
           <button
             key={tab.id}
             type="button"
-            className="mobile-tab"
+            className="tab-bar-item"
             aria-current={activeTab === tab.id ? "page" : undefined}
             onClick={() => onSelectTab(tab.id)}
           >
-            <Icon name={tabIcons[tab.id]} />
-            <span>{tab.id === "bto" ? "Radar" : tab.label}</span>
+            <span className="tab-bar-icon" aria-hidden="true">
+              <Icon name={tabIcons[tab.id]} />
+              {doneTabs.has(tab.id) && <span className="tab-bar-dot" />}
+            </span>
+            <span>{tab.label}</span>
           </button>
         ))}
       </nav>
     </>
+  );
+}
+
+function Brand() {
+  return (
+    <div className="brand">
+      <span className="brand-mark" aria-hidden="true">
+        <span />
+      </span>
+      <span className="brand-name">
+        BTO <strong>Radar</strong>
+      </span>
+    </div>
   );
 }

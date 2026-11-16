@@ -25,9 +25,11 @@
 ## Product Surfaces
 
 - **Budget**: five questions, one price ceiling, and what sets it.
-- **BTO Radar**: launches, project cards measured against the ceiling, compare, and send-to-plan.
-- **Plan**: target price, loan and downpayment choices, whether it fits, and payment milestones.
+- **Projects**: launches, project cards checked against the ceiling, a detail sheet, saved projects, and side-by-side compare.
+- **Plan**: target price, loan and downpayment choices, whether it fits, and a payment timeline to tick off. Saves automatically.
 - **Overview**: the next payment and where each step stands.
+
+The visual system is described in [`DESIGN.md`](DESIGN.md).
 
 ## Structure
 

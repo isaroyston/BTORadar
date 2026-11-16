@@ -1,119 +1,85 @@
-import { Card, Icon, PageHeader } from "./DashboardUi";
+import { Icon, PageHeader, type IconName } from "./DashboardUi";
 
-type ResourceLink = {
+type SourceLink = {
   label: string;
-  url: string;
+  href: string;
   description: string;
 };
 
-type PolicyDocument = {
-  label: string;
-  filename: string;
-  description: string;
-};
-
-const officialLinks: ResourceLink[] = [
+const dataSources: SourceLink[] = [
   {
     label: "RecordBTO",
-    url: "https://recordbto.com",
-    description: "Community-curated BTO launch records, prices, and reviews.",
+    href: "https://recordbto.com",
+    description: "Community-curated BTO launch records and prices.",
   },
   {
     label: "BTOHQ",
-    url: "https://btohq.com",
-    description: "BTO launch data and analytics for Singapore.",
+    href: "https://btohq.com",
+    description: "BTO launch data, ratings and nearby amenities.",
   },
   {
     label: "data.gov.sg",
-    url: "https://data.gov.sg",
-    description: "Singapore government open data portal with housing datasets.",
+    href: "https://data.gov.sg",
+    description: "Singapore's open data portal, used for MRT station locations.",
   },
 ];
 
-const policyDocuments: PolicyDocument[] = [
+const policyDocuments: SourceLink[] = [
   {
-    label: "CPF Allocation Rates 2026",
-    filename: "cpf_allocation_2026.pdf",
-    description: "CPF contribution rates for different age groups from 2026.",
+    label: "CPF allocation rates, 2026",
+    href: `/data/policies/${encodeURIComponent("cpf_allocation_2026.pdf")}`,
+    description: "How much of each salary goes into the CPF Ordinary Account, by age.",
   },
   {
-    label: "EHG Grant Amounts",
-    filename: "EHG amount Couples and Families Aug 2024.pdf",
-    description: "Enhanced CPF Housing Grant amounts for couples and families.",
+    label: "Enhanced CPF Housing Grant amounts",
+    href: `/data/policies/${encodeURIComponent("EHG amount Couples and Families Aug 2024.pdf")}`,
+    description: "Grant amounts for couples and families, by household income.",
   },
 ];
 
 export function SourcesTab() {
   return (
-    <section className="dashboard-page">
+    <section className="screen">
       <PageHeader
-        title="Where the numbers"
-        accent="come from."
-        subtitle="Official links and policy documents that power this planner."
+        title="Sources"
+        subtitle="Project data is scraped from public listings and refreshed by hand. Policy figures come from the documents below."
       />
 
-      <div className="sources-grid">
-        <Card title="Official Links" icon="external">
-          <div className="sources-card-content">
-            <p className="sources-intro">
-              Useful resources for BTO planning.
-            </p>
-            <div className="sources-list">
-              {officialLinks.map((link) => (
-                <a
-                  key={link.url}
-                  href={link.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="sources-link"
-                >
-                  <span className="sources-link-icon">
-                    <Icon name="external" />
-                  </span>
-                  <div className="sources-link-body">
-                    <strong>{link.label}</strong>
-                    <p>{link.description}</p>
-                  </div>
-                  <span className="sources-link-chevron">
-                    <Icon name="chevron" />
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </Card>
-
-        <Card title="Policy Documents" icon="document">
-          <div className="sources-card-content">
-            <p className="sources-intro">
-              PDFs referenced by the policy engine. These are kept in the repo for
-              offline reference.
-            </p>
-            <div className="sources-list">
-              {policyDocuments.map((doc) => (
-                <a
-                  key={doc.filename}
-                  href={`/data/policies/${encodeURIComponent(doc.filename)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="sources-link"
-                >
-                  <span className="sources-link-icon">
-                    <Icon name="document" />
-                  </span>
-                  <div className="sources-link-body">
-                    <strong>{doc.label}</strong>
-                    <p>{doc.description}</p>
-                  </div>
-                  <span className="sources-link-chevron">
-                    <Icon name="chevron" />
-                  </span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </Card>
+      <div className="sources">
+        <SourceList title="Project data" icon="external" links={dataSources} />
+        <SourceList title="Policy documents" icon="document" links={policyDocuments} />
       </div>
+
+      <div className="callout">
+        <p>
+          Everything here is an estimate. HDB's HFE letter and your bank's in-principle approval are the final word on
+          what you can borrow.
+        </p>
+      </div>
+    </section>
+  );
+}
+
+function SourceList({ title, icon, links }: { title: string; icon: IconName; links: SourceLink[] }) {
+  return (
+    <section className="card">
+      <h2 className="card-title">{title}</h2>
+      <ul className="link-list">
+        {links.map((link) => (
+          <li key={link.href}>
+            <a href={link.href} target="_blank" rel="noreferrer">
+              <span className="link-icon" aria-hidden="true">
+                <Icon name={icon} />
+              </span>
+              <span>
+                <strong>{link.label}</strong>
+                <span className="muted">{link.description}</span>
+              </span>
+              <Icon name="chevron" />
+            </a>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

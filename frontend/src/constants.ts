@@ -2,7 +2,7 @@ import type { FlatType, TabKey } from "./types";
 
 export const TABS: { id: TabKey; label: string }[] = [
   { id: "budget", label: "Budget" },
-  { id: "bto", label: "BTO Radar" },
+  { id: "bto", label: "Projects" },
   { id: "plan", label: "Plan" },
   { id: "overview", label: "Overview" },
   { id: "sources", label: "Sources" },

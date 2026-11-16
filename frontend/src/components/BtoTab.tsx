@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { FLAT_TYPE_OPTIONS } from "../constants";
 import type { BtoFlatVariant, BtoProject } from "../policies/policyConfig";
 import type {
@@ -21,7 +21,8 @@ import {
   BTO_SOURCE_CREDITS,
   getBtoProjectSourceLabel,
 } from "../utils/sourceCredits";
-import { Icon, PageHeader, type IconName } from "./DashboardUi";
+import { Icon, PageHeader } from "./DashboardUi";
+import { Segmented } from "./Segmented";
 
 type BtoTabProps = {
   btoLoading: boolean;
@@ -30,13 +31,16 @@ type BtoTabProps = {
   yearFilter: string;
   townQuery: string;
   filteredProjects: BtoProject[];
+  allProjects: BtoProject[];
   selectedFlatType: FlatType;
+  budgetKnown: boolean;
   loanAmount: number;
   ehgGrant: number;
   totalAffordability: number;
   scorePreset: BtoScorePreset;
   scoreWeights: BtoScoreWeights;
   selectedProjectId: string | null;
+  savedProjectIds: string[];
   onRetry: () => void;
   onYearFilterChange: (value: string) => void;
   onTownQueryChange: (value: string) => void;
@@ -44,7 +48,9 @@ type BtoTabProps = {
   onScorePresetChange: (value: BtoScorePreset) => void;
   onScoreWeightsChange: (value: BtoScoreWeights) => void;
   onSelectProject: (projectId: string) => void;
+  onToggleSaved: (projectId: string) => void;
   onResetFilters: () => void;
+  onOpenBudget: () => void;
 };
 
 type LaunchGroup = {
@@ -68,6 +74,7 @@ type CompareRow = {
 };
 
 const MAX_COMPARE_PROJECTS = 4;
+const SAVED_KEY = "__saved__";
 const SCORE_COMPONENT_ORDER = [
   "affordability",
   "centrality",
@@ -76,15 +83,10 @@ const SCORE_COMPONENT_ORDER = [
   "supply",
 ] as const;
 
-const SCORE_COMPONENT_ICONS: Record<
-  (typeof SCORE_COMPONENT_ORDER)[number],
-  IconName
-> = {
-  affordability: "wallet",
-  centrality: "chart",
-  commute: "metro",
-  wait: "clock",
-  supply: "cube",
+const TYPE_NOTES: Record<string, string> = {
+  standard: "Standard flats can be sold after the 5-year minimum occupation period.",
+  plus: "Plus flats have a 10-year minimum occupation period, and HDB recovers part of the subsidy if you sell.",
+  prime: "Prime flats have a 10-year minimum occupation period, stricter resale rules, and HDB recovers part of the subsidy if you sell.",
 };
 
 export function BtoTab({
@@ -94,13 +96,16 @@ export function BtoTab({
   yearFilter,
   townQuery,
   filteredProjects,
+  allProjects,
   selectedFlatType,
+  budgetKnown,
   loanAmount,
   ehgGrant,
   totalAffordability,
   scorePreset,
   scoreWeights,
   selectedProjectId,
+  savedProjectIds,
   onRetry,
   onYearFilterChange,
   onTownQueryChange,
@@ -108,15 +113,37 @@ export function BtoTab({
   onScorePresetChange,
   onScoreWeightsChange,
   onSelectProject,
+  onToggleSaved,
   onResetFilters,
+  onOpenBudget,
 }: BtoTabProps) {
   const [activeLaunch, setActiveLaunch] = useState<string | null>(null);
   const [comparedProjectIds, setComparedProjectIds] = useState<string[]>([]);
+  const [detailProjectId, setDetailProjectId] = useState<string | null>(null);
+  const [rankingOpen, setRankingOpen] = useState(false);
   const hasActiveFilters = yearFilter !== "latest" || townQuery.trim().length > 0;
+  const ceiling = Math.floor(totalAffordability / 1000) * 1000;
+  const savedSet = useMemo(() => new Set(savedProjectIds), [savedProjectIds]);
+
   const launchGroups = useMemo(
     () => groupProjectsByLaunch(filteredProjects, selectedFlatType, loanAmount, ehgGrant, totalAffordability, scorePreset, scoreWeights),
     [filteredProjects, selectedFlatType, loanAmount, ehgGrant, totalAffordability, scorePreset, scoreWeights]
   );
+  const savedGroup = useMemo<LaunchGroup | null>(() => {
+    const saved = allProjects.filter((project) => savedSet.has(project.id));
+    if (saved.length === 0) return null;
+    const groups = groupProjectsByLaunch(saved, selectedFlatType, loanAmount, ehgGrant, totalAffordability, scorePreset, scoreWeights);
+    return {
+      key: SAVED_KEY,
+      projects: groups.flatMap((group) => group.projects),
+      totalUnits: groups.reduce((sum, group) => sum + group.totalUnits, 0),
+      lowestPrice: minOrNull(groups.map((group) => group.lowestPrice)),
+      pricedProjectCount: groups.reduce((sum, group) => sum + group.pricedProjectCount, 0),
+      distanceProjectCount: groups.reduce((sum, group) => sum + group.distanceProjectCount, 0),
+      ratingProjectCount: groups.reduce((sum, group) => sum + group.ratingProjectCount, 0),
+    };
+  }, [allProjects, savedSet, selectedFlatType, loanAmount, ehgGrant, totalAffordability, scorePreset, scoreWeights]);
+
   const pricedProjectCount = useMemo(
     () =>
       filteredProjects.filter((project) =>
@@ -125,7 +152,9 @@ export function BtoTab({
     [filteredProjects, selectedFlatType]
   );
   const selectedLaunch =
-    launchGroups.find((group) => group.key === activeLaunch) ?? launchGroups[0];
+    activeLaunch === SAVED_KEY && savedGroup
+      ? savedGroup
+      : launchGroups.find((group) => group.key === activeLaunch) ?? launchGroups[0];
   const launchProjectIds = useMemo(
     () => new Set(selectedLaunch?.projects.map((project) => project.id) ?? []),
     [selectedLaunch]
@@ -134,79 +163,114 @@ export function BtoTab({
     () => comparedProjectIds.filter((projectId) => launchProjectIds.has(projectId)),
     [comparedProjectIds, launchProjectIds]
   );
+  const projectScores = useMemo(
+    () =>
+      selectedLaunch
+        ? scoreBtoProjects(
+            selectedLaunch.projects,
+            { flatType: selectedFlatType, loanAmount, ehgGrant, totalAffordability },
+            "buyer-fit",
+            scorePreset,
+            scoreWeights
+          )
+        : new Map<string, BtoDecisionScore>(),
+    [ehgGrant, loanAmount, scorePreset, scoreWeights, selectedFlatType, selectedLaunch, totalAffordability]
+  );
+  const detailProject =
+    (detailProjectId && allProjects.find((project) => project.id === detailProjectId)) || null;
 
   const handleToggleCompareProject = (projectId: string) => {
     setComparedProjectIds((current) => {
       const activeCurrent = current.filter((id) => launchProjectIds.has(id));
-
       if (activeCurrent.includes(projectId)) {
         return activeCurrent.filter((id) => id !== projectId);
       }
-
       if (activeCurrent.length >= MAX_COMPARE_PROJECTS) return activeCurrent;
       return [...activeCurrent, projectId];
     });
   };
 
+  const comparedProjects = activeComparedProjectIds
+    .map((projectId) => selectedLaunch?.projects.find((project) => project.id === projectId))
+    .filter((project): project is BtoProject => Boolean(project));
+
   return (
-    <section className="dashboard-page bto-dashboard">
+    <section className="screen">
       <PageHeader
-        title="Find a flat that"
-        accent="fits."
-        subtitle="Every project, measured against your budget and what matters to you."
-        action={
-          <div className="bto-header-actions">
-            <SourceCreditLinks />
-          </div>
-        }
+        title="Projects"
+        subtitle="BTO launches and their prices, checked against your budget."
+        action={<SourceCreditLinks />}
       />
 
-      {btoLoading && (
-        <div className="panel p-5 text-sm text-warm-stone">
-          Loading RecordBTO project data...
+      {!budgetKnown && (
+        <div className="callout" role="note">
+          <p>Set your budget and every project will say whether it fits.</p>
+          <button type="button" className="btn btn-quiet" onClick={onOpenBudget}>
+            Set your budget
+          </button>
         </div>
       )}
 
       {btoError && (
-        <div className="panel flex items-center justify-between gap-4 p-5 text-sm text-warm-stone">
-          <span>{btoError}</span>
-          <button type="button" className="btn-primary" onClick={onRetry}>
-            Retry
+        <div className="callout callout-caution" role="alert">
+          <p>{btoError}</p>
+          <button type="button" className="btn btn-quiet" onClick={onRetry}>
+            Try again
           </button>
+        </div>
+      )}
+
+      {btoLoading && (
+        <div className="project-grid" aria-label="Loading projects">
+          {[0, 1, 2].map((index) => (
+            <div key={index} className="card skeleton-card" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
+          ))}
         </div>
       )}
 
       {!btoLoading && !btoError && (
         <>
-          <div className="radar-filters">
-            <div className="radar-filter">
-              <span className="radar-filter-label" id="flat-size-label">
+          <div className="card filter-bar">
+            <div className="filter">
+              <label className="filter-label" htmlFor="flat-size-select">
                 Flat size
-              </span>
-              <div className="radar-segment" role="radiogroup" aria-labelledby="flat-size-label">
+              </label>
+              <select
+                id="flat-size-select"
+                className="input select only-narrow"
+                value={selectedFlatType}
+                onChange={(event) => onFlatTypeChange(event.target.value as FlatType)}
+              >
                 {FLAT_TYPE_OPTIONS.map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    role="radio"
-                    aria-checked={selectedFlatType === option.value}
-                    className="radar-segment-option"
-                    onClick={() => onFlatTypeChange(option.value)}
-                  >
+                  <option key={option.value} value={option.value}>
                     {option.label}
-                  </button>
+                  </option>
                 ))}
-              </div>
+              </select>
+              <Segmented
+                className="only-wide"
+                label="Flat size"
+                value={selectedFlatType}
+                options={FLAT_TYPE_OPTIONS.map((option) => ({
+                  value: option.value,
+                  label: option.value === "executive" ? "Executive" : option.label.replace("-room", " room"),
+                }))}
+                onChange={onFlatTypeChange}
+              />
             </div>
-            <div className="radar-filter">
-              <label className="radar-filter-label" htmlFor="year-filter">
+            <div className="filter">
+              <label className="filter-label" htmlFor="year-filter">
                 Launches
               </label>
               <select
                 id="year-filter"
                 value={yearFilter}
                 onChange={(event) => onYearFilterChange(event.target.value)}
-                className="radar-select"
+                className="input select"
                 disabled={availableYears.length === 0}
               >
                 <option value="latest">Latest</option>
@@ -218,8 +282,8 @@ export function BtoTab({
                 ))}
               </select>
             </div>
-            <div className="radar-filter radar-filter-grow">
-              <label className="radar-filter-label" htmlFor="town-filter">
+            <div className="filter filter-grow">
+              <label className="filter-label" htmlFor="town-filter">
                 Town
               </label>
               <input
@@ -228,28 +292,44 @@ export function BtoTab({
                 value={townQuery}
                 onChange={(event) => onTownQueryChange(event.target.value)}
                 placeholder="e.g. Punggol"
-                className="radar-search"
+                className="input"
               />
             </div>
-            <p className="radar-count">
-              {filteredProjects.length} projects in {launchGroups.length}{" "}
-              {launchGroups.length === 1 ? "launch" : "launches"}, {pricedProjectCount} with prices
+            <p className="filter-count">
+              {filteredProjects.length} projects, {pricedProjectCount} with {selectedFlatType} prices
+              {hasActiveFilters && (
+                <button type="button" className="text-link" onClick={onResetFilters}>
+                  Clear
+                </button>
+              )}
             </p>
-            {hasActiveFilters && (
-              <button type="button" className="budget-link" onClick={onResetFilters}>
-                Clear filters
-              </button>
-            )}
           </div>
 
-          {launchGroups.length === 0 ? (
-            <div className="radar-empty">
-              <h3>No projects match</h3>
+          {launchGroups.length === 0 && !savedGroup ? (
+            <div className="card empty">
+              <h2>No projects match</h2>
               <p>Try another town, a different flat size, or all years.</p>
             </div>
           ) : (
             <>
-              <div className="radar-launches" role="tablist" aria-label="Launches">
+              <div className="launch-tabs" role="tablist" aria-label="Launches">
+                {savedGroup && (
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={selectedLaunch?.key === SAVED_KEY}
+                    className="launch-tab launch-tab-saved"
+                    onClick={() => setActiveLaunch(SAVED_KEY)}
+                  >
+                    <strong>
+                      <Icon name="heart" />
+                      Saved
+                    </strong>
+                    <span>
+                      {savedGroup.projects.length} {savedGroup.projects.length === 1 ? "project" : "projects"}
+                    </span>
+                  </button>
+                )}
                 {launchGroups.map((group) => (
                   <LaunchTab
                     key={group.key}
@@ -261,25 +341,104 @@ export function BtoTab({
               </div>
 
               {selectedLaunch && (
-                <ProjectDrilldown
-                  key={selectedLaunch.key}
-                  launch={selectedLaunch}
-                  comparedProjectIds={activeComparedProjectIds}
-                  selectedFlatType={selectedFlatType}
-                  loanAmount={loanAmount}
-                  ehgGrant={ehgGrant}
-                  totalAffordability={totalAffordability}
-                  scorePreset={scorePreset}
-                  scoreWeights={scoreWeights}
-                  onScorePresetChange={onScorePresetChange}
-                  onScoreWeightsChange={onScoreWeightsChange}
-                  selectedProjectId={selectedProjectId}
-                  onToggleCompareProject={handleToggleCompareProject}
-                  onSelectProject={onSelectProject}
-                />
+                <div className="launch-body" key={selectedLaunch.key}>
+                  <LaunchSummary
+                    launch={selectedLaunch}
+                    flatType={selectedFlatType}
+                    budgetKnown={budgetKnown}
+                    ceiling={ceiling}
+                  />
+
+                  <div className="list-toolbar">
+                    <p>
+                      Best match first, ranked for{" "}
+                      <strong>{BTO_SCORE_PRESET_DETAILS[scorePreset].label.toLowerCase()}</strong>.
+                    </p>
+                    <button
+                      type="button"
+                      className="btn btn-quiet"
+                      aria-expanded={rankingOpen}
+                      aria-controls="ranking-panel"
+                      onClick={() => setRankingOpen((open) => !open)}
+                    >
+                      <Icon name="filter" />
+                      {rankingOpen ? "Done" : "Change what matters"}
+                    </button>
+                  </div>
+
+                  {rankingOpen && (
+                    <ScoreSettingsCard
+                      scorePreset={scorePreset}
+                      scoreWeights={scoreWeights}
+                      onScorePresetChange={onScorePresetChange}
+                      onScoreWeightsChange={onScoreWeightsChange}
+                    />
+                  )}
+
+                  {comparedProjects.length >= 2 && (
+                    <CompareTray
+                      projects={comparedProjects}
+                      selectedFlatType={selectedFlatType}
+                      scores={projectScores}
+                      onClear={() => setComparedProjectIds([])}
+                    />
+                  )}
+
+                  <div className="project-grid">
+                    {selectedLaunch.projects.map((project, index) => (
+                      <ProjectCard
+                        key={project.id}
+                        index={index}
+                        project={project}
+                        selectedFlatType={selectedFlatType}
+                        budgetKnown={budgetKnown}
+                        ceiling={ceiling}
+                        decisionScore={projectScores.get(project.id) ?? null}
+                        isSelected={project.id === selectedProjectId}
+                        isSaved={savedSet.has(project.id)}
+                        isCompareSelected={activeComparedProjectIds.includes(project.id)}
+                        isCompareDisabled={
+                          activeComparedProjectIds.length >= MAX_COMPARE_PROJECTS &&
+                          !activeComparedProjectIds.includes(project.id)
+                        }
+                        onOpen={() => setDetailProjectId(project.id)}
+                        onToggleSaved={() => onToggleSaved(project.id)}
+                        onToggleCompare={() => handleToggleCompareProject(project.id)}
+                        onSelectProject={() => onSelectProject(project.id)}
+                      />
+                    ))}
+                  </div>
+                </div>
               )}
             </>
           )}
+
+          {activeComparedProjectIds.length === 1 && (
+            <div className="dock" role="status">
+              <p>Pick one more project to compare.</p>
+              <button type="button" className="text-link" onClick={() => setComparedProjectIds([])}>
+                Clear
+              </button>
+            </div>
+          )}
+
+          <ProjectSheet
+            project={detailProject}
+            selectedFlatType={selectedFlatType}
+            budgetKnown={budgetKnown}
+            ceiling={ceiling}
+            decisionScore={detailProject ? projectScores.get(detailProject.id) ?? null : null}
+            isSelected={detailProject?.id === selectedProjectId}
+            isSaved={detailProject ? savedSet.has(detailProject.id) : false}
+            onClose={() => setDetailProjectId(null)}
+            onFlatTypeChange={onFlatTypeChange}
+            onToggleSaved={() => detailProject && onToggleSaved(detailProject.id)}
+            onSelectProject={() => {
+              if (!detailProject) return;
+              setDetailProjectId(null);
+              onSelectProject(detailProject.id);
+            }}
+          />
         </>
       )}
     </section>
@@ -296,26 +455,69 @@ function LaunchTab({
   onClick: () => void;
 }) {
   const status = getLaunchStatus(group.key);
-  const count = `${group.projects.length} ${group.projects.length === 1 ? "project" : "projects"}`;
 
   return (
-    <button
-      type="button"
-      role="tab"
-      aria-selected={isActive}
-      className="radar-launch"
-      onClick={onClick}
-    >
-      <strong>{group.key}</strong>
-      <span>{status ? `${count}, ${status}` : count}</span>
+    <button type="button" role="tab" aria-selected={isActive} className="launch-tab" onClick={onClick}>
+      <strong>
+        {group.key}
+        {status === "upcoming" || status === "this month" ? (
+          <span className="launch-live">{status === "this month" ? "Open" : "Soon"}</span>
+        ) : null}
+      </strong>
       <span>
-        {group.pricedProjectCount === 0
-          ? "No prices listed"
-          : group.lowestPrice
-            ? `From ${currency(group.lowestPrice)}`
-            : "No prices listed"}
+        {group.projects.length} {group.projects.length === 1 ? "project" : "projects"}
+        {group.lowestPrice ? `, from ${currency(group.lowestPrice)}` : ""}
       </span>
     </button>
+  );
+}
+
+function LaunchSummary({
+  launch,
+  flatType,
+  budgetKnown,
+  ceiling,
+}: {
+  launch: LaunchGroup;
+  flatType: FlatType;
+  budgetKnown: boolean;
+  ceiling: number;
+}) {
+  const priced = launch.projects.filter((project) => getSelectedVariant(project, flatType));
+  const fitting = priced.filter(
+    (project) => (getSelectedVariant(project, flatType)?.basePrice ?? Infinity) <= ceiling
+  ).length;
+  const isSaved = launch.key === SAVED_KEY;
+  const status = isSaved ? null : getLaunchStatus(launch.key);
+
+  return (
+    <div className="card launch-summary">
+      <div>
+        <h2>{isSaved ? "Your saved projects" : launch.key}</h2>
+        <p>
+          {launch.projects.length} {launch.projects.length === 1 ? "project" : "projects"},{" "}
+          {formatNumber(launch.totalUnits)} flats
+          {status ? `, ${status}` : ""}.
+        </p>
+      </div>
+      <p className="launch-summary-fit">
+        {priced.length === 0 ? (
+          <span>No {flatType} prices listed yet</span>
+        ) : budgetKnown ? (
+          <>
+            <strong>
+              {fitting} of {priced.length}
+            </strong>
+            <span>fit your {currency(ceiling)} budget</span>
+          </>
+        ) : (
+          <>
+            <strong>{currency(launch.lowestPrice ?? 0)}</strong>
+            <span>lowest {flatType} price</span>
+          </>
+        )}
+      </p>
+    </div>
   );
 }
 
@@ -333,136 +535,329 @@ function getLaunchStatus(launchKey: string) {
   return "upcoming";
 }
 
-function ProjectDrilldown({
-  launch,
-  comparedProjectIds,
+function FitPill({ price, ceiling }: { price: number; ceiling: number }) {
+  const over = Math.round(price - ceiling);
+  return over > 0 ? (
+    <span className="pill pill-caution">
+      <Icon name="alert" />
+      {currency(over)} over budget
+    </span>
+  ) : (
+    <span className="pill pill-positive">
+      <Icon name="check" />
+      Fits your budget
+    </span>
+  );
+}
+
+function ProjectCard({
+  index,
+  project,
   selectedFlatType,
-  loanAmount,
-  ehgGrant,
-  totalAffordability,
-  scorePreset,
-  scoreWeights,
-  onScorePresetChange,
-  onScoreWeightsChange,
-  selectedProjectId,
-  onToggleCompareProject,
+  budgetKnown,
+  ceiling,
+  decisionScore,
+  isSelected,
+  isSaved,
+  isCompareSelected,
+  isCompareDisabled,
+  onOpen,
+  onToggleSaved,
+  onToggleCompare,
   onSelectProject,
 }: {
-  launch: LaunchGroup;
-  comparedProjectIds: string[];
+  index: number;
+  project: BtoProject;
   selectedFlatType: FlatType;
-  loanAmount: number;
-  ehgGrant: number;
-  totalAffordability: number;
-  scorePreset: BtoScorePreset;
-  scoreWeights: BtoScoreWeights;
-  onScorePresetChange: (value: BtoScorePreset) => void;
-  onScoreWeightsChange: (value: BtoScoreWeights) => void;
-  selectedProjectId: string | null;
-  onToggleCompareProject: (projectId: string) => void;
-  onSelectProject: (projectId: string) => void;
+  budgetKnown: boolean;
+  ceiling: number;
+  decisionScore: BtoDecisionScore | null;
+  isSelected: boolean;
+  isSaved: boolean;
+  isCompareSelected: boolean;
+  isCompareDisabled: boolean;
+  onOpen: () => void;
+  onToggleSaved: () => void;
+  onToggleCompare: () => void;
+  onSelectProject: () => void;
 }) {
-  const comparedProjects = comparedProjectIds
-    .map((projectId) => launch.projects.find((project) => project.id === projectId))
-    .filter((project): project is BtoProject => Boolean(project));
-  const projectScores = useMemo(
-    () =>
-      scoreBtoProjects(
-        launch.projects,
-        {
-          flatType: selectedFlatType,
-          loanAmount,
-          ehgGrant,
-          totalAffordability,
-        },
-        "buyer-fit",
-        scorePreset,
-        scoreWeights
-      ),
-    [
-      ehgGrant,
-      launch.projects,
-      loanAmount,
-      totalAffordability,
-      scorePreset,
-      scoreWeights,
-      selectedFlatType,
-    ]
-  );
-
-  const presetLabel =
-    BTO_SCORE_PRESET_OPTIONS.find((option) => option.value === scorePreset)?.label ?? "Custom";
-
-  const shownCeiling = Math.floor(totalAffordability / 1000) * 1000;
-  const pricedProjects = launch.projects.filter((project) => getSelectedVariant(project, selectedFlatType));
-  const fittingCount = pricedProjects.filter(
-    (project) => (getSelectedVariant(project, selectedFlatType)?.basePrice ?? Infinity) <= shownCeiling
-  ).length;
+  const variant = getSelectedVariant(project, selectedFlatType);
+  const flatLabel = flatTypeLabel(selectedFlatType);
+  const score = decisionScore?.total ?? null;
 
   return (
-    <div className="radar-launch-body bto-reveal">
-      <div className="radar-launch-head">
-        <div>
-          <h3>{launch.key}</h3>
-          <p>
-            {launch.projects.length} {launch.projects.length === 1 ? "project" : "projects"},{" "}
-            {formatNumber(launch.totalUnits)} flats. Best match first.
-          </p>
-        </div>
-        <p className="radar-launch-fit">
-          {pricedProjects.length === 0 ? (
-            "No prices listed for this flat size yet"
-          ) : (
-            <>
-              <strong>
-                {fittingCount} of {pricedProjects.length}
-              </strong>{" "}
-              fit your {currency(shownCeiling)} budget
-            </>
-          )}
+    <article
+      className={isSelected ? "project-card is-selected" : "project-card"}
+      style={{ ["--i" as string]: Math.min(index, 12) } as CSSProperties}
+    >
+      <div className="project-card-head">
+        <p className="project-meta">
+          <TypeBadge type={project.btoType} />
+          <span>{project.location}</span>
         </p>
+        <SaveButton saved={isSaved} name={project.name} onToggle={onToggleSaved} />
       </div>
 
-      <details className="radar-ranking">
-        <summary>Ranked for: {presetLabel}. Change what matters</summary>
-        <ScoreSettingsCard
-          scorePreset={scorePreset}
-          scoreWeights={scoreWeights}
-          onScorePresetChange={onScorePresetChange}
-          onScoreWeightsChange={onScoreWeightsChange}
-        />
-      </details>
+      <h3 className="project-name">
+        <button type="button" className="stretched" onClick={onOpen}>
+          {project.name}
+        </button>
+      </h3>
 
-      {comparedProjects.length > 0 && (
-        <div className="radar-compare">
-          <CompareTray
-            projects={comparedProjects}
-            selectedFlatType={selectedFlatType}
-            scores={projectScores}
-          />
+      {variant ? (
+        <div className="project-price">
+          <p>
+            <strong>{currency(variant.basePrice)}</strong>
+            <span>{flatLabel}, estimated</span>
+          </p>
+          {budgetKnown && <FitPill price={variant.basePrice} ceiling={ceiling} />}
         </div>
+      ) : (
+        <p className="project-price-missing">No {flatLabel} price listed yet</p>
       )}
 
-      <div className="radar-card-list">
-        {launch.projects.map((project) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            selectedFlatType={selectedFlatType}
-            budgetCeiling={totalAffordability}
-            decisionScore={projectScores.get(project.id) ?? null}
-            isSelected={project.id === selectedProjectId}
-            isCompareSelected={comparedProjectIds.includes(project.id)}
-            isCompareDisabled={
-              comparedProjectIds.length >= MAX_COMPARE_PROJECTS &&
-              !comparedProjectIds.includes(project.id)
-            }
-            onToggleCompareProject={onToggleCompareProject}
-            onSelectProject={onSelectProject}
-          />
-        ))}
+      <dl className="spec-grid">
+        <div>
+          <dt>Keys, estimated</dt>
+          <dd>{project.expectedTop ?? "Not listed"}</dd>
+        </div>
+        <div>
+          <dt>Nearest MRT</dt>
+          <dd>
+            {project.nearestMrtDistanceMeters
+              ? `${formatDistance(project.nearestMrtDistanceMeters)}${project.nearestMrt ? `, ${shortStation(project.nearestMrt)}` : ""}`
+              : "Not listed"}
+          </dd>
+        </div>
+        <div>
+          <dt>Flats</dt>
+          <dd>{formatNumber(project.totalUnits)}</dd>
+        </div>
+        <div>
+          <dt>Match</dt>
+          <dd>{score === null ? "Not enough data" : <ScoreMeter value={score} />}</dd>
+        </div>
+      </dl>
+
+      <div className="project-actions">
+        <button type="button" className="btn btn-primary btn-small" aria-pressed={isSelected} onClick={onSelectProject}>
+          {isSelected ? "In your plan" : "Plan this flat"}
+        </button>
+        <button
+          type="button"
+          className="btn btn-quiet btn-small"
+          aria-pressed={isCompareSelected}
+          disabled={isCompareDisabled}
+          onClick={onToggleCompare}
+        >
+          {isCompareSelected ? (
+            <>
+              <Icon name="check" />
+              Comparing
+            </>
+          ) : (
+            "Compare"
+          )}
+        </button>
+        <button type="button" className="text-link project-more" onClick={onOpen}>
+          Details
+        </button>
       </div>
-    </div>
+    </article>
+  );
+}
+
+function ScoreMeter({ value }: { value: number }) {
+  return (
+    <span className="meter">
+      <span className="meter-track" aria-hidden="true">
+        <span style={{ width: `${Math.max(4, Math.min(value, 100))}%` }} />
+      </span>
+      {value}
+      <span className="sr-only"> out of 100</span>
+    </span>
+  );
+}
+
+function SaveButton({ saved, name, onToggle }: { saved: boolean; name: string; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      className="save-btn"
+      aria-pressed={saved}
+      aria-label={saved ? `Remove ${name} from saved` : `Save ${name}`}
+      onClick={onToggle}
+    >
+      <Icon name="heart" />
+    </button>
+  );
+}
+
+function ProjectSheet({
+  project,
+  selectedFlatType,
+  budgetKnown,
+  ceiling,
+  decisionScore,
+  isSelected,
+  isSaved,
+  onClose,
+  onFlatTypeChange,
+  onToggleSaved,
+  onSelectProject,
+}: {
+  project: BtoProject | null;
+  selectedFlatType: FlatType;
+  budgetKnown: boolean;
+  ceiling: number;
+  decisionScore: BtoDecisionScore | null;
+  isSelected: boolean;
+  isSaved: boolean;
+  onClose: () => void;
+  onFlatTypeChange: (value: FlatType) => void;
+  onToggleSaved: () => void;
+  onSelectProject: () => void;
+}) {
+  const ref = useRef<HTMLDialogElement>(null);
+
+  useEffect(() => {
+    const dialog = ref.current;
+    if (!dialog) return;
+    if (project && !dialog.open) dialog.showModal();
+    if (!project && dialog.open) dialog.close();
+  }, [project]);
+
+  const variants = project
+    ? [...project.flatVariants].sort(
+        (a, b) =>
+          FLAT_TYPE_OPTIONS.findIndex((option) => option.value === a.type) -
+          FLAT_TYPE_OPTIONS.findIndex((option) => option.value === b.type)
+      )
+    : [];
+  const typeNote = project?.btoType ? TYPE_NOTES[project.btoType.toLowerCase()] : undefined;
+  const components = decisionScore?.components ?? [];
+
+  return (
+    <dialog
+      ref={ref}
+      className="sheet"
+      aria-labelledby="sheet-title"
+      onClose={onClose}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      {project && (
+        <div className="sheet-inner">
+          <div className="sheet-head">
+            <p className="project-meta">
+              <TypeBadge type={project.btoType} />
+              <span>
+                {project.location}
+                {project.launchMonth ? `, ${project.launchMonth} launch` : ""}
+              </span>
+            </p>
+            <button type="button" className="icon-btn" aria-label="Close" onClick={onClose}>
+              <Icon name="close" />
+            </button>
+          </div>
+
+          <h2 id="sheet-title" className="sheet-title">
+            {project.name}
+          </h2>
+
+          <section className="sheet-section">
+            <h3>Prices by flat size</h3>
+            {variants.length === 0 ? (
+              <p className="muted">No prices listed for this project yet.</p>
+            ) : (
+              <ul className="price-list">
+                {variants.map((variant) => (
+                  <li key={variant.type}>
+                    <button
+                      type="button"
+                      className="price-row"
+                      aria-pressed={variant.type === selectedFlatType}
+                      onClick={() => onFlatTypeChange(variant.type)}
+                    >
+                      <span className="price-row-size">{flatTypeLabel(variant.type)}</span>
+                      <strong>{currency(variant.basePrice)}</strong>
+                      {budgetKnown ? (
+                        <FitPill price={variant.basePrice} ceiling={ceiling} />
+                      ) : (
+                        <span className="muted">estimated</span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+
+          <section className="sheet-section">
+            <h3>The project</h3>
+            <dl className="spec-grid spec-grid-wide">
+              <div>
+                <dt>Keys, estimated</dt>
+                <dd>{project.expectedTop ?? "Not listed"}</dd>
+              </div>
+              <div>
+                <dt>Nearest MRT</dt>
+                <dd>{formatNearestMrt(project)}</dd>
+              </div>
+              <div>
+                <dt>Flats</dt>
+                <dd>{formatNumber(project.totalUnits)}</dd>
+              </div>
+              <div>
+                <dt>Sizes</dt>
+                <dd>{formatFlatSizes(project)}</dd>
+              </div>
+            </dl>
+            {typeNote && <p className="sheet-note">{typeNote}</p>}
+          </section>
+
+          {components.length > 0 && (
+            <section className="sheet-section">
+              <h3>
+                How it matches
+                {decisionScore?.total != null && <span className="sheet-score">{decisionScore.total} of 100</span>}
+              </h3>
+              <ul className="match-list">
+                {components.map((component) => (
+                  <li key={component.key}>
+                    <div>
+                      <span>{component.label}</span>
+                      <span className="muted">{component.reason}</span>
+                    </div>
+                    <span className="meter-track meter-track-wide" aria-hidden="true">
+                      <span style={{ width: `${Math.max(4, Math.min(component.score, 100))}%` }} />
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <div className="sheet-foot">
+            <button type="button" className="btn btn-quiet" aria-pressed={isSaved} onClick={onToggleSaved}>
+              <Icon name="heart" />
+              {isSaved ? "Saved" : "Save"}
+            </button>
+            <button type="button" className="btn btn-primary btn-grow" onClick={onSelectProject}>
+              {isSelected ? "Open in your plan" : "Plan this flat"}
+              <Icon name="arrow" />
+            </button>
+          </div>
+          {project.sourceUrl && (
+            <a className="sheet-source" href={project.sourceUrl} target="_blank" rel="noreferrer">
+              Full listing on {getBtoProjectSourceLabel(project)}
+              <Icon name="external" />
+            </a>
+          )}
+        </div>
+      )}
+    </dialog>
   );
 }
 
@@ -477,301 +872,66 @@ function ScoreSettingsCard({
   onScorePresetChange: (value: BtoScorePreset) => void;
   onScoreWeightsChange: (value: BtoScoreWeights) => void;
 }) {
-  const handleWeightChange = (
-    key: (typeof SCORE_COMPONENT_ORDER)[number],
-    value: number
-  ) => {
-    if (scorePreset !== "custom") {
-      onScorePresetChange("custom");
-    }
+  const handleWeightChange = (key: (typeof SCORE_COMPONENT_ORDER)[number], value: number) => {
+    if (scorePreset !== "custom") onScorePresetChange("custom");
     onScoreWeightsChange({
       ...scoreWeights,
       [key]: Math.min(Math.max(Math.round(value), 0), BTO_SCORE_IMPORTANCE_MAX),
     });
   };
-
   const hasActivePriority = Object.values(scoreWeights).some((weight) => weight > 0);
 
   return (
-    <div className="panel bto-score-settings bto-score-card-open">
-      <div className="bto-score-card-head">
-        <h3>Ranking priorities</h3>
-      </div>
-      <label className="score-control-group" htmlFor="side-score-preset">
-        <span>Starting point</span>
-        <select
-          id="side-score-preset"
-          value={scorePreset}
-          onChange={(event) =>
-            onScorePresetChange(event.target.value as BtoScorePreset)
-          }
-          className="control w-full"
-        >
-          {BTO_SCORE_PRESET_OPTIONS.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
-
-      <div className="score-selected-note">
-        <Icon name="check" />
-        <span>{BTO_SCORE_PRESET_DETAILS[scorePreset].focus}</span>
-      </div>
-
-      {!hasActivePriority && (
-        <p className="score-priority-warning" role="status">
-          Choose at least one factor to calculate a Radar score.
-        </p>
-      )}
-
-      <div
-        className="score-slider-list"
-        aria-label="Radar ranking priorities"
-      >
-        {SCORE_COMPONENT_ORDER.map((key) => (
-          <ScoreWeightSlider
-            key={key}
-            icon={SCORE_COMPONENT_ICONS[key]}
-            label={BTO_SCORE_COMPONENT_DETAILS[key].label}
-            description={BTO_SCORE_COMPONENT_DETAILS[key].description}
-            value={scoreWeights[key]}
-            onChange={(value) => handleWeightChange(key, value)}
-          />
+    <div className="card ranking" id="ranking-panel">
+      <div className="ranking-presets" role="radiogroup" aria-label="Start from">
+        {BTO_SCORE_PRESET_OPTIONS.filter((option) => option.value !== "custom").map((option) => (
+          <button
+            key={option.value}
+            type="button"
+            role="radio"
+            aria-checked={scorePreset === option.value}
+            className="chip"
+            onClick={() => onScorePresetChange(option.value)}
+          >
+            {option.label}
+          </button>
         ))}
       </div>
-    </div>
-  );
-}
-
-function ScoreWeightSlider({
-  label,
-  value,
-  icon,
-  onChange,
-  description,
-}: {
-  label: string;
-  value: number;
-  icon: IconName;
-  onChange: (value: number) => void;
-  description?: string;
-}) {
-  const [showTip, setShowTip] = useState(false);
-  const tipId = useId();
-  const importance =
-    BTO_SCORE_IMPORTANCE_LEVELS.find((level) => level.value === value) ??
-    BTO_SCORE_IMPORTANCE_LEVELS[0];
-
-  return (
-    <div className="score-weight-slider">
-      <div className="score-weight-slider-head">
-        <Icon name={icon} />
-        <div className="score-weight-label">
-          {label}
-          {description && (
-            <span
-              className="bto-breakdown-info"
-              onMouseEnter={() => setShowTip(true)}
-              onMouseLeave={() => setShowTip(false)}
-              onFocus={() => setShowTip(true)}
-              onBlur={() => setShowTip(false)}
-              aria-describedby={tipId}
-              tabIndex={0}
-            >
-              <Icon name="info" />
-              {showTip && (
-                <span id={tipId} className="bto-tooltip" role="tooltip">
-                  {description}
-                </span>
-              )}
-            </span>
-          )}
-        </div>
-        <strong>{importance.label}</strong>
-      </div>
-      <input
-        type="range"
-        min={0}
-        max={BTO_SCORE_IMPORTANCE_MAX}
-        step={1}
-        value={value}
-        onChange={(event) => onChange(Number(event.target.value))}
-        aria-label={`${label} priority`}
-        aria-valuetext={importance.label}
-        className="interactive-slider score-mini-slider"
-      />
-      <div className="score-mini-scale" aria-hidden="true">
-        <span>Ignore</span>
-        <span>Essential</span>
+      <p className="muted">{BTO_SCORE_PRESET_DETAILS[scorePreset].focus}</p>
+      {!hasActivePriority && (
+        <p className="ranking-warning" role="status">
+          Choose at least one thing that matters to rank projects.
+        </p>
+      )}
+      <div className="ranking-sliders">
+        {SCORE_COMPONENT_ORDER.map((key) => {
+          const value = scoreWeights[key];
+          const importance =
+            BTO_SCORE_IMPORTANCE_LEVELS.find((level) => level.value === value) ?? BTO_SCORE_IMPORTANCE_LEVELS[0];
+          const id = `weight-${key}`;
+          return (
+            <div key={key} className="ranking-slider">
+              <label htmlFor={id}>
+                <span>{BTO_SCORE_COMPONENT_DETAILS[key].label}</span>
+                <strong>{importance.label}</strong>
+              </label>
+              <p className="muted">{BTO_SCORE_COMPONENT_DETAILS[key].description}</p>
+              <input
+                id={id}
+                type="range"
+                min={0}
+                max={BTO_SCORE_IMPORTANCE_MAX}
+                step={1}
+                value={value}
+                aria-valuetext={importance.label}
+                style={{ ["--fill" as string]: `${(value / BTO_SCORE_IMPORTANCE_MAX) * 100}%` }}
+                onChange={(event) => handleWeightChange(key, Number(event.target.value))}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
-  );
-}
-
-function ProjectCard({
-  project,
-  selectedFlatType,
-  budgetCeiling,
-  decisionScore,
-  isSelected,
-  isCompareSelected,
-  isCompareDisabled,
-  onToggleCompareProject,
-  onSelectProject,
-}: {
-  project: BtoProject;
-  selectedFlatType: FlatType;
-  budgetCeiling: number;
-  decisionScore: BtoDecisionScore | null;
-  isSelected: boolean;
-  isCompareSelected: boolean;
-  isCompareDisabled: boolean;
-  onToggleCompareProject: (projectId: string) => void;
-  onSelectProject: (projectId: string) => void;
-}) {
-  const selectedVariant = getSelectedVariant(project, selectedFlatType);
-  const flatLabel =
-    FLAT_TYPE_OPTIONS.find((option) => option.value === selectedFlatType)?.label ?? selectedFlatType;
-  const scoreTotal = decisionScore?.total ?? null;
-  const scoreTone =
-    scoreTotal === null
-      ? ""
-      : scoreTotal >= 70
-        ? "radar-score-high"
-        : scoreTotal >= 50
-          ? "radar-score-mid"
-          : "radar-score-low";
-  // The Budget screen shows the ceiling rounded down to the thousand, so compare against the same figure.
-  const shownCeiling = Math.floor(budgetCeiling / 1000) * 1000;
-  const overBy = selectedVariant ? Math.round(selectedVariant.basePrice - shownCeiling) : 0;
-
-  const strengths = decisionScore
-    ? decisionScore.components
-        .filter((c) => c.score >= 70)
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3)
-    : [];
-
-  const tradeoffs = decisionScore
-    ? decisionScore.components
-        .filter((c) => c.score < 50)
-        .sort((a, b) => a.score - b.score)
-        .slice(0, 2)
-    : [];
-
-  return (
-    <article className={`radar-card ${isSelected ? "radar-card-selected" : ""}`}>
-      <div className="radar-card-top">
-        <div className="radar-card-id">
-          <h4>{project.name}</h4>
-          <p>
-            <ProjectTypeBadge type={project.btoType} />
-            <span>{project.location}</span>
-          </p>
-        </div>
-        {scoreTotal !== null && (
-          <div
-            className={`radar-score ${scoreTone}`}
-            title="Match out of 100, from what you said matters"
-          >
-            <strong>{scoreTotal}</strong>
-            <span>match</span>
-          </div>
-        )}
-      </div>
-
-      {selectedVariant ? (
-        <div className="radar-card-price">
-          <p className="radar-price">
-            {currency(selectedVariant.basePrice)}
-            <span>{flatLabel}, estimated</span>
-          </p>
-          {overBy > 0 ? (
-            <p className="radar-fit radar-fit-over">
-              <Icon name="alert" />
-              {currency(overBy)} over your budget
-            </p>
-          ) : (
-            <p className="radar-fit radar-fit-good">
-              <Icon name="check" />
-              Within your budget
-            </p>
-          )}
-        </div>
-      ) : (
-        <div className="radar-card-price">
-          <p className="radar-price-missing">No {flatLabel} price listed yet</p>
-        </div>
-      )}
-
-      <dl className="radar-facts">
-        <div>
-          <dt>Keys, estimated</dt>
-          <dd>{project.expectedTop ?? "Not listed"}</dd>
-        </div>
-        <div>
-          <dt>Nearest MRT</dt>
-          <dd>
-            {project.nearestMrtDistanceMeters
-              ? `${formatDistance(project.nearestMrtDistanceMeters)}${project.nearestMrt ? ` to ${project.nearestMrt}` : ""}`
-              : "Not listed"}
-          </dd>
-        </div>
-        <div>
-          <dt>Flats</dt>
-          <dd>{formatNumber(project.totalUnits)}</dd>
-        </div>
-        <div>
-          <dt>Sizes</dt>
-          <dd>{formatFlatSizes(project)}</dd>
-        </div>
-      </dl>
-
-      {(strengths.length > 0 || tradeoffs.length > 0) && (
-        <div className="radar-notes">
-          {strengths.length > 0 && (
-            <p>
-              <strong>Good</strong>
-              {strengths.map((c) => c.reason).join(", ")}
-            </p>
-          )}
-          {tradeoffs.length > 0 && (
-            <p>
-              <strong>Watch</strong>
-              {tradeoffs.map((c) => c.reason).join(", ")}
-            </p>
-          )}
-        </div>
-      )}
-
-      <div className="radar-card-actions">
-        <button
-          type="button"
-          className="radar-plan-btn"
-          aria-pressed={isSelected}
-          onClick={() => onSelectProject(project.id)}
-        >
-          {isSelected ? "In your plan" : "Plan this flat"}
-        </button>
-        <button
-          type="button"
-          className="radar-compare-btn"
-          disabled={isCompareDisabled}
-          aria-pressed={isCompareSelected}
-          onClick={() => onToggleCompareProject(project.id)}
-        >
-          {isCompareSelected ? "Comparing" : "Compare"}
-        </button>
-        {project.sourceUrl && (
-          <a href={project.sourceUrl} target="_blank" rel="noreferrer" className="radar-source">
-            {getBtoProjectSourceLabel(project)}
-            <Icon name="external" />
-          </a>
-        )}
-      </div>
-    </article>
   );
 }
 
@@ -779,70 +939,50 @@ function CompareTray({
   projects,
   selectedFlatType,
   scores,
+  onClear,
 }: {
   projects: BtoProject[];
   selectedFlatType: FlatType;
   scores: Map<string, BtoDecisionScore>;
+  onClear: () => void;
 }) {
-  if (projects.length < 2) {
-    return (
-      <div className="border-b border-heritage-navy/10 px-4 py-3 text-sm text-warm-stone">
-        Select 2 to 4 projects in this launch to compare them side by side.
-      </div>
-    );
-  }
-
   const rows = buildCompareRows(projects, selectedFlatType, scores);
 
   return (
-    <div className="border-b border-heritage-navy/10 p-4">
-      <div className="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h4 className="text-sm font-semibold text-heritage-navy">
-            Project comparison
-          </h4>
-        </div>
-        <span className="text-xs text-warm-stone">
-          {projects.length}/{MAX_COMPARE_PROJECTS} selected
-        </span>
+    <section className="card compare" aria-labelledby="compare-title">
+      <div className="compare-head">
+        <h2 id="compare-title">Side by side</h2>
+        <p className="muted">
+          {projects.length} of {MAX_COMPARE_PROJECTS} picked. The best value in each row is marked.
+        </p>
+        <button type="button" className="text-link" onClick={onClear}>
+          Clear
+        </button>
       </div>
-
-      <div className="overflow-x-auto rounded-hdb border border-heritage-navy/10">
-        <table className="min-w-[760px] w-full border-collapse text-left text-sm">
+      <div className="compare-scroll">
+        <table className="compare-table">
           <thead>
-            <tr className="bg-heritage-navy/[0.04]">
-              <th className="w-40 px-3 py-2 text-xs font-semibold text-warm-stone">
-                Metric
+            <tr>
+              <th scope="col">
+                <span className="sr-only">Detail</span>
               </th>
               {projects.map((project) => (
-                <th
-                  key={project.id}
-                  className="min-w-40 px-3 py-2 text-xs font-semibold text-heritage-navy"
-                >
-                  <span className="block">{project.name}</span>
-                  <span className="block font-normal text-warm-stone">
-                    {project.location}
-                  </span>
+                <th key={project.id} scope="col">
+                  <strong>{project.name}</strong>
+                  <span>{project.location}</span>
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-heritage-navy/10">
+          <tbody>
             {rows.map((row) => (
               <tr key={row.label}>
-                <th className="bg-white px-3 py-2 text-xs font-semibold text-warm-stone">
-                  {row.label}
-                </th>
+                <th scope="row">{row.label}</th>
                 {row.values.map((cell) => {
-                  const isBest = row.bestProjectIds?.has(cell.projectId) ?? false;
-
+                  const isBest = (row.bestProjectIds?.has(cell.projectId) ?? false) && projects.length > 1;
                   return (
-                    <td
-                      key={cell.projectId}
-                      className={`px-3 py-2 align-top text-heritage-navy ${
-                        isBest ? "bg-good-soft font-semibold text-good" : "bg-white"
-                      }`}
-                    >
+                    <td key={cell.projectId} className={isBest ? "is-best" : undefined}>
+                      {isBest && <Icon name="check" />}
                       {cell.value}
                     </td>
                   );
@@ -852,8 +992,27 @@ function CompareTray({
           </tbody>
         </table>
       </div>
-    </div>
+    </section>
   );
+}
+
+function TypeBadge({ type }: { type: string | undefined }) {
+  if (!type) return null;
+  const lower = type.toLowerCase();
+  return <span className={`type-badge type-${lower}`}>{formatProjectType(type)}</span>;
+}
+
+function flatTypeLabel(type: FlatType) {
+  return FLAT_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? type;
+}
+
+function shortStation(name: string) {
+  return name.replace(/\s+MRT( Station)?$/i, "");
+}
+
+function minOrNull(values: Array<number | null>) {
+  const known = values.filter((value): value is number => value !== null);
+  return known.length ? Math.min(...known) : null;
 }
 
 function buildCompareRows(
@@ -1028,14 +1187,14 @@ function plainCompareRow({
 
 function SourceCreditLinks() {
   return (
-    <div className="source-credit-row" aria-label="BTO data credits">
-      <span>Sources</span>
+    <p className="credits" aria-label="BTO data credits">
+      <span>Data from</span>
       {BTO_SOURCE_CREDITS.map((source) => (
         <a key={source.url} href={source.url} target="_blank" rel="noreferrer">
           {source.label}
         </a>
       ))}
-    </div>
+    </p>
   );
 }
 
@@ -1217,22 +1376,6 @@ function formatDecisionReasons(score: BtoDecisionScore | null) {
       : "";
 
   return `${score.confidence}: ${reasons}${missing}`;
-}
-
-function ProjectTypeBadge({ type }: { type: string | undefined }) {
-  if (!type) return null;
-  const lower = type.toLowerCase();
-  
-  let layout = "project-type-badge-default";
-  if (lower === "prime") layout = "project-type-badge-prime";
-  else if (lower === "plus") layout = "project-type-badge-plus";
-  else if (lower === "standard") layout = "project-type-badge-standard";
-  
-  return (
-    <span className={`project-type-badge ${layout}`}>
-      {formatProjectType(type)}
-    </span>
-  );
 }
 
 function formatNumber(value: number | undefined) {

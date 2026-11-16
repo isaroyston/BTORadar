@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { BtoTab } from "./components/BtoTab";
 import { BudgetTab } from "./components/BudgetTab";
 import { Navigation } from "./components/Navigation";
@@ -50,7 +50,9 @@ import {
 } from "./utils/btoScoring";
 import { parseLaunchMonthInput } from "./utils/date";
 import { clampNumber } from "./utils/format";
+import { withViewTransition } from "./utils/motion";
 import { buildPaymentTimeline } from "./utils/paymentTimeline";
+import { loadShortlist, saveShortlist } from "./utils/shortlistStorage";
 import {
   createPlannerSnapshot,
   loadPlannerSnapshot,
@@ -113,16 +115,8 @@ function App() {
   const [selectedBtoProjectId, setSelectedBtoProjectId] = useState<string | null>(
     initialPlan?.selectedBtoProjectId ?? null
   );
-  const [planStorageStatus, setPlanStorageStatus] = useState(
-    initialPlanResult.error
-      ? "Saved plan could not be loaded"
-      : initialPlan
-        ? `Loaded saved plan from ${formatSavedAt(initialPlan.savedAt)}`
-        : "No saved plan in this browser"
-  );
-  const [planStorageError, setPlanStorageError] = useState<string | null>(
-    initialPlanResult.error
-  );
+  const planLoadError = initialPlanResult.error;
+  const [savedProjectIds, setSavedProjectIds] = useState<string[]>(loadShortlist);
   const [applicationMonth, setApplicationMonth] = useState(
     initialPlan?.applicationMonth ?? getDefaultApplicationMonth()
   );
@@ -278,8 +272,61 @@ function App() {
     () => filterBtoProjects(btoProjects, activeYear, townQuery, flatType),
     [activeYear, btoProjects, flatType, townQuery]
   );
+  useEffect(() => {
+    try {
+      savePlannerSnapshot(
+        createPlannerSnapshot({
+          combinedIncome,
+          flatPrice,
+          flatType,
+          financing,
+          scheme,
+          loanTenureYears,
+          loanInterestRate,
+          yearFilter,
+          townQuery,
+          btoScoreMode,
+          btoScorePreset,
+          btoScoreWeights,
+          selectedBtoProjectId,
+          applicationMonth,
+          completedMilestones: activeCompletedMilestones,
+          confirmedMilestoneDates: activeConfirmedMilestoneDates,
+        })
+      );
+    } catch {
+      // Storage can be blocked or full; the plan still works for this visit.
+    }
+  }, [
+    activeCompletedMilestones,
+    activeConfirmedMilestoneDates,
+    applicationMonth,
+    btoScoreMode,
+    btoScorePreset,
+    btoScoreWeights,
+    combinedIncome,
+    financing,
+    flatPrice,
+    flatType,
+    loanInterestRate,
+    loanTenureYears,
+    scheme,
+    selectedBtoProjectId,
+    townQuery,
+    yearFilter,
+  ]);
+
+  const doneTabs = useMemo(() => {
+    const done = new Set<TabKey>();
+    if (budgetKnown) done.add("budget");
+    if (selectedBtoProjectId) done.add("bto");
+    if (timeline.length > 0 && activeCompletedMilestones.length === timeline.length) done.add("plan");
+    return done;
+  }, [activeCompletedMilestones.length, budgetKnown, selectedBtoProjectId, timeline.length]);
+
   const setActiveTab = (tab: TabKey) => {
-    setActiveTabState(tab);
+    withViewTransition(() => setActiveTabState(tab));
+    window.scrollTo({ top: 0 });
 
     const url = new URL(window.location.href);
     if (tab === "budget") {
@@ -374,36 +421,14 @@ function App() {
     });
   };
 
-  const buildCurrentSnapshot = () =>
-    createPlannerSnapshot({
-      combinedIncome,
-      flatPrice,
-      flatType,
-      financing,
-      scheme,
-      loanTenureYears,
-      loanInterestRate,
-      yearFilter,
-      townQuery,
-      btoScoreMode,
-      btoScorePreset,
-      btoScoreWeights,
-      selectedBtoProjectId,
-      applicationMonth,
-      completedMilestones: activeCompletedMilestones,
-      confirmedMilestoneDates: activeConfirmedMilestoneDates,
+  const handleToggleSaved = (projectId: string) => {
+    setSavedProjectIds((current) => {
+      const next = current.includes(projectId)
+        ? current.filter((id) => id !== projectId)
+        : [projectId, ...current];
+      saveShortlist(next);
+      return next;
     });
-
-  const handleSavePlan = () => {
-    try {
-      const snapshot = buildCurrentSnapshot();
-      savePlannerSnapshot(snapshot);
-      setPlanStorageStatus(`Saved locally at ${formatSavedAt(snapshot.savedAt)}`);
-      setPlanStorageError(null);
-    } catch (error) {
-      setPlanStorageStatus("Plan was not saved");
-      setPlanStorageError(getErrorMessage(error));
-    }
   };
 
   const handleSelectBtoProject = (projectId: string) => {
@@ -430,14 +455,10 @@ function App() {
   };
 
   return (
-    <div className="app-shell min-h-screen bg-hdb-bg text-heritage-navy">
-      <Navigation
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
-      />
+    <div className="shell">
+      <Navigation activeTab={activeTab} doneTabs={doneTabs} onSelectTab={setActiveTab} />
 
-      <main className="min-w-0 overflow-x-hidden px-5 pb-28 pt-24 md:px-8 lg:pb-14 lg:ml-[280px] lg:px-8 lg:pt-8 xl:px-10">
-        <div className="mx-auto w-full max-w-[1720px] space-y-8">
+      <main className="main">
         {activeTab === "budget" && (
           <BudgetTab
             combinedIncome={combinedIncome}
@@ -454,16 +475,34 @@ function App() {
           />
         )}
 
-        {activeTab === "overview" && (
-          <OverviewTab
+        {activeTab === "bto" && (
+          <BtoTab
+            btoLoading={btoLoading}
+            btoError={btoError}
+            availableYears={availableYears}
+            yearFilter={yearFilter}
+            townQuery={townQuery}
+            filteredProjects={filteredProjects}
+            allProjects={btoProjects}
+            selectedFlatType={flatType}
             budgetKnown={budgetKnown}
-            budgetCeiling={totalAffordability}
-            selectedProject={selectedBtoProject}
-            flatPrice={flatPrice}
-            fundingGap={budgetKnown ? targetEstimate.fundingGap : null}
-            timeline={timeline}
-            completedMilestones={activeCompletedMilestones}
-            onSelectTab={setActiveTab}
+            loanAmount={loanAmount}
+            ehgGrant={ehgGrant}
+            totalAffordability={totalAffordability}
+            scorePreset={btoScorePreset}
+            scoreWeights={btoScoreWeights}
+            selectedProjectId={selectedBtoProjectId}
+            savedProjectIds={savedProjectIds}
+            onScorePresetChange={handleBtoScorePresetChange}
+            onScoreWeightsChange={setBtoScoreWeights}
+            onRetry={handleRetryBto}
+            onYearFilterChange={handleYearFilterChange}
+            onTownQueryChange={handleTownQueryChange}
+            onFlatTypeChange={setFlatType}
+            onSelectProject={handleSelectBtoProject}
+            onToggleSaved={handleToggleSaved}
+            onResetFilters={handleResetBtoFilters}
+            onOpenBudget={() => setActiveTab("budget")}
           />
         )}
 
@@ -489,8 +528,7 @@ function App() {
             timeline={timeline}
             completedMilestones={activeCompletedMilestones}
             confirmedMilestoneDates={activeConfirmedMilestoneDates}
-            planStorageStatus={planStorageStatus}
-            planStorageError={planStorageError}
+            loadError={planLoadError}
             onOpenBudget={() => setActiveTab("budget")}
             onOpenRadar={() => setActiveTab("bto")}
             onFlatPriceChange={handleFlatPriceChange}
@@ -499,64 +537,29 @@ function App() {
             onSchemeChange={setScheme}
             onLoanTenureChange={handleLoanTenureChange}
             onLoanInterestRateChange={handleLoanInterestRateChange}
-            onSavePlan={handleSavePlan}
             onToggleMilestoneComplete={handleToggleMilestoneComplete}
             onMilestoneDateChange={handleMilestoneDateChange}
           />
         )}
 
-        {activeTab === "bto" && !budgetKnown && (
-          <div className="budget-notice" role="note">
-            <p>
-              The budget labels below use a rough guess from income alone. Add your age and savings for a real
-              price ceiling.
-            </p>
-            <button type="button" className="budget-link" onClick={() => setActiveTab("budget")}>
-              Set your budget
-            </button>
-          </div>
-        )}
-
-        {activeTab === "bto" && (
-          <BtoTab
-            btoLoading={btoLoading}
-            btoError={btoError}
-            availableYears={availableYears}
-            yearFilter={yearFilter}
-            townQuery={townQuery}
-            filteredProjects={filteredProjects}
-            selectedFlatType={flatType}
-            loanAmount={loanAmount}
-            ehgGrant={ehgGrant}
-            totalAffordability={totalAffordability}
-            scorePreset={btoScorePreset}
-            scoreWeights={btoScoreWeights}
-            onScorePresetChange={handleBtoScorePresetChange}
-            onScoreWeightsChange={setBtoScoreWeights}
-            onRetry={handleRetryBto}
-            onYearFilterChange={handleYearFilterChange}
-            onTownQueryChange={handleTownQueryChange}
-            onFlatTypeChange={setFlatType}
-            selectedProjectId={selectedBtoProjectId}
-            onSelectProject={handleSelectBtoProject}
-            onResetFilters={handleResetBtoFilters}
+        {activeTab === "overview" && (
+          <OverviewTab
+            budgetKnown={budgetKnown}
+            budgetCeiling={totalAffordability}
+            selectedProject={selectedBtoProject}
+            flatPrice={flatPrice}
+            fundingGap={budgetKnown ? targetEstimate.fundingGap : null}
+            savedCount={savedProjectIds.length}
+            timeline={timeline}
+            completedMilestones={activeCompletedMilestones}
+            onSelectTab={setActiveTab}
           />
         )}
 
         {activeTab === "sources" && <SourcesTab />}
-        </div>
       </main>
     </div>
   );
-}
-
-function formatSavedAt(value: string) {
-  return new Date(value).toLocaleString("en-SG", {
-    day: "2-digit",
-    month: "short",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
 }
 
 function getDefaultApplicationMonth() {

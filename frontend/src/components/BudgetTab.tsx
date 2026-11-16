@@ -1,11 +1,14 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { INCOME_MAX, INCOME_MIN } from "../constants";
 import type { FinancingType } from "../types";
 import type { FinancingEstimate } from "../utils/affordability";
 import type { BudgetInputs } from "../utils/budgetStorage";
 import type { EhgAssessment } from "../utils/ehg";
 import { currency } from "../utils/format";
-import { PageHeader } from "./DashboardUi";
+import { useCountUp } from "../utils/motion";
+import { Icon, PageHeader } from "./DashboardUi";
+import { FundingBar, type FundingPart } from "./FundingBar";
+import { Segmented } from "./Segmented";
 
 type BudgetTabProps = {
   combinedIncome: number;
@@ -44,22 +47,22 @@ export function BudgetTab({
   onSeeProjects,
   onOpenPlan,
 }: BudgetTabProps) {
-  const missing = [
-    budget.age === null ? "your age" : null,
-    budget.cpfOa === null ? "your CPF savings" : null,
-    budget.cash === null ? "your cash savings" : null,
-  ].filter((item): item is string => item !== null);
+  const checklist = [
+    { label: "Household income", done: true },
+    { label: "Age of the youngest buyer", done: budget.age !== null },
+    { label: "CPF savings", done: budget.cpfOa !== null },
+    { label: "Cash savings", done: budget.cash !== null },
+  ];
 
   return (
-    <>
+    <section className="screen">
       <PageHeader
-        title="What can you"
-        accent="afford?"
-        subtitle="Four answers give you a price ceiling. Everything else in BTO Radar is measured against it."
+        title="Budget"
+        subtitle="The most you could spend on a flat, from four answers. Every project is checked against it."
       />
 
       <div className="budget-layout">
-        <form className="budget-form" onSubmit={(event) => event.preventDefault()}>
+        <form className="card budget-form" onSubmit={(event) => event.preventDefault()}>
           <MoneyField
             id="budget-income"
             label="Household income, per month"
@@ -69,15 +72,19 @@ export function BudgetTab({
             onCommit={(value) => onIncomeChange(value ?? INCOME_MIN)}
           />
 
-          <div className="budget-field">
+          <div className="field">
             <label htmlFor="budget-age">Age of the youngest buyer</label>
-            <p className="budget-hint">An HDB loan must end by 65, so age can shorten it.</p>
+            <p className="field-hint" id="budget-age-hint">
+              An HDB loan has to end by 65, so age can shorten it. Between {AGE_MIN} and {AGE_MAX}.
+            </p>
             <input
               id="budget-age"
-              className="budget-input budget-input-short"
+              className="input input-short"
               inputMode="numeric"
+              autoComplete="off"
               placeholder="e.g. 29"
               defaultValue={budget.age ?? ""}
+              aria-describedby="budget-age-hint"
               onChange={(event) => {
                 const digits = event.target.value.replace(/\D/g, "");
                 const age = digits === "" ? null : Number(digits);
@@ -85,15 +92,13 @@ export function BudgetTab({
                   age: age === null || age < AGE_MIN || age > AGE_MAX ? null : age,
                 });
               }}
-              aria-describedby="budget-age-range"
             />
-            <p id="budget-age-range" className="budget-hint">Between {AGE_MIN} and {AGE_MAX}.</p>
           </div>
 
           <MoneyField
             id="budget-cpf"
             label="CPF Ordinary Account savings"
-            hint="Combined, as shown in the CPF app. Enter 0 if none."
+            hint="Everyone buying, combined, as shown in the CPF app. Enter 0 if none."
             value={budget.cpfOa}
             max={SAVINGS_MAX}
             placeholder="e.g. 60,000"
@@ -110,38 +115,41 @@ export function BudgetTab({
             onCommit={(value) => onBudgetChange({ cash: value })}
           />
 
-          <fieldset className="budget-field">
-            <legend>First-time buyers?</legend>
-            <p className="budget-hint">
-              First-timer families can get the Enhanced CPF Housing Grant. Singles and second-timers get different amounts.
+          <fieldset className="field">
+            <legend>Are you first-time buyers?</legend>
+            <p className="field-hint">
+              First-timer families can get the Enhanced CPF Housing Grant. Singles and second-timers get different
+              amounts.
             </p>
-            <div className="budget-choice" role="radiogroup" aria-label="First-time buyers">
-              {[
-                { value: true, label: "Yes, include the grant" },
-                { value: false, label: "No grant" },
-              ].map((option) => (
-                <button
-                  key={option.label}
-                  type="button"
-                  role="radio"
-                  aria-checked={budget.firstTimer === option.value}
-                  className="budget-choice-option"
-                  onClick={() => onBudgetChange({ firstTimer: option.value })}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+            <Segmented
+              label="First-time buyers"
+              value={budget.firstTimer ? "yes" : "no"}
+              options={[
+                { value: "yes", label: "Yes, include the grant" },
+                { value: "no", label: "No grant" },
+              ]}
+              onChange={(value) => onBudgetChange({ firstTimer: value === "yes" })}
+            />
           </fieldset>
         </form>
 
-        <section className="budget-answer" aria-live="polite">
+        <section className="answer budget-answer" aria-live="polite">
           {maxPrice === null || estimateAtMax === null ? (
-            <div className="budget-waiting">
-              <h2>Your price ceiling appears here</h2>
-              <p>
-                Still needed: {missing.join(", ")}. Your figures stay in this browser and are never sent anywhere.
+            <div className="answer-waiting">
+              <p className="answer-lead">Your price ceiling</p>
+              <p className="answer-figure answer-figure-ghost" aria-hidden="true">
+                S$ ···
               </p>
+              <ul className="answer-checklist">
+                {checklist.map((item) => (
+                  <li key={item.label} className={item.done ? "is-done" : ""}>
+                    <span aria-hidden="true">{item.done ? <Icon name="check" /> : null}</span>
+                    {item.label}
+                    <span className="sr-only">{item.done ? " (answered)" : " (still needed)"}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="answer-note">Your figures stay in this browser and are never sent anywhere.</p>
             </div>
           ) : (
             <BudgetAnswer
@@ -157,7 +165,7 @@ export function BudgetTab({
           )}
         </section>
       </div>
-    </>
+    </section>
   );
 }
 
@@ -186,22 +194,23 @@ function BudgetAnswer({
   const ownFunds = Math.max(Math.round(maxPrice) - loan - grant, 0);
   const cpfUsed = Math.min(budget.cpfOa ?? 0, ownFunds);
   const cashUsed = Math.max(ownFunds - cpfUsed, 0);
-  const total = Math.max(loan + grant + cpfUsed + cashUsed, 1);
-  const parts = [
-    { key: "loan", tone: "budget-part-loan", label: financing === "bank" ? "Bank loan" : "HDB loan", amount: loan },
-    { key: "grant", tone: "budget-part-grant", label: "Housing grant", amount: grant },
-    { key: "cpf", tone: "budget-part-cpf", label: "CPF savings", amount: cpfUsed },
-    { key: "cash", tone: "budget-part-cash", label: "Cash", amount: cashUsed },
-  ].filter((part) => part.amount > 0);
+  const parts: FundingPart[] = [
+    { key: "loan", label: financing === "bank" ? "Bank loan" : "HDB loan", amount: loan },
+    { key: "grant", label: "Housing grant", amount: grant },
+    { key: "cpf", label: "CPF savings", amount: cpfUsed },
+    { key: "cash", label: "Cash", amount: cashUsed },
+  ];
   const tenure = estimate.effectiveTenureYears;
   const monthly = estimate.estimatedMonthlyPayment;
   const limit = describeLimit({ estimate, loan, maxPrice, financing });
+  const shownCeiling = useCountUp(ceiling);
+  const shownMonthly = useCountUp(Math.round(monthly ?? 0));
 
   if (ceiling <= 0) {
     return (
-      <div className="budget-waiting">
-        <h2>These figures don't reach a flat yet</h2>
-        <p>
+      <div className="answer-waiting">
+        <p className="answer-lead">Not enough to reach a flat yet</p>
+        <p className="answer-body">
           With {financingLabel[financing]}, some of the price has to come from savings or a grant. Add CPF or cash
           savings to see a ceiling.
         </p>
@@ -211,36 +220,17 @@ function BudgetAnswer({
 
   return (
     <>
-      <p className="budget-lead">You could buy a flat priced up to</p>
-      <p key={ceiling} className="budget-figure">{currency(ceiling)}</p>
+      <p className="answer-lead">You could buy a flat priced up to</p>
+      <p className="answer-figure">{currency(Math.round(shownCeiling / 1000) * 1000)}</p>
       {monthly !== null && tenure !== null && loan > 0 && (
-        <p className="budget-monthly">
-          That is about <strong>{currency(Math.round(monthly))} a month</strong> for {tenure} years.
+        <p className="answer-body">
+          That's about <strong>{currency(Math.round(shownMonthly))} a month</strong> over {tenure} years.
         </p>
       )}
 
-      <div className="budget-bar" role="img" aria-label={`Paid for by ${parts.map((part) => `${part.label} ${currency(part.amount)}`).join(", ")}`}>
-        {parts.map((part) => (
-          <span
-            key={part.key}
-            className={`budget-bar-part ${part.tone}`}
-            style={{ flexGrow: part.amount / total }}
-          />
-        ))}
-      </div>
-      <dl className="budget-legend">
-        {parts.map((part) => (
-          <div key={part.key} className="budget-legend-row">
-            <dt>
-              <span className={`budget-swatch ${part.tone}`} aria-hidden="true" />
-              {part.label}
-            </dt>
-            <dd>{currency(part.amount)}</dd>
-          </div>
-        ))}
-      </dl>
+      <FundingBar parts={parts} />
 
-      <div className="budget-limit">
+      <div className="answer-limit">
         <h2>{limit.title}</h2>
         <p>{limit.body}</p>
         {tenure !== null && tenure < loanTenureYears && financing === "hdb" && (
@@ -248,16 +238,18 @@ function BudgetAnswer({
         )}
       </div>
 
-      <div className="budget-actions">
-        <button type="button" className="budget-cta" onClick={onSeeProjects}>
-          See projects that fit
+      <div className="answer-actions">
+        <button type="button" className="btn btn-primary" onClick={onSeeProjects}>
+          See flats that fit
+          <Icon name="arrow" />
         </button>
-        <button type="button" className="budget-link" onClick={onOpenPlan}>
+        <button type="button" className="text-link" onClick={onOpenPlan}>
           Change loan type or length
         </button>
       </div>
 
-      <Disclosure summary="What this estimate assumes">
+      <details className="answer-more">
+        <summary>What this estimate assumes</summary>
         <ul>
           <li>{ehg.note}</li>
           {estimate.warnings.map((warning) => (
@@ -265,7 +257,7 @@ function BudgetAnswer({
           ))}
           <li>Stamp duty and one-off fees are set aside from your savings before the price is worked out.</li>
         </ul>
-      </Disclosure>
+      </details>
     </>
   );
 }
@@ -329,14 +321,15 @@ function MoneyField({
   const [text, setText] = useState(value === null ? "" : value.toLocaleString("en-SG"));
 
   return (
-    <div className="budget-field">
+    <div className="field">
       <label htmlFor={id}>{label}</label>
-      <p className="budget-hint" id={`${id}-hint`}>{hint}</p>
-      <div className="budget-money">
+      <p className="field-hint" id={`${id}-hint`}>
+        {hint}
+      </p>
+      <div className="input input-money">
         <span aria-hidden="true">S$</span>
         <input
           id={id}
-          className="budget-input"
           inputMode="numeric"
           autoComplete="off"
           placeholder={placeholder}
@@ -356,14 +349,5 @@ function MoneyField({
         />
       </div>
     </div>
-  );
-}
-
-function Disclosure({ summary, children }: { summary: string; children: ReactNode }) {
-  return (
-    <details className="budget-disclosure">
-      <summary>{summary}</summary>
-      {children}
-    </details>
   );
 }

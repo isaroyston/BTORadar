@@ -31,148 +31,28 @@ export type IconName =
   | "settings"
   | "team"
   | "user"
-  | "wallet";
-
-type CardProps = {
-  children: ReactNode;
-  className?: string;
-  title?: string;
-  icon?: IconName;
-  action?: ReactNode;
-};
-
-type PillProps = {
-  children: ReactNode;
-  tone?: "blue" | "green" | "gray" | "amber";
-  className?: string;
-};
+  | "wallet"
+  | "heart"
+  | "close"
+  | "arrow";
 
 export function PageHeader({
   title,
-  accent,
   subtitle,
   action,
 }: {
   title: string;
-  accent?: string;
   subtitle: string;
   action?: ReactNode;
 }) {
   return (
-    <header className="page-header">
+    <header className="page-head">
       <div>
-        <h1>
-          {title}
-          {accent && (
-            <>
-              {" "}
-              <em>{accent}</em>
-            </>
-          )}
-        </h1>
+        <h1>{title}</h1>
         <p>{subtitle}</p>
       </div>
-      {action && <div className="page-header-action">{action}</div>}
+      {action && <div className="page-head-action">{action}</div>}
     </header>
-  );
-}
-
-export function Card({ children, className = "", title, icon, action }: CardProps) {
-  return (
-    <section className={`ui-card ${className}`}>
-      {(title || action) && (
-        <div className="ui-card-head">
-          <div className="ui-card-title">
-            {icon && <Icon name={icon} />}
-            {title && <h2>{title}</h2>}
-          </div>
-          {action}
-        </div>
-      )}
-      {children}
-    </section>
-  );
-}
-
-export function SectionHeader({
-  title,
-  description,
-  action,
-}: {
-  title: string;
-  description?: string;
-  action?: ReactNode;
-}) {
-  return (
-    <div className="section-header">
-      <div>
-        <h2>{title}</h2>
-        {description && <p>{description}</p>}
-      </div>
-      {action}
-    </div>
-  );
-}
-
-export function Pill({ children, tone = "gray", className = "" }: PillProps) {
-  return <span className={`status-pill status-pill-${tone} ${className}`}>{children}</span>;
-}
-
-export function MetricRow({
-  icon,
-  label,
-  value,
-  detail,
-}: {
-  icon?: IconName;
-  label: string;
-  value: ReactNode;
-  detail?: ReactNode;
-}) {
-  return (
-    <div className="metric-row">
-      {icon && (
-        <span className="metric-row-icon">
-          <Icon name={icon} />
-        </span>
-      )}
-      <div>
-        <p>{label}</p>
-        <strong>{value}</strong>
-        {detail && <span>{detail}</span>}
-      </div>
-    </div>
-  );
-}
-
-export function ProgressBar({
-  value,
-  tone = "blue",
-}: {
-  value: number;
-  tone?: "blue" | "green";
-}) {
-  return (
-    <span className="progress-track" aria-hidden="true">
-      <span
-        className={`progress-fill progress-fill-${tone}`}
-        style={{ width: `${Math.max(0, Math.min(value, 100))}%` }}
-      />
-    </span>
-  );
-}
-
-export function CircularProgress({ value }: { value: number }) {
-  const safeValue = Math.max(0, Math.min(value, 100));
-
-  return (
-    <div
-      className="circular-progress"
-      style={{ ["--progress" as string]: `${safeValue * 3.6}deg` }}
-      aria-label={`${safeValue}% complete`}
-    >
-      <span>{safeValue}%</span>
-    </div>
   );
 }
 
@@ -192,6 +72,9 @@ const stroke = {
 };
 
 const paths: Record<IconName, ReactNode> = {
+  heart: <path {...stroke} d="M12 20s-7.5-4.6-9.2-9.3A4.9 4.9 0 0 1 12 6.3a4.9 4.9 0 0 1 9.2 4.4C19.5 15.4 12 20 12 20Z" />,
+  close: <path {...stroke} d="M6 6l12 12M18 6 6 18" />,
+  arrow: <path {...stroke} d="M5 12h14M13 6l6 6-6 6" />,
   alert: <><path {...stroke} d="M12 8v5" /><path {...stroke} d="M12 17h.01" /><path {...stroke} d="M10.3 3.7 2.8 18a2 2 0 0 0 1.8 3h14.8a2 2 0 0 0 1.8-3L13.7 3.7a1.9 1.9 0 0 0-3.4 0Z" /></>,
   application: <><path {...stroke} d="M8 4h8l3 3v13H5V4h3Z" /><path {...stroke} d="M15 4v4h4" /><path {...stroke} d="M8 13h8" /><path {...stroke} d="M8 17h6" /></>,
   bell: <><path {...stroke} d="M18 9a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" /><path {...stroke} d="M10 21a2 2 0 0 0 4 0" /></>,
