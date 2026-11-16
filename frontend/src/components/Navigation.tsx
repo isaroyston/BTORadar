@@ -1,6 +1,7 @@
 import { TABS } from "../constants";
 import type { TabKey } from "../types";
 import { Icon, type IconName } from "./DashboardUi";
+import { HeroArt } from "./HeroArt";
 
 type NavigationProps = {
   activeTab: TabKey;
@@ -23,48 +24,45 @@ export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps
   const journey = TABS.filter((tab) => JOURNEY.includes(tab.id));
   const other = TABS.filter((tab) => !JOURNEY.includes(tab.id));
 
+  const item = (tab: (typeof TABS)[number]) => {
+    const done = doneTabs.has(tab.id);
+    return (
+      <button
+        key={tab.id}
+        type="button"
+        className="side-item"
+        aria-current={activeTab === tab.id ? "page" : undefined}
+        onClick={() => onSelectTab(tab.id)}
+      >
+        <span className="side-icon" aria-hidden="true">
+          <Icon name={tabIcons[tab.id]} />
+        </span>
+        <span>{tab.label}</span>
+        {done && (
+          <span className="side-done" title="Done">
+            <Icon name="check" />
+            <span className="sr-only">(done)</span>
+          </span>
+        )}
+      </button>
+    );
+  };
+
   return (
     <>
       <nav className="side-nav" aria-label="Sections">
         <Brand />
-        <ol className="side-steps">
-          {journey.map((tab, index) => {
-            const done = doneTabs.has(tab.id);
-            return (
-              <li key={tab.id}>
-                <button
-                  type="button"
-                  className="side-item"
-                  aria-current={activeTab === tab.id ? "page" : undefined}
-                  onClick={() => onSelectTab(tab.id)}
-                >
-                  <span className={done ? "side-step side-step-done" : "side-step"} aria-hidden="true">
-                    {done ? <Icon name="check" /> : index + 1}
-                  </span>
-                  <span>{tab.label}</span>
-                  {done && <span className="sr-only">(done)</span>}
-                </button>
-              </li>
-            );
-          })}
-        </ol>
-        <div className="side-other">
-          {other.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              className="side-item side-item-quiet"
-              aria-current={activeTab === tab.id ? "page" : undefined}
-              onClick={() => onSelectTab(tab.id)}
-            >
-              <span className="side-icon" aria-hidden="true">
-                <Icon name={tabIcons[tab.id]} />
-              </span>
-              <span>{tab.label}</span>
-            </button>
-          ))}
+        <div className="side-group">{journey.map(item)}</div>
+        <div className="side-group side-group-quiet">{other.map(item)}</div>
+        <div className="side-foot">
+          <p>
+            Plan smarter.
+            <br />
+            Own sooner.
+          </p>
+          <p className="side-note">Estimates only. HDB's HFE letter is the final word.</p>
+          <HeroArt variant="quiet" />
         </div>
-        <p className="side-note">Estimates only. HDB's HFE letter is the final word.</p>
       </nav>
 
       <header className="top-bar">
@@ -99,7 +97,9 @@ function Brand() {
         <span />
       </span>
       <span className="brand-name">
-        BTO <strong>Radar</strong>
+        {"BTO "}
+        <br />
+        Radar
       </span>
     </div>
   );

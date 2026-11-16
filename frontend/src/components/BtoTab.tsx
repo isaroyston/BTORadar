@@ -122,6 +122,7 @@ export function BtoTab({
   const [comparedProjectIds, setComparedProjectIds] = useState<string[]>([]);
   const [detailProjectId, setDetailProjectId] = useState<string | null>(null);
   const [rankingOpen, setRankingOpen] = useState(false);
+  const [fitOnly, setFitOnly] = useState(false);
   const hasActiveFilters = yearFilter !== "latest" || townQuery.trim().length > 0;
   const ceiling = Math.floor(totalAffordability / 1000) * 1000;
   const savedSet = useMemo(() => new Set(savedProjectIds), [savedProjectIds]);
@@ -238,6 +239,20 @@ export function BtoTab({
       {!btoLoading && !btoError && (
         <>
           <div className="card filter-bar">
+            <div className="filter filter-budget">
+              <span className="filter-label">Your budget</span>
+              {budgetKnown ? (
+                <button type="button" className="budget-pill" onClick={onOpenBudget}>
+                  Up to {currency(ceiling)}
+                  <Icon name="edit" />
+                </button>
+              ) : (
+                <button type="button" className="budget-pill budget-pill-empty" onClick={onOpenBudget}>
+                  Set your budget
+                  <Icon name="arrow" />
+                </button>
+              )}
+            </div>
             <div className="filter">
               <label className="filter-label" htmlFor="flat-size-select">
                 Flat size
@@ -367,6 +382,8 @@ export function BtoTab({
                     flatType={selectedFlatType}
                     budgetKnown={budgetKnown}
                     ceiling={ceiling}
+                    fitOnly={fitOnly}
+                    onToggleFitOnly={() => setFitOnly((current) => !current)}
                   />
 
                   <div className="list-toolbar">
@@ -405,7 +422,9 @@ export function BtoTab({
                   )}
 
                   <div className="project-grid">
-                    {selectedLaunch.projects.map((project, index) => (
+                    {selectedLaunch.projects
+                      .filter((project) => !fitOnly || !budgetKnown || fitsBudget(project, selectedFlatType, ceiling))
+                      .map((project, index) => (
                       <ProjectCard
                         key={project.id}
                         index={index}
@@ -424,7 +443,6 @@ export function BtoTab({
                         onOpen={() => setDetailProjectId(project.id)}
                         onToggleSaved={() => onToggleSaved(project.id)}
                         onToggleCompare={() => handleToggleCompareProject(project.id)}
-                        onSelectProject={() => onSelectProject(project.id)}
                       />
                     ))}
                   </div>
@@ -506,51 +524,63 @@ function LaunchSummary({
   flatType,
   budgetKnown,
   ceiling,
+  fitOnly,
+  onToggleFitOnly,
 }: {
   launch: LaunchGroup;
   flatType: FlatType;
   budgetKnown: boolean;
   ceiling: number;
+  fitOnly: boolean;
+  onToggleFitOnly: () => void;
 }) {
   const priced = launch.projects.filter((project) => getSelectedVariant(project, flatType));
-  const fitting = priced.filter(
-    (project) => (getSelectedVariant(project, flatType)?.basePrice ?? Infinity) <= ceiling
-  ).length;
+  const fitting = priced.filter((project) => fitsBudget(project, flatType, ceiling));
+  const fittingPrices = fitting.map((project) => getSelectedVariant(project, flatType)?.basePrice ?? 0);
   const isSaved = launch.key === SAVED_KEY;
   const status = isSaved ? null : getLaunchStatus(launch.key);
+  const context = [
+    isSaved ? "Saved projects" : launch.key,
+    `${formatNumber(launch.totalUnits)} flats`,
+    status,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  let title: string;
+  let detail: string;
+  if (priced.length === 0) {
+    title = `No ${flatTypeLabel(flatType)} prices listed yet`;
+    detail = context;
+  } else if (!budgetKnown) {
+    title = `${priced.length} ${priced.length === 1 ? "project has" : "projects have"} ${flatTypeLabel(flatType)} prices`;
+    detail = `${context} · from ${currency(launch.lowestPrice ?? 0)}`;
+  } else if (fitting.length === 0) {
+    title = `None of ${priced.length} fit your ${currency(ceiling)} budget`;
+    detail = `${context} · lowest ${currency(launch.lowestPrice ?? 0)}`;
+  } else {
+    title = `${fitting.length} of ${priced.length} ${priced.length === 1 ? "project fits" : "projects fit"} your budget`;
+    detail = `${context} · from ${currency(Math.min(...fittingPrices))} to ${currency(Math.max(...fittingPrices))}`;
+  }
 
   return (
-    <div className="card launch-summary">
+    <div className="match-banner">
+      <span className="match-icon" aria-hidden="true">
+        <Icon name="sparkle" />
+      </span>
       <div>
-        <h2>{isSaved ? "Your saved projects" : launch.key}</h2>
-        <p>
-          {launch.projects.length} {launch.projects.length === 1 ? "project" : "projects"},{" "}
-          {formatNumber(launch.totalUnits)} flats
-          {status ? `, ${status}` : ""}.
-        </p>
+        <h2>{title}</h2>
+        <p>{detail}</p>
       </div>
-      <p className="launch-summary-fit">
-        {priced.length === 0 ? (
-          <span>No {flatType} prices listed yet</span>
-        ) : budgetKnown ? (
-          <>
-            <strong>
-              {fitting} of {priced.length}
-            </strong>
-            <span>fit your {currency(ceiling)} budget</span>
-          </>
-        ) : (
-          <>
-            <strong>{currency(launch.lowestPrice ?? 0)}</strong>
-            <span>lowest {flatType} price</span>
-          </>
-        )}
-      </p>
+      {budgetKnown && fitting.length > 0 && fitting.length < launch.projects.length && (
+        <button type="button" className="btn btn-white btn-small" aria-pressed={fitOnly} onClick={onToggleFitOnly}>
+          {fitOnly ? "Show all" : "Show only these"}
+        </button>
+      )}
     </div>
   );
 }
 
-// HDB takes applications for about a week in the launch month, so an earlier month is closed.
 function getLaunchStatus(launchKey: string) {
   const parsed = new Date(`1 ${launchKey}`);
   if (Number.isNaN(parsed.getTime())) return null;
@@ -585,7 +615,6 @@ function ProjectCard({
   selectedFlatType,
   budgetKnown,
   ceiling,
-  decisionScore,
   isSelected,
   isSaved,
   isCompareSelected,
@@ -593,7 +622,6 @@ function ProjectCard({
   onOpen,
   onToggleSaved,
   onToggleCompare,
-  onSelectProject,
 }: {
   index: number;
   project: BtoProject;
@@ -608,11 +636,8 @@ function ProjectCard({
   onOpen: () => void;
   onToggleSaved: () => void;
   onToggleCompare: () => void;
-  onSelectProject: () => void;
 }) {
   const variant = getSelectedVariant(project, selectedFlatType);
-  const flatLabel = flatTypeLabel(selectedFlatType);
-  const score = decisionScore?.total ?? null;
 
   return (
     <article
@@ -620,91 +645,46 @@ function ProjectCard({
       style={{ ["--i" as string]: Math.min(index, 12) } as CSSProperties}
     >
       <div className="project-card-head">
-        <p className="project-meta">
-          <TypeBadge type={project.btoType} />
-          <span>{project.location}</span>
-        </p>
+        <div>
+          <h3 className="project-name">
+            <button type="button" className="stretched" onClick={onOpen}>
+              {project.name}
+            </button>
+          </h3>
+          <p className="project-meta">
+            {project.location}
+            {isSelected && <span className="in-plan">In your plan</span>}
+          </p>
+        </div>
         <SaveButton saved={isSaved} name={project.name} onToggle={onToggleSaved} />
       </div>
-
-      <h3 className="project-name">
-        <button type="button" className="stretched" onClick={onOpen}>
-          {project.name}
-        </button>
-      </h3>
 
       {variant ? (
         <div className="project-price">
           <p>
             <strong>{currency(variant.basePrice)}</strong>
-            <span>{flatLabel}, estimated</span>
+            <span className="size-chip">{flatTypeLabel(selectedFlatType)}</span>
           </p>
           {budgetKnown && <FitPill price={variant.basePrice} ceiling={ceiling} />}
         </div>
       ) : (
-        <p className="project-price-missing">No {flatLabel} price listed yet</p>
+        <p className="project-price-missing">No {flatTypeLabel(selectedFlatType)} price yet</p>
       )}
 
-      <dl className="spec-grid">
-        <div>
-          <dt>Keys, estimated</dt>
-          <dd>{formatKeys(project.expectedTop)}</dd>
-        </div>
-        <div>
-          <dt>Nearest MRT</dt>
-          <dd>
-            {project.nearestMrtDistanceMeters
-              ? `${formatDistance(project.nearestMrtDistanceMeters)}${project.nearestMrt ? `, ${shortStation(project.nearestMrt)}` : ""}`
-              : "Not listed"}
-          </dd>
-        </div>
-        <div>
-          <dt>Flats</dt>
-          <dd>{formatNumber(project.totalUnits)}</dd>
-        </div>
-        <div>
-          <dt>Match</dt>
-          <dd>{score === null ? "Not enough data" : <ScoreMeter value={score} />}</dd>
-        </div>
-      </dl>
-
-      <div className="project-actions">
-        <button type="button" className="btn btn-primary btn-small" aria-pressed={isSelected} onClick={onSelectProject}>
-          {isSelected ? "In your plan" : "Plan this flat"}
-        </button>
-        <button
-          type="button"
-          className="btn btn-quiet btn-small"
-          aria-pressed={isCompareSelected}
-          disabled={isCompareDisabled}
-          onClick={onToggleCompare}
-        >
-          {isCompareSelected ? (
-            <>
-              <Icon name="check" />
-              Comparing
-            </>
-          ) : (
-            "Compare"
-          )}
-        </button>
-        <button type="button" className="text-link project-more" onClick={onOpen}>
-          Details
+      <div className="project-foot">
+        <p className="muted">
+          <TypeBadge type={project.btoType} />
+          Keys: {formatKeys(project.expectedTop).replace("Not announced", "not announced")}
+        </p>
+        <label className={isCompareDisabled ? "compare-check is-disabled" : "compare-check"}>
+          <input type="checkbox" checked={isCompareSelected} disabled={isCompareDisabled} onChange={onToggleCompare} />
+          Compare
+        </label>
+        <button type="button" className="round-btn round-btn-small" aria-label={`Details for ${project.name}`} onClick={onOpen}>
+          <Icon name="arrow" />
         </button>
       </div>
     </article>
-  );
-}
-
-function ScoreMeter({ value }: { value: number }) {
-  return (
-    <span className="meter">
-      <span className="meter-track" aria-hidden="true">
-        <span style={{ width: `${Math.max(4, Math.min(value, 100))}%` }} />
-      </span>
-      {value}
-      <span className="sr-only"> out of 100</span>
-    </span>
   );
 }
 
@@ -1056,8 +1036,9 @@ function flatTypeLabel(type: FlatType) {
   return FLAT_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? type;
 }
 
-function shortStation(name: string) {
-  return name.replace(/\s+MRT( Station)?$/i, "");
+function fitsBudget(project: BtoProject, flatType: FlatType, ceiling: number) {
+  const price = getSelectedVariant(project, flatType)?.basePrice;
+  return price !== undefined && price <= ceiling;
 }
 
 function minOrNull(values: Array<number | null>) {

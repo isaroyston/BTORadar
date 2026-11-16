@@ -1,6 +1,7 @@
 import type { BtoProject } from "../policies/policyConfig";
 import type { TabKey, TimelineItem } from "../types";
 import { currency } from "../utils/format";
+import { HeroCard } from "./Cards";
 import { Icon, PageHeader } from "./DashboardUi";
 
 type OverviewTabProps = {
@@ -73,22 +74,20 @@ export function OverviewTab({
       <PageHeader title="Overview" subtitle="What's done, and what comes next." />
 
       {selectedProject && nextStep ? (
-        <div className="answer overview-next">
-          <p className="answer-lead">Next: {nextStep.label.toLowerCase()}</p>
-          <p className="answer-figure answer-figure-md">
-            {nextStep.payment ? currency(nextStep.payment.total) : "Nothing to pay"}
-          </p>
-          <p className="answer-body">
+        <HeroCard art="overview">
+          <p className="hero-lead">Next: {nextStep.label.toLowerCase()}</p>
+          <p className="hero-figure">{nextStep.payment ? currency(nextStep.payment.total) : "Nothing to pay"}</p>
+          <p className="hero-body-text">
             {nextStep.payment ? `${nextStep.payment.label}, expected ${nextStep.date}. ` : `Expected ${nextStep.date}. `}
             {nextStep.note}
           </p>
-          <div className="answer-actions">
+          <div className="hero-actions">
             <button type="button" className="btn btn-primary" onClick={() => onSelectTab("plan")}>
               Open your plan
               <Icon name="arrow" />
             </button>
           </div>
-        </div>
+        </HeroCard>
       ) : null}
 
       <ol className="card journey">

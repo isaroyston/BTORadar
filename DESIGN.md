@@ -1,32 +1,27 @@
 ---
 name: BTO Radar
-description: A housing-money planner for Singapore BTO buyers. Restrained product UI on one typeface, a warm off-white canvas, white working cards, one dark summary card per screen, one accent for actions, and calm motion that shows numbers changing.
-references:
-  - Wise (base system): one accent, 24px radius, surface contrast as depth, a live calculator card as the signature.
-  - Airbnb (browsing): listing cards with a save heart, one hover-float shadow tier, a sticky summary rail beside detail.
-  - NerdWallet (comparison): ruled comparison rows, label-over-value spec cells, no vertical dividers.
+description: A housing-money planner for Singapore BTO buyers. Soft pink product UI on one typeface, white cards with soft shadows, one pink headline card per screen with a drawn HDB scene, icon tiles for every figure, one raspberry accent, and calm motion that shows numbers changing.
+reference: The owner's reference screens (soft pink Budget, Projects and Plan screens with illustrated headline cards, icon tiles, a match banner, compact project cards and a light sidebar). Earlier references (Wise, Airbnb, NerdWallet) still shape behaviour; the look follows the owner's reference.
 colors:
-  canvas: "oklch(97.4% 0.005 80)"      # warm off-white page ground
-  canvas-deep: "oklch(94.6% 0.007 80)" # inputs, segmented tracks, active nav
-  card: "oklch(100% 0 0)"              # white working cards
-  ink: "oklch(22% 0.012 60)"           # warm near-black: text, and the summary-card ground
-  ink-2: "oklch(38% 0.012 60)"         # secondary text on light
-  mute: "oklch(52% 0.01 60)"           # tertiary text, captions
-  hairline: "oklch(22% 0.012 60 / 0.09)"
-  accent: "oklch(55% 0.2 15)"          # raspberry: every primary action and the active nav item
-  accent-bright: "oklch(68% 0.19 15)"  # accent on the dark summary card
-  accent-pale: "oklch(95% 0.03 15)"
-  cream: "oklch(95% 0.02 80)"          # text on the dark summary card
-  positive: "oklch(48% 0.13 152)"      # within budget, done
-  positive-pale: "oklch(94.5% 0.05 152)"
-  caution: "oklch(52% 0.12 65)"        # over budget, not covered
-  caution-pale: "oklch(95% 0.05 85)"
+  canvas: "oklch(97.6% 0.008 15)"       # pale pink page ground
+  canvas-deep: "oklch(95.4% 0.012 15)"  # notes, tracks
+  card: "oklch(100% 0 0)"               # white cards
+  hero: "oklch(93.8% 0.038 12)"         # flat pink headline card and sidebar footer
+  ink: "oklch(23% 0.015 20)"
+  ink-2: "oklch(40% 0.015 20)"
+  mute: "oklch(53% 0.012 20)"
+  accent: "oklch(57% 0.21 15)"          # raspberry: actions, headline figures, active nav, icons
+  accent-soft: "oklch(95.5% 0.03 12)"   # icon tiles, edit chips, selected segment
+  positive: "oklch(48% 0.13 152)"       # within budget, done, grant tile
+  caution: "oklch(50% 0.11 62)"         # over budget, not covered
+  gold: "oklch(78% 0.15 80)"            # tip and match icons only
 typography:
-  face: "Inter only, 400-700. Tabular numerals wherever digits line up."
-  scale: "page title clamp(1.75rem, 2.4vw, 2.125rem)/700; summary figure clamp(2.5rem, 4.6vw, 3.6rem)/700; section 1.2-1.4rem/600; body 1rem; caption 0.85rem"
+  face: "Inter only, 400-800. Tabular numerals wherever digits line up."
+  scale: "page title clamp(1.75rem, 2.4vw, 2.1rem)/800; headline figure clamp(2.3rem, 4.4vw, 3.1rem)/800 in raspberry; card title 1.1rem/700; body 15.5px; caption 0.8rem"
 rounded:
-  card: 24px
-  control: 16px
+  card: 22px
+  hero: 24px
+  control: 14px
   pill: 999px
 ---
 
@@ -34,71 +29,49 @@ rounded:
 
 ## What it is
 
-A planner people open with a real decision in front of them: can we afford a flat, which launch, and when the money is due. The interface should feel like a confident friend who is good with money. Plain words, big answers, nothing hidden behind jargon.
+A planner people open with a real decision in front of them: can we afford a flat, which launch, and when the money is due. It should feel friendly and calm: soft colour, pictures where they help, plain words, and one big answer per screen.
 
-## The references, and what each contributes
+## The look
 
-- **Wise is the base.** One accent colour for actions and nothing else. Cards and buttons at a generous 24px radius. Depth comes mostly from surface contrast (white cards on an oat canvas), not shadows. Its signature is a live calculator card; ours is the Budget card, where the price ceiling updates as you type.
-- **Airbnb shapes browsing.** Project cards are scannable listings with a save heart in the corner. One soft shadow tier exists, used only for things that float: a hovered card, the detail sheet, the bottom bar. Detail opens beside the list with a sticky summary.
-- **NerdWallet shapes comparison.** The compare view is ruled rows with no vertical dividers, label above value, and the best value in each row marked with the positive colour.
-- **Ours, not theirs.** The palette (warm near-black, off-white, raspberry) belongs to BTO Radar. No reference's brand colours, typefaces or illustrations are copied.
+- **Pale pink canvas, white cards.** Cards have no borders; a soft pink-tinted shadow lifts them.
+- **One pink headline card per screen**, full width at the top: a flat pink panel (not a gradient) with the screen's answer on the left and a drawn HDB scene on the right. On phones the scene sits under the text.
+- **The scene** (`components/HeroArt.tsx`) is hand-drawn SVG: three HDB blocks with a raspberry roof band, clouds, a sun, trees, and a white badge holding the screen's icon (piggy bank on Budget, calendar on Plan, target on Overview). It uses the palette only, so it stays sharp and costs nothing to load. The sidebar footer carries a quiet version under "Plan smarter. Own sooner."
+- **Every figure has an icon.** Stat tiles (loan, grant, CPF, cash) pair a pale icon tile with label and amount. The monthly repayment is a white chip with a calendar icon. Card titles carry a small raspberry icon square. Answer rows lead with an icon.
+- **Edit is a chip.** Pale pink pill with a pencil, top-right of the thing it edits.
+- **Banners for context.** The tip card (Budget) and match banner (Projects) are pale pink with a white icon tile and one action.
 
-## Restraint is the polish
+## Copy rules
 
-An earlier pass used marketing-style question headlines with one accented word, a heavy display face, radar rings, a glow and a pulsing dot. It read as generated, so it was removed. The rules that came out of it:
-
-- Screens are titled with their name ("Budget", "Projects", "Plan"), plus one factual line. No questions, slogans or accented words.
-- One typeface. The only large type on a screen is its main money figure.
-- No decoration: no rings, glows, gradients, pulsing dots or bounce effects.
-- One dark surface per screen at most. The sidebar, tab bar and banners stay light.
+- Screens are titled with their name ("Budget", "Projects", "Plan") plus one factual line. No questions, slogans or accented words.
+- The headline card leads with a plain label ("Target price", "You could buy a flat priced up to") and one figure.
 
 ## Colour rules
 
-- **Raspberry means "do this".** Primary buttons, the active nav item, focus rings, links. Never a status.
-- **Status has its own colours.** Green for within budget and done; ochre for over budget and not covered. Over budget is a caution, not an error, so it is never red.
-- **One dark summary card per screen.** The price ceiling, the plan verdict and the next payment sit on the dark ground with cream text. Everything you work on (forms, lists, tables, the launch summary) sits on white.
-- Text on the dark card uses cream at full or 75% strength, never grey.
-
-## Type rules
-
-- Page titles are the screen's name in Inter 700, with one plain sentence under it.
-- The summary figure is Inter 700 with slightly tight tracking. Supporting figures use Inter 600 with tabular numerals.
-- No uppercase eyebrows or labels above headings.
-
-## Depth
-
-| Level | Treatment | Used for |
-|---|---|---|
-| 0 | Oat canvas | Page ground |
-| 1 | White card, no border | Forms, lists, cards |
-| 2 | Dark summary card | The screen's main answer |
-| 3 | Float shadow `0 1px 2px ink/6%, 0 12px 32px -12px ink/28%` | Hovered card, detail sheet, bottom bar, sticky rail |
+- **Raspberry means "this matters".** Actions, the headline figure, the active nav item, icons and focus rings.
+- **Status has its own colours.** Green for within budget, done and the grant; ochre for over budget. Over budget is never red.
+- Gold appears only inside the tip and match icons.
 
 ## Components
 
-- **Summary card.** Dark ground, 28px radius, no decoration. Holds one figure, one sentence, a funding bar, and one primary action.
-- **Funding bar.** Segments for loan (raspberry-bright), grant (green), CPF (cream), cash (sand), not covered (hatched ochre). Segments grow from zero when shown.
-- **Project card.** White, 24px radius. Name and town, save heart top-right, price large, a fit pill (green "Fits your budget" or ochre "S$X over"), four facts as label-over-value cells, two actions.
-- **Detail sheet.** Slides in from the right on desktop, up from the bottom on phones. Price per flat size, fit, monthly payment at that price, facts, strengths, and a full-width "Plan this flat".
-- **Segmented control.** Oat track, white thumb that slides to the selected option.
-- **Timeline.** Plan's payments are a vertical timeline: a dot per step, the date, what is paid, how (CPF or cash), and a tick to mark it done.
+- **Headline card.** `HeroCard` with `art="budget" | "plan" | "overview"`.
+- **Stat tiles.** `StatTiles`; two per row on phones, icon above the figure.
+- **Project card.** Compact and text-only: name, town, save heart, price with a size chip, fit pill, then a footer with type badge, keys date, Compare and a round arrow to details.
+- **Detail sheet.** Slides from the right on desktop, up on phones; "Plan this flat" is the one primary action.
+- **Segmented control.** White track with a pale pink thumb that slides.
+- **Payments.** Compact numbered rows: what, when (editable), the amount (editable) and CPF or cash tags.
 
 ## Motion
 
-None of the references document motion, so these rules are ours.
-
-- **Numbers move.** When a money figure changes it counts to the new value over 500ms (ease-out). That is the signature: you change your savings and watch the ceiling move.
-- **Screens cross-fade** on navigation, through the View Transitions API where the browser has it.
-- **Lists fade in** 6px at 45ms per item, once per screen visit.
-- **Floating things gain a shadow.** Cards take the float shadow on hover without moving. The sheet slides 32px with a fade.
-- **Nothing bounces, pulses or spins.**
-- **Everything uses** `cubic-bezier(0.16, 1, 0.3, 1)`, 200–500ms. Under `prefers-reduced-motion`, figures jump, screens swap instantly, and nothing moves.
+- **Numbers count** to new values over 500ms.
+- **Screens cross-fade** through the View Transitions API.
+- **Cards, tiles and the scene rise** 6px into place, staggered.
+- **Nothing bounces, pulses or spins.** Everything uses `cubic-bezier(0.16, 1, 0.3, 1)`. Under `prefers-reduced-motion`, nothing moves.
 
 ## Do and don't
 
 - **Do** lead every screen with its answer, then the inputs that change it.
-- **Do** save automatically. People should never lose a plan because they forgot a button.
-- **Don't** add a second accent colour, gradients, glass, decorative illustrations, or a second typeface.
-- **Don't** write headlines; name the screen.
-- **Don't** put borders on cards; surface contrast separates them.
-- **Don't** show a verdict ("fits", "over") before the person has given their own numbers; say what is missing instead.
+- **Do** save automatically.
+- **Do** give every figure an icon and a label.
+- **Don't** use gradients on the headline card; it is a flat pink panel with a picture.
+- **Don't** add a second typeface or a second accent.
+- **Don't** show a verdict ("fits", "over") before the person has given their numbers.

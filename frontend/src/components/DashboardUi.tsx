@@ -34,7 +34,12 @@ export type IconName =
   | "wallet"
   | "heart"
   | "close"
-  | "arrow";
+  | "arrow"
+  | "piggy"
+  | "bulb"
+  | "sparkle"
+  | "target"
+  | "cash";
 
 export function PageHeader({
   title,
@@ -75,6 +80,11 @@ const paths: Record<IconName, ReactNode> = {
   heart: <path {...stroke} d="M12 20s-7.5-4.6-9.2-9.3A4.9 4.9 0 0 1 12 6.3a4.9 4.9 0 0 1 9.2 4.4C19.5 15.4 12 20 12 20Z" />,
   close: <path {...stroke} d="M6 6l12 12M18 6 6 18" />,
   arrow: <path {...stroke} d="M5 12h14M13 6l6 6-6 6" />,
+  piggy: <><path {...stroke} d="M19 11.5c0 3.6-3.1 6.5-7 6.5s-7-2.9-7-6.5S8.1 5 12 5s7 2.9 7 6.5Z" /><path {...stroke} d="M8 17.5V20M16 17.5V20M19 10h2M10 8.5h4" /><circle {...stroke} cx="15.5" cy="11" r=".6" /></>,
+  bulb: <><path {...stroke} d="M9 18h6M10 21h4" /><path {...stroke} d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3Z" /></>,
+  sparkle: <><path {...stroke} d="M12 3v4M12 17v4M3 12h4M17 12h4" /><path {...stroke} d="m7.5 7.5 2 2M14.5 14.5l2 2M16.5 7.5l-2 2M9.5 14.5l-2 2" /></>,
+  target: <><circle {...stroke} cx="12" cy="12" r="8.5" /><circle {...stroke} cx="12" cy="12" r="4.5" /><circle {...stroke} cx="12" cy="12" r=".8" /></>,
+  cash: <><rect {...stroke} x="3" y="6.5" width="18" height="11" rx="2" /><circle {...stroke} cx="12" cy="12" r="2.5" /><path {...stroke} d="M6.5 9.5v.01M17.5 14.5v.01" /></>,
   alert: <><path {...stroke} d="M12 8v5" /><path {...stroke} d="M12 17h.01" /><path {...stroke} d="M10.3 3.7 2.8 18a2 2 0 0 0 1.8 3h14.8a2 2 0 0 0 1.8-3L13.7 3.7a1.9 1.9 0 0 0-3.4 0Z" /></>,
   application: <><path {...stroke} d="M8 4h8l3 3v13H5V4h3Z" /><path {...stroke} d="M15 4v4h4" /><path {...stroke} d="M8 13h8" /><path {...stroke} d="M8 17h6" /></>,
   bell: <><path {...stroke} d="M18 9a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z" /><path {...stroke} d="M10 21a2 2 0 0 0 4 0" /></>,
