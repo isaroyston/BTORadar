@@ -161,6 +161,14 @@ export interface BtoProject {
   minPrice?: number;
   maxPrice?: number;
   waitTimeMonths?: string;
+  // From the RecordBTO project page: HDB's waiting time from booking to completion, and the
+  // keys month it implies while no completion date is published.
+  waitMonths?: { min: number; max: number };
+  estimatedKeys?: string;
+  blocks?: number;
+  highestFloor?: number;
+  highlights?: string[];
+  nearby?: Partial<Record<"shopping" | "education" | "transport" | "healthcare" | "recreation", string[]>>;
   nearestMrt?: string;
   nearestMrtDistanceMeters?: number;
   nearestMrtDistanceSource?: string;

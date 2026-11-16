@@ -8,6 +8,7 @@ import type {
   FlatType,
 } from "../types";
 import { getLaunchMonthSortValue } from "./date";
+import { keysMonth } from "./projectFacts";
 
 export type BtoScoreWeights = Record<BtoScoreComponentKey, number>;
 
@@ -146,7 +147,7 @@ export const BTO_SCORE_COMPONENT_DETAILS: Record<
     label: "Wait Time",
     shortLabel: "TOP",
     description:
-      "Uses expected TOP. Earlier completion scores higher within the selected launch.",
+      "Uses HDB's completion date, or the waiting time announced at launch. Earlier keys score higher.",
   },
   supply: {
     label: "Supply",
@@ -329,13 +330,13 @@ function buildWaitComponent(
   context: BtoScoreContext,
   weight: number
 ): BtoScoreComponent | null {
-  const topSortValue = getLaunchMonthSortValue(project.expectedTop ?? "");
+  const topSortValue = getLaunchMonthSortValue(keysMonth(project) ?? "");
   if (!topSortValue) return null;
 
   const score = lowIsBetter(
     topSortValue,
     context.cohortProjects
-      .map((candidate) => getLaunchMonthSortValue(candidate.expectedTop ?? ""))
+      .map((candidate) => getLaunchMonthSortValue(keysMonth(candidate) ?? ""))
       .filter((value) => value > 0)
   );
 
@@ -393,7 +394,7 @@ function getMissingFields(
   ) {
     fields.push("location centrality");
   }
-  if (weights.wait > 0 && !project.expectedTop) fields.push("expected TOP");
+  if (weights.wait > 0 && !keysMonth(project)) fields.push("keys date");
   if (weights.supply > 0 && !Number.isFinite(project.totalUnits)) {
     fields.push("unit count");
   }

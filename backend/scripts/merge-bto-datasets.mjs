@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const RECORDBTO_URL = new URL("../../frontend/public/data/recordbto/projects.json", import.meta.url);
 const BTOHQ_URL = new URL("../../frontend/public/data/btohq/projects.json", import.meta.url);
+const DETAILS_PATH = fileURLToPath(new URL("../../frontend/public/data/recordbto/details.json", import.meta.url));
 const OUTPUT_URL = new URL("../../frontend/public/data/bto/projects.json", import.meta.url);
 const RAIL_STATIONS_URL = new URL("../data/geospatial/rail-stations.geojson", import.meta.url);
 
@@ -57,6 +58,7 @@ async function main() {
   const recordbtoPayload = JSON.parse(await readFile(RECORDBTO_PATH, "utf8"));
   const btohqPayload = JSON.parse(await readFile(BTOHQ_PATH, "utf8"));
   const railStations = await loadRailStations();
+  const details = await loadDetails();
   const recordProjects = recordbtoPayload.projects ?? [];
   const btohqProjects = btohqPayload.projects ?? [];
   const btohqByKey = new Map();
@@ -117,7 +119,7 @@ async function main() {
         ? "Nearest MRT distances are straight-line estimates from project coordinates to URA Master Plan 2019 rail station centroids."
         : "Rail station GeoJSON was unavailable, so nearest MRT distances were not generated.",
     },
-    projects: projects.map(slimForApp).map(compactObject),
+    projects: projects.map((project) => withDetails(project, details)).map(slimForApp).map(compactObject),
   };
 
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
@@ -663,6 +665,37 @@ function compareProjects(a, b) {
 // The app reads only these BTOHQ fields. The rest (photos, descriptions, supply tables)
 // stays in data/btohq/projects.json, so every visitor does not download it.
 const BTOHQ_FIELDS_FOR_APP = ["sourceUrl", "ratings", "nearbyAmenities"];
+
+// Waiting time, blocks, highlights and nearby places from each RecordBTO project page
+// (backfill-recordbto-details.mjs). Optional: the merge still runs without the file.
+async function loadDetails() {
+  try {
+    return JSON.parse(await readFile(DETAILS_PATH, "utf8")).details ?? {};
+  } catch {
+    return {};
+  }
+}
+
+function withDetails(project, details) {
+  const extra = details[project.id];
+  if (!extra) return project;
+  const { waitMonths, blocks, highestFloor, highlights, nearby } = extra;
+  return { ...project, waitMonths, blocks, highestFloor, highlights, nearby, estimatedKeys: estimateKeys(project, waitMonths) };
+}
+
+const MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+// HDB announces a waiting time at launch, counted from flat selection (about three months
+// after the launch) to completion. Only used while no keys date has been published.
+function estimateKeys(project, waitMonths) {
+  if (!waitMonths || /\d{4}/.test(project.expectedTop ?? "")) return undefined;
+  const match = /^([A-Za-z]{3})[a-z]*\s+(\d{4})$/.exec(String(project.launchMonth ?? "").trim());
+  if (!match) return undefined;
+  const month = MONTH_NAMES.indexOf(match[1]);
+  if (month === -1) return undefined;
+  const total = Number(match[2]) * 12 + month + 3 + Math.round((waitMonths.min + waitMonths.max) / 2);
+  return `${MONTH_NAMES[total % 12]} ${Math.floor(total / 12)}`;
+}
 
 function slimForApp(project) {
   if (!project.btohq) return project;

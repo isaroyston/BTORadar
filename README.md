@@ -28,8 +28,8 @@
 ## Product Surfaces
 
 - **Overview**: the front door. New visitors pick where they are (budget first, a project in mind, or already booked); returning visitors see the next payment and where each step stands.
-- **Budget**: income, age and CPF (plus optional CPF-per-month and cash), one price ceiling, and what sets it.
-- **Projects**: launches, project cards checked against the ceiling, a detail sheet, saved projects, and side-by-side compare.
+- **Budget**: one price ceiling, with the answers it rests on as chips in the headline card (each opens its field), what sets the ceiling and how to raise it, then the breakdown.
+- **Projects**: launches; a "What matters most" choice that is always visible (best all-round, lowest price, near the MRT, soonest keys, or a fine-tuned mix); cards with a OneMap street map of the site, a rank, the price checked against the ceiling, and facts led by what the buyer ranked highest; a detail sheet with highlights, keys date, blocks and nearby schools and parks; saved projects; and side-by-side compare.
 - **Plan**: target price, loan and downpayment choices, whether it fits (asking income, age and CPF in place if they're missing), whether CPF covers the monthly repayment, and a payment timeline showing grant, CPF and cash per payment. Saves automatically.
 
 The visual system is described in [`DESIGN.md`](DESIGN.md).
@@ -71,6 +71,17 @@ npm.cmd run data:recordbto
 This replaces `frontend/public/data/recordbto/projects.json` with the current
 RecordBTO project scrape. The scraper is dependency-free and uses the project
 count reported by `https://recordbto.com/bto`.
+
+It then runs `data:recordbto:details`, which reads each recent or undated project's
+page for HDB's announced waiting time, block count, tallest block, highlights and
+nearby places, and writes `frontend/public/data/recordbto/details.json`. The merge
+folds these in and adds `estimatedKeys` (launch month + 3 months to booking + the
+waiting time) for projects without a published completion date. The app shows those
+as "About Apr 2030" and uses them for payment dates and the "soonest keys" ranking.
+
+Project maps are not stored: each card loads a static street map from OneMap
+(Singapore Land Authority, keyless, at most 512 px a side) using the project's
+coordinates.
 
 ## Deploy
 

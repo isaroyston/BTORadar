@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { FLAT_TYPE_OPTIONS } from "../constants";
 import type { BtoFlatVariant, BtoProject } from "../policies/policyConfig";
 import type {
@@ -7,17 +7,15 @@ import type {
   FlatType,
 } from "../types";
 import {
-  BTO_SCORE_COMPONENT_DETAILS,
   BTO_SCORE_IMPORTANCE_LEVELS,
   BTO_SCORE_IMPORTANCE_MAX,
-  BTO_SCORE_PRESET_DETAILS,
-  BTO_SCORE_PRESET_OPTIONS,
   scoreBtoProjects,
   type BtoScoreWeights,
 } from "../utils/btoScoring";
 import { getLaunchMonthSortValue } from "../utils/date";
 import { arrowNavigate } from "../utils/keyboard";
 import { currency } from "../utils/format";
+import { keysAreEstimated, keysLabel, locationMapUrl, projectFacts, waitLabel, type ProjectFact } from "../utils/projectFacts";
 import {
   BTO_SOURCE_CREDITS,
   getBtoProjectSourceLabel,
@@ -85,6 +83,8 @@ const SCORE_COMPONENT_ORDER = [
   "wait",
   "supply",
 ] as const;
+
+const NEARBY_LABELS = { education: "Schools", recreation: "Parks", healthcare: "Healthcare", shopping: "Shops" } as const;
 
 const TYPE_NOTES: Record<string, string> = {
   standard: "Standard flats can be sold after the 5-year minimum occupation period.",
@@ -181,6 +181,14 @@ export function BtoTab({
         : new Map<string, BtoDecisionScore>(),
     [ehgGrant, loanAmount, scorePreset, scoreWeights, selectedFlatType, selectedLaunch, totalAffordability]
   );
+  const priceRanks = useMemo(() => {
+    const priced = (selectedLaunch?.projects ?? [])
+      .map((project) => ({ id: project.id, price: getSelectedVariant(project, selectedFlatType)?.basePrice }))
+      .filter((entry): entry is { id: string; price: number } => entry.price !== undefined)
+      .sort((a, b) => a.price - b.price);
+    return new Map(priced.map((entry, index) => [entry.id, { rank: index + 1, of: priced.length }]));
+  }, [selectedFlatType, selectedLaunch]);
+  const hasPriority = Object.values(scoreWeights).some((weight) => weight > 0);
   const detailProject =
     (detailProjectId && allProjects.find((project) => project.id === detailProjectId)) || null;
 
@@ -389,22 +397,13 @@ export function BtoTab({
                     onToggleFitOnly={() => setFitOnly((current) => !current)}
                   />
 
-                  <div className="list-toolbar">
-                    <p>
-                      Best match first, ranked for{" "}
-                      <strong>{BTO_SCORE_PRESET_DETAILS[scorePreset].label.toLowerCase()}</strong>.
-                    </p>
-                    <button
-                      type="button"
-                      className="btn btn-quiet"
-                      aria-expanded={rankingOpen}
-                      aria-controls="ranking-panel"
-                      onClick={() => setRankingOpen((open) => !open)}
-                    >
-                      <Icon name="filter" />
-                      {rankingOpen ? "Done" : "Change what matters"}
-                    </button>
-                  </div>
+                  <Priorities
+                    scorePreset={scorePreset}
+                    scoreWeights={scoreWeights}
+                    fineTuneOpen={rankingOpen}
+                    onFineTune={() => setRankingOpen((open) => !open)}
+                    onScorePresetChange={onScorePresetChange}
+                  />
 
                   {rankingOpen && (
                     <ScoreSettingsCard
@@ -436,6 +435,8 @@ export function BtoTab({
                         budgetKnown={budgetKnown}
                         ceiling={ceilingFor(project)}
                         decisionScore={projectScores.get(project.id) ?? null}
+                        rank={hasPriority ? index + 1 : null}
+                        facts={projectFacts(project, scoreWeights, priceRanks.get(project.id) ?? null)}
                         isSelected={project.id === selectedProjectId}
                         isSaved={savedSet.has(project.id)}
                         isCompareSelected={activeComparedProjectIds.includes(project.id)}
@@ -618,6 +619,8 @@ function ProjectCard({
   selectedFlatType,
   budgetKnown,
   ceiling,
+  rank,
+  facts,
   isSelected,
   isSaved,
   isCompareSelected,
@@ -632,6 +635,8 @@ function ProjectCard({
   budgetKnown: boolean;
   ceiling: number;
   decisionScore: BtoDecisionScore | null;
+  rank: number | null;
+  facts: ProjectFact[];
   isSelected: boolean;
   isSaved: boolean;
   isCompareSelected: boolean;
@@ -647,48 +652,187 @@ function ProjectCard({
       className={isSelected ? "project-card is-selected" : "project-card"}
       style={{ ["--i" as string]: Math.min(index, 12) } as CSSProperties}
     >
-      <div className="project-card-head">
-        <div>
-          <h3 className="project-name">
-            <button type="button" className="stretched" onClick={onOpen}>
-              {project.name}
-            </button>
-          </h3>
-          <p className="project-meta">
-            {project.location}
-            {isSelected && <span className="in-plan">In your plan</span>}
-          </p>
-        </div>
-        <SaveButton saved={isSaved} name={project.name} onToggle={onToggleSaved} />
-      </div>
+      <ProjectMap project={project} className="project-map">
+        {rank === 1 && <span className="rank-badge">Top match</span>}
+        {rank !== null && rank > 1 && <span className="rank-badge rank-badge-quiet">#{rank}</span>}
+        <TypeBadge type={project.btoType} />
+      </ProjectMap>
 
-      {variant ? (
-        <div className="project-price">
-          <p>
-            <strong>{currency(variant.basePrice)}</strong>
-            <span className="size-chip">{flatTypeLabel(selectedFlatType)}</span>
-          </p>
-          {budgetKnown && <FitPill price={variant.basePrice} ceiling={ceiling} />}
+      <div className="project-card-body">
+        <div className="project-card-head">
+          <div>
+            <h3 className="project-name">
+              <button type="button" className="stretched" onClick={onOpen}>
+                {project.name}
+              </button>
+            </h3>
+            <p className="project-meta">
+              {project.location}
+              {isSelected && <span className="in-plan">In your plan</span>}
+            </p>
+          </div>
+          <SaveButton saved={isSaved} name={project.name} onToggle={onToggleSaved} />
         </div>
-      ) : (
-        <p className="project-price-missing">No {flatTypeLabel(selectedFlatType)} price yet</p>
-      )}
 
-      <div className="project-foot">
-        <p className="muted">
-          <TypeBadge type={project.btoType} />
-          Keys: {formatKeys(project.expectedTop).replace("Not announced", "not announced")}
-        </p>
-        <label className={isCompareDisabled ? "compare-check is-disabled" : "compare-check"}>
-          <input type="checkbox" checked={isCompareSelected} disabled={isCompareDisabled} onChange={onToggleCompare} />
-          Compare
-        </label>
-        <button type="button" className="round-btn round-btn-small" aria-label={`Details for ${project.name}`} onClick={onOpen}>
-          <Icon name="arrow" />
-        </button>
+        {variant ? (
+          <div className="project-price">
+            <p>
+              <strong>{currency(variant.basePrice)}</strong>
+              <span className="size-chip">{flatTypeLabel(selectedFlatType)}</span>
+            </p>
+            {budgetKnown && <FitPill price={variant.basePrice} ceiling={ceiling} />}
+          </div>
+        ) : (
+          <p className="project-price-missing">No {flatTypeLabel(selectedFlatType)} price yet</p>
+        )}
+
+        {facts.length > 0 && (
+          <ul className="project-facts">
+            {facts.map((fact) => (
+              <li key={fact.key}>
+                <Icon name={fact.icon} />
+                {fact.text}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="project-foot">
+          <label className={isCompareDisabled ? "compare-check is-disabled" : "compare-check"}>
+            <input type="checkbox" checked={isCompareSelected} disabled={isCompareDisabled} onChange={onToggleCompare} />
+            Compare
+          </label>
+          <button type="button" className="round-btn round-btn-small" aria-label={`Details for ${project.name}`} onClick={onOpen}>
+            <Icon name="arrow" />
+          </button>
+        </div>
       </div>
     </article>
   );
+}
+
+// A street map of the site from OneMap (Singapore Land Authority). Projects without
+// coordinates get a quiet placeholder so the grid keeps its rhythm.
+function ProjectMap({
+  project,
+  className,
+  large = false,
+  children,
+}: {
+  project: BtoProject;
+  className: string;
+  large?: boolean;
+  children?: ReactNode;
+}) {
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const src = locationMapUrl(project, 512, large ? 214 : 200);
+  return (
+    <div className={className}>
+      {src && failedSrc !== src ? (
+        <img
+          src={src}
+          alt={`Street map around ${project.name}`}
+          loading="lazy"
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onError={() => setFailedSrc(src)}
+        />
+      ) : (
+        <span className="project-map-empty" aria-hidden="true">
+          <Icon name="map" />
+        </span>
+      )}
+      {children && <div className="project-map-tags">{children}</div>}
+    </div>
+  );
+}
+
+const PRESET_CHOICES: Array<{ value: BtoScorePreset; label: string; icon: "sparkle" | "money" | "metro" | "clock" }> = [
+  { value: "balanced", label: "Best all-round", icon: "sparkle" },
+  { value: "budget", label: "Lowest price", icon: "money" },
+  { value: "commute", label: "Near the MRT", icon: "metro" },
+  { value: "faster-top", label: "Soonest keys", icon: "clock" },
+];
+
+const SLIDER_TEXT: Record<keyof BtoScoreWeights, { label: string; hint: string }> = {
+  affordability: { label: "Price", hint: "Lower prices, and prices within your budget, rank higher." },
+  commute: { label: "Near the MRT", hint: "Shorter walk to the nearest MRT station." },
+  centrality: { label: "Location", hint: "Closer to the city, mature towns and the waterfront." },
+  wait: { label: "Keys date", hint: "Sooner keys, from HDB's completion date or announced waiting time." },
+  supply: { label: "Project size", hint: "More flats in the project." },
+};
+
+const WEIGHT_WORDS: Record<keyof BtoScoreWeights, string> = {
+  affordability: "price",
+  commute: "MRT",
+  centrality: "location",
+  wait: "keys date",
+  supply: "project size",
+};
+
+function Priorities({
+  scorePreset,
+  scoreWeights,
+  fineTuneOpen,
+  onFineTune,
+  onScorePresetChange,
+}: {
+  scorePreset: BtoScorePreset;
+  scoreWeights: BtoScoreWeights;
+  fineTuneOpen: boolean;
+  onFineTune: () => void;
+  onScorePresetChange: (value: BtoScorePreset) => void;
+}) {
+  const index = PRESET_CHOICES.findIndex((choice) => choice.value === scorePreset);
+  const order = (Object.keys(scoreWeights) as Array<keyof BtoScoreWeights>)
+    .filter((key) => scoreWeights[key] > 0)
+    .sort((a, b) => scoreWeights[b] - scoreWeights[a])
+    .slice(0, 3)
+    .map((key) => WEIGHT_WORDS[key]);
+  return (
+    <section className="priorities" aria-labelledby="priorities-title">
+      <div className="priorities-head">
+        <h2 id="priorities-title">What matters most to you</h2>
+        <button type="button" className="text-link" aria-expanded={fineTuneOpen} aria-controls="ranking-panel" onClick={onFineTune}>
+          <Icon name="filter" />
+          {fineTuneOpen ? "Done" : "Fine-tune"}
+        </button>
+      </div>
+      <div
+        className="priority-choices"
+        role="radiogroup"
+        aria-labelledby="priorities-title"
+        onKeyDown={(event) => {
+          const next = arrowNavigate(event, Math.max(index, 0), PRESET_CHOICES.length, '[role="radio"]');
+          if (next !== null) onScorePresetChange(PRESET_CHOICES[next].value);
+        }}
+      >
+        {PRESET_CHOICES.map((choice, choiceIndex) => (
+          <button
+            key={choice.value}
+            type="button"
+            role="radio"
+            aria-checked={scorePreset === choice.value}
+            tabIndex={choiceIndex === (index < 0 ? 0 : index) ? 0 : -1}
+            className="priority-choice"
+            onClick={() => onScorePresetChange(choice.value)}
+          >
+            <Icon name={choice.icon} />
+            {choice.label}
+          </button>
+        ))}
+      </div>
+      <p className="priorities-note">
+        {order.length
+          ? `${scorePreset === "custom" ? "Your own mix. " : ""}Best match first; each card leads with ${joinWords(order)}.`
+          : "Pick what matters to rank the projects."}
+      </p>
+    </section>
+  );
+}
+
+function joinWords(words: string[]) {
+  return words.length < 2 ? words.join("") : `${words.slice(0, -1).join(", ")} and ${words[words.length - 1]}`;
 }
 
 function SaveButton({ saved, name, onToggle }: { saved: boolean; name: string; onToggle: () => void }) {
@@ -748,6 +892,9 @@ function ProjectSheet({
     : [];
   const typeNote = project?.btoType ? TYPE_NOTES[project.btoType.toLowerCase()] : undefined;
   const components = decisionScore?.components ?? [];
+  const nearbyGroups = (["education", "recreation", "healthcare", "shopping"] as const)
+    .map((group) => [group, project?.nearby?.[group] ?? []] as const)
+    .filter(([, places]) => places.length > 0);
 
   return (
     <dialog
@@ -777,6 +924,19 @@ function ProjectSheet({
           <h2 id="sheet-title" className="sheet-title">
             {project.name}
           </h2>
+
+          <ProjectMap project={project} className="sheet-map" large />
+
+          {project.highlights && project.highlights.length > 0 && (
+            <ul className="highlights">
+              {project.highlights.slice(0, 4).map((highlight) => (
+                <li key={highlight}>
+                  <Icon name="check" />
+                  {highlight}
+                </li>
+              ))}
+            </ul>
+          )}
 
           <section className="sheet-section">
             <h3>Prices by flat size</h3>
@@ -817,7 +977,10 @@ function ProjectSheet({
             <dl className="spec-grid spec-grid-wide">
               <div>
                 <dt>Keys, estimated</dt>
-                <dd>{formatKeys(project.expectedTop)}</dd>
+                <dd>
+                  {keysLabel(project)}
+                  {keysAreEstimated(project) && waitLabel(project) && <span className="spec-sub">{waitLabel(project)}</span>}
+                </dd>
               </div>
               <div>
                 <dt>Nearest MRT</dt>
@@ -825,7 +988,14 @@ function ProjectSheet({
               </div>
               <div>
                 <dt>Flats</dt>
-                <dd>{formatNumber(project.totalUnits)}</dd>
+                <dd>
+                  {formatNumber(project.totalUnits)}
+                  {project.blocks ? (
+                    <span className="spec-sub">
+                      {project.blocks} blocks{project.highestFloor ? `, up to ${project.highestFloor} storeys` : ""}
+                    </span>
+                  ) : null}
+                </dd>
               </div>
               <div>
                 <dt>Sizes</dt>
@@ -834,6 +1004,20 @@ function ProjectSheet({
             </dl>
             {typeNote && <p className="sheet-note">{typeNote}</p>}
           </section>
+
+          {nearbyGroups.length > 0 && (
+            <section className="sheet-section">
+              <h3>Nearby</h3>
+              <dl className="nearby-list">
+                {nearbyGroups.map(([group, places]) => (
+                  <div key={group}>
+                    <dt>{NEARBY_LABELS[group]}</dt>
+                    <dd>{places.slice(0, 3).join(" · ")}</dd>
+                  </div>
+                ))}
+              </dl>
+            </section>
+          )}
 
           {components.length > 0 && (
             <section className="sheet-section">
@@ -898,35 +1082,10 @@ function ScoreSettingsCard({
     });
   };
   const hasActivePriority = Object.values(scoreWeights).some((weight) => weight > 0);
-  const presetOptions = BTO_SCORE_PRESET_OPTIONS.filter((option) => option.value !== "custom");
-  const presetIndex = presetOptions.findIndex((option) => option.value === scorePreset);
 
   return (
     <div className="card ranking" id="ranking-panel">
-      <div
-        className="ranking-presets"
-        role="radiogroup"
-        aria-label="Start from"
-        onKeyDown={(event) => {
-          const next = arrowNavigate(event, Math.max(presetIndex, 0), presetOptions.length, '[role="radio"]');
-          if (next !== null) onScorePresetChange(presetOptions[next].value);
-        }}
-      >
-        {presetOptions.map((option, index) => (
-          <button
-            key={option.value}
-            type="button"
-            role="radio"
-            aria-checked={scorePreset === option.value}
-            tabIndex={index === (presetIndex < 0 ? 0 : presetIndex) ? 0 : -1}
-            className="chip"
-            onClick={() => onScorePresetChange(option.value)}
-          >
-            {option.label}
-          </button>
-        ))}
-      </div>
-      <p className="muted">{BTO_SCORE_PRESET_DETAILS[scorePreset].focus}</p>
+      <p className="muted">Set how much each one counts. Changing any of them makes your own mix.</p>
       {!hasActivePriority && (
         <p className="ranking-warning" role="status">
           Choose at least one thing that matters to rank projects.
@@ -941,10 +1100,10 @@ function ScoreSettingsCard({
           return (
             <div key={key} className="ranking-slider">
               <label htmlFor={id}>
-                <span>{BTO_SCORE_COMPONENT_DETAILS[key].label}</span>
+                <span>{SLIDER_TEXT[key].label}</span>
                 <strong>{importance.label}</strong>
               </label>
-              <p className="muted">{BTO_SCORE_COMPONENT_DETAILS[key].description}</p>
+              <p className="muted">{SLIDER_TEXT[key].hint}</p>
               <input
                 id={id}
                 type="range"
@@ -1032,11 +1191,6 @@ function TypeBadge({ type }: { type: string | undefined }) {
 }
 
 // Listings say "To be announced" until HDB publishes a completion date.
-function formatKeys(expectedTop: string | undefined) {
-  if (!expectedTop) return "Not listed";
-  return /announced/i.test(expectedTop) ? "Not announced" : expectedTop;
-}
-
 function tabId(launchKey: string) {
   return `launch-tab-${launchKey.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
 }
@@ -1098,12 +1252,12 @@ function buildCompareRows(
     plainCompareRow({
       label: "Keys, estimated",
       projects,
-      format: (project) => formatKeys(project.expectedTop),
+      format: (project) => keysLabel(project),
     }),
     plainCompareRow({
       label: "Wait for keys",
       projects,
-      format: (project) => project.waitTimeMonths ?? "Not listed",
+      format: (project) => waitLabel(project) ?? project.waitTimeMonths ?? "Not listed",
     }),
     numericCompareRow({
       label: "Flats",

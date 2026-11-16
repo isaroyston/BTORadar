@@ -10,7 +10,7 @@ const dataSources: SourceLink[] = [
   {
     label: "RecordBTO",
     href: "https://recordbto.com",
-    description: "Community-curated BTO launch records and prices.",
+    description: "Community-curated BTO launch records, prices, waiting times, highlights and nearby places.",
   },
   {
     label: "BTOHQ",
@@ -21,6 +21,11 @@ const dataSources: SourceLink[] = [
     label: "data.gov.sg",
     href: "https://data.gov.sg",
     description: "Singapore's open data portal, used for MRT station locations.",
+  },
+  {
+    label: "OneMap",
+    href: "https://www.onemap.gov.sg",
+    description: "Street maps of each project site, from the Singapore Land Authority.",
   },
 ];
 

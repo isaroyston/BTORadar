@@ -4,7 +4,7 @@ export const BTO_SOURCE_CREDITS = [
   {
     label: "RecordBTO",
     url: "https://recordbto.com/bto",
-    note: "project pages, listed price ranges, and MRT distance labels",
+    note: "project pages, listed price ranges, waiting times, highlights and nearby places",
   },
   {
     label: "BTOHQ",

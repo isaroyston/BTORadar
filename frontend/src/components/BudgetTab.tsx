@@ -11,7 +11,6 @@ import {
   EditChip,
   HeroCard,
   MonthlyChip,
-  Note,
   StatTiles,
   type Tile,
 } from "./Cards";
@@ -45,6 +44,12 @@ const financingLabel: Record<FinancingType, string> = {
   hdb: "an HDB loan",
   bank: "a bank loan",
   none: "no loan",
+};
+
+const firstTimerShort: Record<FirstTimers, string> = {
+  both: "Both first-timers",
+  one: "One first-timer",
+  none: "Second-timers",
 };
 
 const firstTimerLabel: Record<FirstTimers, string> = {
@@ -84,8 +89,32 @@ export function BudgetTab({
 
   const openField = (id: string) => {
     setEditing(true);
-    requestAnimationFrame(() => document.getElementById(id)?.focus());
+    requestAnimationFrame(() => {
+      const field = document.getElementById(id);
+      field?.scrollIntoView({ block: "center", behavior: "smooth" });
+      field?.focus({ preventScroll: true });
+    });
   };
+
+  // What the figure rests on, shown in the headline card so the inputs are one tap away.
+  const basis = [
+    { id: "budget-income", text: `${currency(combinedIncome)} a month` },
+    { id: "budget-age", text: budget.age === null ? "Age not set" : `Age ${budget.age}` },
+    { id: "budget-cpf", text: budget.cpfOa === null ? "CPF not set" : `${currency(budget.cpfOa)} CPF` },
+    { id: "budget-cash", text: budget.cash === null ? "Cash for fees only" : `${currency(budget.cash)} cash` },
+    { id: "budget-first", text: firstTimerShort[budget.firstTimers] },
+  ];
+
+  const cpfNote =
+    known && ceiling
+      ? `Counts the CPF you build up before each payment is due: about ${currency(ceiling.oaAtSigning)} by signing (in about ${timing.monthsToSigning} months) and ${currency(ceiling.oaAtKeys)} by keys (about ${Math.round(timing.monthsToKeys / 6) / 2} years). Your grant is credited before signing.${
+          monthlyCpf !== null && estimateAtMax?.estimatedMonthlyPayment
+            ? monthlyCpf >= estimateAtMax.estimatedMonthlyPayment
+              ? ` After keys, your CPF of about ${currency(monthlyCpf)} a month covers the loan repayment.`
+              : ` After keys, CPF covers about ${currency(monthlyCpf)} of the ${currency(Math.round(estimateAtMax.estimatedMonthlyPayment))} monthly repayment; the other ${currency(Math.round(estimateAtMax.estimatedMonthlyPayment - monthlyCpf))} is cash.`
+            : ""
+        }`
+      : null;
 
   const answers: {
     id: string;
@@ -153,6 +182,8 @@ export function BudgetTab({
           financing={financing}
           loanTenureYears={loanTenureYears}
           ehg={ehg}
+          basis={basis}
+          onEditField={openField}
           onSeeProjects={onSeeProjects}
           onOpenPlan={onOpenPlan}
         />
@@ -177,6 +208,19 @@ export function BudgetTab({
           </ul>
         </HeroCard>
       )}
+      {known && estimateAtMax && maxPrice !== null && (
+        <TipCard
+          limit={describeLimit({
+            estimate: estimateAtMax,
+            loan: Math.round(estimateAtMax.loanForTarget ?? 0),
+            maxPrice,
+            financing,
+            ceiling,
+            timing,
+          })}
+          onEdit={() => openField(ceiling?.limitedBy === "loan" ? "budget-income" : "budget-cpf")}
+        />
+      )}
       <div className="two-col">
         <div className="col">
           {known && (
@@ -188,28 +232,13 @@ export function BudgetTab({
               financing={financing}
               loanTenureYears={loanTenureYears}
               ehg={ehg}
+              cpfNote={cpfNote}
+              basis={basis}
+              onEditField={openField}
               onSeeProjects={onSeeProjects}
               onOpenPlan={onOpenPlan}
             />
           )}
-          {known && ceiling && (
-            <Note>
-              Counts the CPF you build up before each payment is due: about{" "}
-              {currency(ceiling.oaAtSigning)} by signing (in about{" "}
-              {timing.monthsToSigning} months) and {currency(ceiling.oaAtKeys)}{" "}
-              by keys (about {Math.round(timing.monthsToKeys / 6) / 2} years).
-              Your grant is credited before signing.
-              {monthlyCpf !== null && estimateAtMax?.estimatedMonthlyPayment
-                ? monthlyCpf >= estimateAtMax.estimatedMonthlyPayment
-                  ? ` After keys, your CPF of about ${currency(monthlyCpf)} a month covers the loan repayment.`
-                  : ` After keys, CPF covers about ${currency(monthlyCpf)} of the ${currency(Math.round(estimateAtMax.estimatedMonthlyPayment))} monthly repayment; the other ${currency(Math.round(estimateAtMax.estimatedMonthlyPayment - monthlyCpf))} is cash.`
-                : ""}
-            </Note>
-          )}
-          <Note>
-            Your figures stay in this browser and are never sent anywhere. HDB's
-            HFE letter is the final word on what you can borrow.
-          </Note>
         </div>
 
         <div className="col">
@@ -361,19 +390,10 @@ export function BudgetTab({
             </section>
           )}
 
-          {known && estimateAtMax && maxPrice !== null && (
-            <TipCard
-              limit={describeLimit({
-                estimate: estimateAtMax,
-                loan: Math.round(estimateAtMax.loanForTarget ?? 0),
-                maxPrice,
-                financing,
-                ceiling,
-                timing,
-              })}
-              onSeeProjects={onSeeProjects}
-            />
-          )}
+          <p className="privacy-line">
+            <Icon name="info" />
+            Your figures stay in this browser. HDB's HFE letter is the final word on what you can borrow.
+          </p>
         </div>
       </div>
     </section>
@@ -382,10 +402,10 @@ export function BudgetTab({
 
 function TipCard({
   limit,
-  onSeeProjects,
+  onEdit,
 }: {
   limit: { title: string; body: string };
-  onSeeProjects: () => void;
+  onEdit: () => void;
 }) {
   return (
     <section className="tip">
@@ -396,13 +416,9 @@ function TipCard({
         <h2>{limit.title}</h2>
         <p>{limit.body}</p>
       </div>
-      <button
-        type="button"
-        className="round-btn"
-        aria-label="See flats that fit"
-        onClick={onSeeProjects}
-      >
-        <Icon name="arrow" />
+      <button type="button" className="btn btn-quiet btn-small" onClick={onEdit}>
+        <Icon name="edit" />
+        Change figures
       </button>
     </section>
   );
@@ -416,10 +432,16 @@ function BudgetAnswer({
   financing,
   loanTenureYears,
   ehg,
+  cpfNote = null,
+  basis,
+  onEditField,
   onSeeProjects,
   onOpenPlan,
 }: {
   part: "hero" | "breakdown";
+  cpfNote?: string | null;
+  basis: { id: string; text: string }[];
+  onEditField: (id: string) => void;
   maxPrice: number;
   estimate: FinancingEstimate;
   oaAtKeys: number;
@@ -457,8 +479,9 @@ function BudgetAnswer({
       <>
         <StatTiles tiles={tiles} />
         <details className="card disclosure-card">
-          <summary>What this estimate assumes</summary>
+          <summary>How this is worked out</summary>
           <ul>
+            {cpfNote && <li>{cpfNote}</li>}
             <li>{ehg.note}</li>
             {estimate.warnings.map((warning) => (
               <li key={warning}>{warning}</li>
@@ -481,6 +504,22 @@ function BudgetAnswer({
           With {financingLabel[financing]}, some of the price has to come from
           savings or a grant. Add CPF or cash savings to see a ceiling.
         </p>
+      <div className="hero-basis">
+        <p className="hero-basis-label">Based on</p>
+        <ul>
+          {basis.map((item) => (
+            <li key={item.id}>
+              <button type="button" className="basis-chip" onClick={() => onEditField(item.id)}>
+                {item.text}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <button type="button" className="btn btn-white btn-small" onClick={() => onEditField("budget-income")}>
+          <Icon name="edit" />
+          Edit details
+        </button>
+      </div>
       </HeroCard>
     );
   }
@@ -513,6 +552,22 @@ function BudgetAnswer({
         </button>
         <button type="button" className="text-link" onClick={onOpenPlan}>
           Change loan type
+        </button>
+      </div>
+      <div className="hero-basis">
+        <p className="hero-basis-label">Based on</p>
+        <ul>
+          {basis.map((item) => (
+            <li key={item.id}>
+              <button type="button" className="basis-chip" onClick={() => onEditField(item.id)}>
+                {item.text}
+              </button>
+            </li>
+          ))}
+        </ul>
+        <button type="button" className="btn btn-white btn-small" onClick={() => onEditField("budget-income")}>
+          <Icon name="edit" />
+          Edit details
         </button>
       </div>
     </HeroCard>

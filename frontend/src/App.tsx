@@ -58,6 +58,7 @@ import {
   type PurchaseTiming,
 } from "./utils/cpfProjection";
 import { parseLaunchMonthInput, parseMonth, parseMonthYearDate } from "./utils/date";
+import { keysMonth } from "./utils/projectFacts";
 import { clampNumber } from "./utils/format";
 import { withViewTransition } from "./utils/motion";
 import { buildPaymentTimeline } from "./utils/paymentTimeline";
@@ -269,9 +270,9 @@ function App() {
       timingForLaunch({
         today,
         applicationMonth: parseMonth(applicationMonth),
-        expectedKeys: parseMonthYearDate(selectedBtoProject?.expectedTop),
+        expectedKeys: parseMonthYearDate(keysMonth(selectedBtoProject)),
       }),
-    [applicationMonth, selectedBtoProject?.expectedTop, today]
+    [applicationMonth, selectedBtoProject, today]
   );
   const planOa = useMemo(() => {
     if (budget.age === null || budget.cpfOa === null) return null;
@@ -313,7 +314,7 @@ function App() {
       const timing = timingForLaunch({
         today,
         applicationMonth: parseMonthYearDate(project.launchMonth) ?? today,
-        expectedKeys: parseMonthYearDate(project.expectedTop),
+        expectedKeys: parseMonthYearDate(keysMonth(project)),
       });
       const key = `${timing.monthsToSigning}:${timing.monthsToKeys}`;
       if (!byTiming.has(key)) byTiming.set(key, Math.floor((ceilingAt(timing)?.price ?? 0) / 1000) * 1000);
@@ -330,7 +331,7 @@ function App() {
     () =>
       buildPaymentTimeline({
         applicationMonth,
-        expectedTop: selectedBtoProject?.expectedTop,
+        expectedTop: keysMonth(selectedBtoProject),
         flatType,
         signingAmount,
         signingCpf,
@@ -352,7 +353,7 @@ function App() {
       keyCpf,
       minCashSigning,
       optionFee,
-      selectedBtoProject?.expectedTop,
+      selectedBtoProject,
       signingAmount,
       signingCpf,
       surveyFee,

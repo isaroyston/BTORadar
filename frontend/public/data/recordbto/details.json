@@ -1,0 +1,1186 @@
+{
+  "generatedAt": "2026-11-16T14:50:32.405Z",
+  "source": "https://recordbto.com/bto",
+  "projectCount": 133,
+  "details": {
+    "bayshore-oasis": {
+      "blocks": 4,
+      "highestFloor": 30,
+      "highlights": [
+        "Plus project next to Bayshore MRT",
+        "855 flats, all two-room Flexi and four-room",
+        "Shortest wait in Bayshore at 38 months",
+        "Walk to East Coast Park",
+        "9% subsidy recovery and a 10-year MOP"
+      ],
+      "waitMonths": {
+        "min": 38,
+        "max": 38
+      },
+      "nearby": {
+        "shopping": [
+          "Minimart and shops in the cluster",
+          "Future shops and eateries along Bayshore Drive"
+        ],
+        "education": [
+          "Temasek Primary School",
+          "Temasek Secondary School",
+          "Preschool in the cluster"
+        ],
+        "transport": [
+          "Bayshore MRT (TEL)",
+          "Bedok South MRT and future integrated development",
+          "Bus stops along Bayshore Drive"
+        ],
+        "healthcare": [
+          "Bedok Polyclinic"
+        ],
+        "recreation": [
+          "East Coast Park",
+          "Bayshore precinct parks and cycling paths"
+        ]
+      }
+    },
+    "bayshore-sails": {
+      "blocks": 7,
+      "highestFloor": 34,
+      "highlights": [
+        "Largest Bayshore project with 1,637 flats",
+        "Only Bayshore project with three-room flats",
+        "Next to Bayshore MRT",
+        "Walk to East Coast Park",
+        "9% subsidy recovery and a 10-year MOP"
+      ],
+      "waitMonths": {
+        "min": 44,
+        "max": 44
+      },
+      "nearby": {
+        "shopping": [
+          "Shops and eating house in the cluster",
+          "Future shops and eateries along Bayshore Drive",
+          "Bedok Town Centre"
+        ],
+        "education": [
+          "Temasek Primary School",
+          "Temasek Secondary School",
+          "Preschools in the cluster"
+        ],
+        "transport": [
+          "Bayshore MRT (TEL)",
+          "Bedok South MRT and future integrated development",
+          "Bus stops along Bayshore Drive"
+        ],
+        "healthcare": [
+          "Active Ageing Centre (Care)",
+          "Kidney dialysis centre in the cluster"
+        ],
+        "recreation": [
+          "East Coast Park",
+          "Bayshore precinct parks and cycling paths",
+          "Heartbeat@Bedok",
+          "Siglap Community Club"
+        ]
+      }
+    },
+    "chencharu-acres": {
+      "blocks": 12,
+      "highestFloor": 15,
+      "highlights": [
+        "Largest five-room supply this exercise with 644 flats",
+        "About a 10-minute walk to Khatib MRT",
+        "Future integrated development with bus interchange and hawker centre",
+        "12 blocks of 15 storeys",
+        "Standard project with a 39 or 41-month wait"
+      ],
+      "waitMonths": {
+        "min": 39,
+        "max": 41
+      },
+      "nearby": {
+        "shopping": [
+          "Future hawker centre and shops across Yishun Walk",
+          "Northpoint City"
+        ],
+        "education": [
+          "Peiying Primary School",
+          "Naval Base Primary School",
+          "Naval Base Secondary School",
+          "Orchid Park Secondary School"
+        ],
+        "transport": [
+          "Khatib MRT (NSL)",
+          "Future bus interchange in the integrated development across Yishun Walk"
+        ],
+        "healthcare": [
+          "Yishun Polyclinic",
+          "Khoo Teck Puat Hospital"
+        ],
+        "recreation": [
+          "Khatib Bongsu Park Connector",
+          "Lower Seletar Reservoir Park",
+          "Yishun Sports Centre"
+        ]
+      }
+    },
+    "merpati-meadow": {
+      "blocks": 3,
+      "highestFloor": 18,
+      "highlights": [
+        "Plus project about five minutes from Mattar MRT",
+        "Smallest project this exercise with 438 flats",
+        "Next to Aljunied Park",
+        "Walk to Circuit Road hawker centres",
+        "8% subsidy recovery and a 10-year MOP"
+      ],
+      "waitMonths": {
+        "min": 39,
+        "max": 39
+      },
+      "nearby": {
+        "shopping": [
+          "Circuit Road hawker centres",
+          "FairPrice supermarkets nearby"
+        ],
+        "education": [
+          "Canossa Catholic Primary School",
+          "Geylang Methodist Primary School",
+          "Geylang Methodist Secondary School",
+          "Preschool in the cluster"
+        ],
+        "transport": [
+          "Mattar MRT (DTL)",
+          "Bus stops along Merpati Road"
+        ],
+        "healthcare": [
+          "Macpherson Polyclinic"
+        ],
+        "recreation": [
+          "Aljunied Park",
+          "Common green with playgrounds and a multi-purpose court"
+        ]
+      }
+    },
+    "plantation-dew": {
+      "blocks": 5,
+      "highestFloor": 15,
+      "highlights": [
+        "Only 3Gen flats this exercise",
+        "White flats offered for three-room, four-room and five-room units",
+        "Five 15-storey blocks in Tengah",
+        "Near future Tengah Park and Tengah Plantation JRL stations",
+        "38-month wait"
+      ],
+      "waitMonths": {
+        "min": 38,
+        "max": 38
+      },
+      "nearby": {
+        "shopping": [
+          "Plantation Plaza",
+          "Eating house, minimart and shops in the cluster"
+        ],
+        "education": [
+          "Pioneer Primary School",
+          "Jurong Primary School",
+          "Jurongville Secondary School",
+          "Two-storey preschool in the cluster"
+        ],
+        "transport": [
+          "Future Tengah Park and Tengah Plantation JRL stations",
+          "Bus services along Tengah Garden Avenue"
+        ],
+        "healthcare": [
+          "Kidney dialysis centre in the cluster",
+          "Ng Teng Fong General Hospital"
+        ],
+        "recreation": [
+          "Future park and waterbody",
+          "Roof garden atop the MSCP"
+        ]
+      }
+    },
+    "sembawang-anchor": {
+      "blocks": 6,
+      "highestFloor": 26,
+      "highlights": [
+        "Shortest wait this exercise at 34 months",
+        "1,310 flats across six blocks",
+        "About a 15-minute walk to Sembawang MRT and Sun Plaza",
+        "New park across Admiralty Lane",
+        "Prices include floor finishes, internal doors and sanitary fittings"
+      ],
+      "waitMonths": {
+        "min": 34,
+        "max": 34
+      },
+      "nearby": {
+        "shopping": [
+          "Sun Plaza",
+          "Sembawang Mart",
+          "Supermarket and eating house in the cluster"
+        ],
+        "education": [
+          "Northoaks Primary School",
+          "Endeavour Primary School",
+          "Canberra Primary School",
+          "Canberra Secondary School"
+        ],
+        "transport": [
+          "Sembawang MRT (NSL)",
+          "Bus services along Sembawang Drive and Admiralty Lane"
+        ],
+        "healthcare": [
+          "Sembawang Polyclinic",
+          "Future nursing home across from Block 429A"
+        ],
+        "recreation": [
+          "New park across Admiralty Lane",
+          "Bukit Canberra"
+        ]
+      }
+    },
+    "toa-payoh-hillside": {
+      "blocks": 5,
+      "highestFloor": 43,
+      "highlights": [
+        "Only Prime project in the November 2026 exercise",
+        "Next to Caldecott MRT interchange on the Circle and Thomson-East Coast lines",
+        "256 Community Care Apartments, the first launch since the age limit dropped to 55",
+        "4-room flats with and without balconies",
+        "11% subsidy recovery and a 10-year MOP"
+      ],
+      "waitMonths": {
+        "min": 45,
+        "max": 45
+      },
+      "nearby": {
+        "shopping": [
+          "Toa Payoh West Market and Food Centre",
+          "Food court, supermarket and shops in the cluster"
+        ],
+        "education": [
+          "Marymount Convent School",
+          "Raffles Girls School (Secondary)",
+          "CHIJ Primary (Toa Payoh)",
+          "CHIJ Secondary (Toa Payoh)"
+        ],
+        "transport": [
+          "Caldecott MRT (CCL and TEL)",
+          "Bus stops along Toa Payoh Rise and Toa Payoh Link"
+        ],
+        "healthcare": [
+          "Toa Payoh Polyclinic",
+          "Active Ageing Centre"
+        ],
+        "recreation": [
+          "New park along Toa Payoh Link",
+          "MacRitchie Reservoir Park"
+        ]
+      }
+    },
+    "berlayar-rise": {
+      "blocks": 6,
+      "highestFloor": 49,
+      "highlights": [
+        "Telok Blangah MRT (CCL) just ~100m away — doorstep rapid transit, 1 stop to HarbourFront",
+        "Prime classification on former Keppel Club site with potential sea-facing views",
+        "Greater Southern Waterfront transformation area — long-term value catalyst",
+        "Near Mount Faber Park and Labrador Nature Reserve — dual nature reserves",
+        "Comprehensive integrated amenities: 2 restaurants, 2 cafes, supermarket, eating house, 8 shops, preschool"
+      ]
+    },
+    "kebun-baru-breeze": {
+      "blocks": 4,
+      "highestFloor": 25,
+      "highlights": [
+        "Dual MRT access: ~1km to Mayflower MRT (TEL) and walking distance to Bright Hill MRT (TEL/CCL interchange)",
+        "Plus classification in mature Ang Mo Kio estate with established amenities",
+        "Integrated preschool within the development for family convenience",
+        "Nearby Mayflower Shopping and Food Centre and Kebun Baru Mall for daily needs",
+        "2-room Flexi-heavy mix (370 units) — strong appeal for singles and elderly downgraders"
+      ],
+      "waitMonths": {
+        "min": 52,
+        "max": 52
+      }
+    },
+    "kebun-baru-ridge": {
+      "blocks": 3,
+      "highestFloor": 25,
+      "highlights": [
+        "Wait time of just 3 years 1 month - one of the fastest in a mature estate",
+        "Located along Ang Mo Kio Avenue 2 opposite CHIJ St Nicholas Girls School",
+        "485 units of 3-Room and 4-Room flats across 3 residential blocks",
+        "Nearby Mayflower MRT on the Thomson-East Coast Line for direct city access",
+        "Minimart and eating house within the development plus nearby Kebun Baru Market"
+      ],
+      "waitMonths": {
+        "min": 37,
+        "max": 37
+      }
+    },
+    "lakeview-cascadia": {
+      "blocks": 5,
+      "highestFloor": 40,
+      "highlights": [
+        "First public housing in Lakeview area since 1984 — over 40 years of pent-up demand",
+        "Expected Prime classification in a private-residential enclave near MacRitchie Reservoir",
+        "Marymount MRT (CCL) just 5-7 min walk; covered linkways to bus stops",
+        "Staggered 18-40 storey blocks with scenic MacRitchie Reservoir views from higher floors",
+        "3-Generation playgrounds, fitness stations, roof garden above MSCP, and integrated amenities"
+      ],
+      "waitMonths": {
+        "min": 51,
+        "max": 51
+      }
+    },
+    "sembawang-brook": {
+      "blocks": 5,
+      "highestFloor": 18,
+      "highlights": [
+        "Shorter Waiting Time of 2 years 9 months - among the fastest BTO completions",
+        "Largest Sembawang project with 1,160 units across 5 blocks",
+        "Broadest flat mix of the launch including rare 3Gen flats for multi-gen families",
+        "Adjacent to Sembawang Portico with shared amenities and community facilities",
+        "Riverside setting near Sungei Sembawang with potential water views"
+      ],
+      "waitMonths": {
+        "min": 33,
+        "max": 33
+      }
+    },
+    "sembawang-portico": {
+      "blocks": 3,
+      "highestFloor": 20,
+      "highlights": [
+        "Shortest waiting time of the June 2026 launch at just 2 years 7 months",
+        "Located in the new Sembawang North estate with 875 units across 3 blocks",
+        "Diverse unit mix from 2-Room Flexi to 5-Room flats",
+        "Amenities including cooked food, childcare, minimart ready within 6 months of key collection",
+        "Part of the broader Sembawang North masterplan delivering ~10,000 new homes"
+      ],
+      "waitMonths": {
+        "min": 31,
+        "max": 31
+      }
+    },
+    "woodgrove-acres": {
+      "blocks": 5,
+      "highestFloor": 16,
+      "highlights": [
+        "5-room dominant mix (250 units, 39%) — best large-flat value in June 2026 launch",
+        "Standard classification with lower pricing than comparable mature estate units",
+        "Near Seletar Expressway (SLE) for efficient car commuting",
+        "The Woodgrove mall nearby for retail and dining convenience",
+        "Multiple schools: Fuchun Primary, Si Ling Primary, Woodlands Ring Secondary, Fuchun Secondary"
+      ],
+      "waitMonths": {
+        "min": 42,
+        "max": 42
+      }
+    },
+    "kim-keat-crest": {
+      "blocks": 5,
+      "waitMonths": {
+        "min": 37,
+        "max": 37
+      }
+    },
+    "sembawang-deck": {
+      "blocks": 4,
+      "highestFloor": 25,
+      "waitMonths": {
+        "min": 33,
+        "max": 33
+      }
+    },
+    "sembawang-voyage": {
+      "blocks": 4,
+      "highestFloor": 29,
+      "waitMonths": {
+        "min": 44,
+        "max": 44
+      }
+    },
+    "tampines-bliss": {
+      "blocks": 3,
+      "highestFloor": 10,
+      "waitMonths": {
+        "min": 23,
+        "max": 23
+      }
+    },
+    "tampines-nova": {
+      "blocks": 2,
+      "highestFloor": 14,
+      "waitMonths": {
+        "min": 32,
+        "max": 32
+      }
+    },
+    "berlayar-residences": {
+      "blocks": 4,
+      "highestFloor": 46,
+      "highlights": [
+        "First HDB project in the new Berlayar estate, Greater Southern Waterfront, with 880 units",
+        "Approximately 100m from Telok Blangah MRT (Circle Line), virtually unheard-of MRT proximity for BTO",
+        "Prime with 14% subsidy recovery rate, the highest so far, reflecting exceptional waterfront location",
+        "Near Mount Faber Park and Labrador Nature Reserve for extraordinary nature and coastal recreation",
+        "Potential sea views for higher-floor units with waterfront proximity"
+      ],
+      "waitMonths": {
+        "min": 56,
+        "max": 56
+      }
+    },
+    "bishan-terraces": {
+      "blocks": 2,
+      "highestFloor": 38,
+      "highlights": [
+        "Prime-category BTO in prestigious Bishan with approximately 500 units, a rare new supply",
+        "Bishan MRT interchange (NS/CCL) for dual-line connectivity to CBD and Orchard",
+        "Near elite Catholic High School, Guangyang Primary, and Kuo Chuan Presbyterian",
+        "Bishan-Ang Mo Kio Park and Bishan Park for extensive green recreation",
+        "Junction 8 mall at Bishan MRT for comprehensive shopping and dining"
+      ],
+      "waitMonths": {
+        "min": 47,
+        "max": 47
+      }
+    },
+    "chencharu-grove": {
+      "blocks": 6,
+      "highestFloor": 15,
+      "highlights": [
+        "Anchor project of the new Chencharu estate in Yishun with 826 units across 6 blocks",
+        "Under 10-minute walk to Khatib MRT (North-South Line) with upcoming Integrated Development and bus interchange",
+        "Affordable pricing from $12,000 for 2-room Flexi (incl grants) and $190,000 for 3-room",
+        "Green features: separate recyclable chutes, regenerative lifts, EV charging, Smart-Enabled Homes",
+        "Includes SRSF rental block with 418 units for an integrated community"
+      ],
+      "waitMonths": {
+        "min": 31,
+        "max": 31
+      },
+      "nearby": {
+        "shopping": [
+          "Northpoint City",
+          "Yishun Ring Road shops"
+        ],
+        "transport": [
+          "Khatib MRT Station (NS14)",
+          "Yishun MRT Station (NS13)"
+        ],
+        "recreation": [
+          "Yishun Park",
+          "Lower Seletar Reservoir"
+        ]
+      }
+    },
+    "fernvale-plains": {
+      "blocks": 5,
+      "highestFloor": 26,
+      "highlights": [
+        "1,037 units with pioneering 207 Community Care Apartments for seniors with care support",
+        "Kupang LRT station just next door, 3 stops to Sengkang MRT (NEL)",
+        "CCA units from $5K (incl grants, 30-yr lease) with furnished communal areas and senior-friendly features",
+        "Green spine with playground, elderly fitness, therapeutic garden, and future nursing home",
+        "4 primary schools within proximity: Anchor Green, Fern Green, Sengkang Green, Springdale"
+      ],
+      "waitMonths": {
+        "min": 32,
+        "max": 32
+      }
+    },
+    "mount-pleasant-crest": {
+      "blocks": 4,
+      "highestFloor": 46,
+      "highlights": [
+        "First BTO in new Mount Pleasant estate with approximately 1,348 units, the largest Oct 2025 project",
+        "Near Caldecott MRT (CCL/TEL) and Mount Pleasant MRT (TEL) for dual-line connectivity",
+        "Adjacent to MacRitchie Reservoir and Central Catchment Nature Reserve for exceptional nature access",
+        "Part of major 10,000+ new homes plan for Toa Payoh West and Mount Pleasant",
+        "Upcoming Toa Payoh Integrated Development with sports hub expected by 2030"
+      ],
+      "waitMonths": {
+        "min": 59,
+        "max": 59
+      }
+    },
+    "oak-ville-at-amk": {
+      "blocks": 6,
+      "highestFloor": 24,
+      "highlights": [
+        "Plus-category BTO in mature Ang Mo Kio with approximately 862 units",
+        "Near Mayflower MRT (TEL) and Bright Hill MRT (TEL/CCL) for multi-line connectivity",
+        "Outstanding school options: CHIJ St Nicholas Girls' School, Anderson Primary, Mayflower Primary/Secondary",
+        "Near Mayflower Shopping and Food Centre, Kebun Baru Mall, and AMK Hub",
+        "Plus classification with 7% subsidy recovery rate offering better resale flexibility than Prime"
+      ],
+      "waitMonths": {
+        "min": 49,
+        "max": 49
+      }
+    },
+    "ping-yi-court": {
+      "blocks": 5,
+      "highestFloor": 15,
+      "highlights": [
+        "862 units across 5 blocks with courtyard-oriented layout for natural ventilation and communal green space",
+        "28 3Generation flats for multi-generational families in a mature estate setting",
+        "Walking distance to Bedok MRT (EW Line) and Kembangan MRT",
+        "Near 538 Bedok North Market and Hawker Centre plus Bedok Mall for daily convenience",
+        "Mature Bedok estate with established schools, clinics, and community facilities"
+      ],
+      "waitMonths": {
+        "min": 33,
+        "max": 33
+      }
+    },
+    "redhill-peaks": {
+      "blocks": 3,
+      "highestFloor": 49,
+      "highlights": [
+        "Prime-category BTO in central Bukit Merah with approximately 600 units",
+        "Redhill MRT (EW Line) for direct CBD access in under 10 minutes",
+        "Near Henderson Waves, Mount Faber Park, and Telok Blangah Hill Park for extraordinary nature access",
+        "Close to Tiong Bahru Market and ABC Brickworks Market for beloved hawker dining",
+        "Prime with 10-12% subsidy recovery rate, a moderate premium for exceptional centrality"
+      ],
+      "waitMonths": {
+        "min": 53,
+        "max": 53
+      }
+    },
+    "teban-heights": {
+      "blocks": 2,
+      "highestFloor": 37,
+      "highlights": [
+        "Future Pandan Reservoir MRT (Jurong Region Line) RIGHT NEXT to project, completing around 2028",
+        "638 units in twin 36-37 storey towers with panoramic reservoir views",
+        "36 3Generation flats for multi-generational living",
+        "Near Teban Market Place and Pandan Reservoir running and cycling track",
+        "Competitive pricing from $25K (2RF) and $149K (3rm) ahead of MRT completion"
+      ],
+      "waitMonths": {
+        "min": 48,
+        "max": 48
+      }
+    },
+    "yishun-glade": {
+      "blocks": 4,
+      "highestFloor": 15,
+      "highlights": [
+        "569 units with 406 2-room Flexi flats, the heaviest 2RF emphasis in Oct 2025 BTO",
+        "Ultra-affordable pricing from $12,000 for 2RF and $263,000 for 4-room",
+        "Green spine with playground, elderly fitness, therapeutic garden, and senior care centre",
+        "Near Yishun Park Hawker Centre, Junction Nine, and Northpoint City",
+        "3 primary schools: Huamin, North View, Xishan within the neighbourhood"
+      ],
+      "waitMonths": {
+        "min": 31,
+        "max": 31
+      }
+    },
+    "alexandra-peaks": {
+      "blocks": 2,
+      "highestFloor": 46,
+      "waitMonths": {
+        "min": 56,
+        "max": 56
+      }
+    },
+    "alexandra-vista": {
+      "blocks": 3,
+      "highestFloor": 32,
+      "waitMonths": {
+        "min": 47,
+        "max": 47
+      }
+    },
+    "bangkit-breeze": {
+      "blocks": 6,
+      "highestFloor": 13,
+      "waitMonths": {
+        "min": 35,
+        "max": 35
+      }
+    },
+    "clementi-emerald": {
+      "blocks": 4,
+      "highestFloor": 40,
+      "waitMonths": {
+        "min": 34,
+        "max": 34
+      }
+    },
+    "sembawang-beacon": {
+      "blocks": 4,
+      "highestFloor": 18,
+      "waitMonths": {
+        "min": 36,
+        "max": 36
+      }
+    },
+    "simei-symphony": {
+      "blocks": 4,
+      "highestFloor": 11,
+      "waitMonths": {
+        "min": 42,
+        "max": 42
+      }
+    },
+    "toa-payoh-ascent": {
+      "blocks": 2,
+      "highestFloor": 40,
+      "waitMonths": {
+        "min": 41,
+        "max": 41
+      }
+    },
+    "woodlands-north-grove": {
+      "blocks": 5,
+      "highestFloor": 33,
+      "waitMonths": {
+        "min": 55,
+        "max": 55
+      }
+    },
+    "chencharu-green": {
+      "blocks": 4,
+      "highestFloor": 15,
+      "highlights": [
+        "Affordable pricing under $400k for 4-room flats",
+        "Green-themed development with extensive landscaping",
+        "Shorter waiting time (38 months estimated)",
+        "Walking distance to Khatib MRT",
+        "Part of new 10,000-home Chencharu development",
+        "Standard BTO with 5-year MOP"
+      ],
+      "waitMonths": {
+        "min": 38,
+        "max": 38
+      },
+      "nearby": {
+        "shopping": [
+          "Khatib Central",
+          "Wisteria Mall",
+          "Northpoint City"
+        ],
+        "recreation": [
+          "HomeTeamNS Khatib",
+          "ActiveSG facilities",
+          "Parks and cycling paths",
+          "Project Brochure"
+        ]
+      }
+    },
+    "chencharu-vines": {
+      "blocks": 7,
+      "highestFloor": 14,
+      "highlights": [
+        "Larger project with 848 units across 7 blocks",
+        "Includes 3-room units unique among sister projects",
+        "Farming heritage theme with vegetable motifs",
+        "On-site amenities including supermarket and eating house",
+        "Hardcourt for recreational sports",
+        "Competitive pricing with shortest waiting time (37 months)"
+      ],
+      "waitMonths": {
+        "min": 37,
+        "max": 37
+      },
+      "nearby": {
+        "shopping": [
+          "On-site eating house",
+          "On-site supermarket",
+          "Khatib Central",
+          "Northpoint City"
+        ],
+        "recreation": [
+          "On-site hardcourt",
+          "Fitness stations",
+          "ActiveSG facilities",
+          "Parks and cycling paths"
+        ]
+      }
+    },
+    "stirling-horizon": {
+      "blocks": 3,
+      "highestFloor": 47,
+      "highlights": [
+        "Only Plus BTO in Feb 2025 launch",
+        "10-minute walk to Queenstown MRT (EWL)",
+        "Near Queensway Shopping Centre and IKEA Alexandra",
+        "Premium mature estate location in Queenstown",
+        "15 minutes drive to Downtown Core via AYE",
+        "North-south orientation for natural ventilation"
+      ],
+      "waitMonths": {
+        "min": 55,
+        "max": 55
+      },
+      "nearby": {
+        "shopping": [
+          "Mei Ling Market & Food Centre",
+          "Alexandra Central",
+          "Anchorpoint Shopping Centre",
+          "Queensway Shopping Centre"
+        ],
+        "healthcare": [
+          "Alexandra Hospital",
+          "Queenstown Polyclinic",
+          "National University Hospital"
+        ],
+        "recreation": [
+          "Alexandra-Queensway Park Connector",
+          "Queenstown Community Centre",
+          "Queenstown Public Library",
+          "Project Brochure"
+        ]
+      }
+    },
+    "tanjong-rhu-parc-front": {
+      "blocks": 4,
+      "highestFloor": 12,
+      "highlights": [
+        "Only Prime BTO in Feb 2025 launch",
+        "Most popular project with 4,232 applications for 812 units",
+        "9-minute walk to Tanjong Rhu MRT (TEL)",
+        "13-minute walk to Katong Park MRT (TEL)",
+        "14-minute walk to Stadium MRT (CCL)",
+        "20-minute walk to Mountbatten MRT (CCL)"
+      ],
+      "waitMonths": {
+        "min": 48,
+        "max": 48
+      },
+      "nearby": {
+        "shopping": [
+          "Leisure Park Kallang",
+          "Kallang Wave Mall",
+          "Paya Lebar Quarter",
+          "City Plaza"
+        ],
+        "healthcare": [
+          "Raffles Hospital",
+          "Parkway East Hospital"
+        ],
+        "recreation": [
+          "Singapore Sports Hub",
+          "National Stadium",
+          "Kallang Riverside Park",
+          "Katong Park"
+        ]
+      }
+    },
+    "woodlands-north-verge": {
+      "blocks": 6,
+      "highestFloor": 35,
+      "highlights": [
+        "Largest project in Feb 2025 launch with most units",
+        "Pioneer project in new Woodlands North region",
+        "Excellent cross-border connectivity to Malaysia",
+        "5-minute walk to Woodlands North MRT",
+        "Future RTS Link integration for seamless JB travel",
+        "Comprehensive on-site amenities and facilities"
+      ],
+      "nearby": {
+        "shopping": [
+          "On-site supermarket",
+          "On-site eating houses",
+          "Woodlands Civic Centre",
+          "Causeway Point"
+        ],
+        "transport": [
+          "Woodlands Checkpoint",
+          "Future RTS Link to JB",
+          "Multiple bus services"
+        ],
+        "recreation": [
+          "Woodlands Waterfront Park",
+          "Admiralty Park",
+          "On-site hardcourt",
+          "MSCP roof gardens"
+        ]
+      }
+    },
+    "central-trio-at-amk": {
+      "blocks": 3,
+      "highestFloor": 21,
+      "waitMonths": {
+        "min": 59,
+        "max": 59
+      }
+    },
+    "costa-riviera-i": {
+      "waitMonths": {
+        "min": 37,
+        "max": 37
+      }
+    },
+    "costa-riviera-ii": {
+      "waitMonths": {
+        "min": 38,
+        "max": 38
+      }
+    },
+    "fernvale-oasis": {
+      "waitMonths": {
+        "min": 33,
+        "max": 33
+      }
+    },
+    "fernvale-sails": {
+      "waitMonths": {
+        "min": 27,
+        "max": 27
+      }
+    },
+    "chencharu-hills": {
+      "blocks": 10,
+      "highestFloor": 15
+    },
+    "holland-vista": {
+      "blocks": 1,
+      "highestFloor": 40
+    },
+    "marsiling-peak-i-ii": {
+      "blocks": 6,
+      "highestFloor": 35
+    },
+    "bedok-north-springs": {
+      "blocks": 3,
+      "highestFloor": 16
+    },
+    "bedok-south-bloom": {
+      "blocks": 2,
+      "highestFloor": 25
+    },
+    "matilda-riverside": {
+      "blocks": 7,
+      "highestFloor": 19
+    },
+    "rail-garden-cck": {
+      "blocks": 6,
+      "highestFloor": 11
+    },
+    "tanglin-halt-courtyard": {
+      "blocks": 1,
+      "highestFloor": 48
+    },
+    "tanjong-tree-residences-hougang": {
+      "blocks": 4,
+      "highestFloor": 12
+    },
+    "woodgrove-edge": {
+      "blocks": 7,
+      "highestFloor": 16
+    },
+    "alexandra-peaks-2023": {
+      "blocks": 3,
+      "highestFloor": 48
+    },
+    "chai-chee-green": {
+      "blocks": 7,
+      "highestFloor": 15
+    },
+    "jurong-arcadia": {
+      "blocks": 6,
+      "highestFloor": 17
+    },
+    "petir-park-edge": {
+      "blocks": 1,
+      "highestFloor": 24
+    },
+    "sin-ming-residences": {
+      "blocks": 4,
+      "highestFloor": 28
+    },
+    "plantation-edge-i-ii": {
+      "blocks": 8,
+      "highestFloor": 15
+    },
+    "rail-green-i-ii-cck": {
+      "blocks": 12,
+      "highestFloor": 31
+    },
+    "rajah-residences": {
+      "blocks": 2,
+      "highestFloor": 40
+    },
+    "tanglin-halt-cascadia": {
+      "blocks": 4,
+      "highestFloor": 47
+    },
+    "tenteram-vantage": {
+      "blocks": 4,
+      "highestFloor": 32
+    },
+    "verandah-kallang": {
+      "blocks": 5,
+      "highestFloor": 29
+    },
+    "bedok-south-blossoms": {
+      "blocks": 9,
+      "highestFloor": 22
+    },
+    "farrer-park-arena": {
+      "blocks": 3,
+      "highestFloor": 24
+    },
+    "parc-meadow-tengah": {
+      "blocks": 15,
+      "highestFloor": 13
+    },
+    "plantation-verge": {
+      "blocks": 7,
+      "highestFloor": 18
+    },
+    "serangoon-north-vista": {
+      "blocks": 5,
+      "highestFloor": 12
+    },
+    "brickland-weave": {
+      "blocks": 12,
+      "highestFloor": 17
+    },
+    "buangkok-woods": {
+      "blocks": 5,
+      "highestFloor": 15
+    },
+    "farrer-park-fields": {
+      "blocks": 7,
+      "highestFloor": 24
+    },
+    "jurong-west-crystal": {
+      "blocks": 2,
+      "highestFloor": 18
+    },
+    "rajah-summit": {
+      "blocks": 2,
+      "highestFloor": 40
+    },
+    "ulu-pandan-glades": {
+      "blocks": 2,
+      "highestFloor": 43
+    },
+    "alexandra-vale": {
+      "blocks": 2,
+      "highestFloor": 50
+    },
+    "central-weave-amk": {
+      "blocks": 5,
+      "highestFloor": 32
+    },
+    "havelock-hillside": {
+      "blocks": 2,
+      "highestFloor": 45
+    },
+    "jurong-east-breeze": {
+      "blocks": 2,
+      "highestFloor": 38
+    },
+    "keat-hong-grange": {
+      "blocks": 5,
+      "highestFloor": 23
+    },
+    "sun-plaza-spring": {
+      "blocks": 3,
+      "highestFloor": 11
+    },
+    "woodlands-south-plains": {
+      "blocks": 6,
+      "highestFloor": 12
+    },
+    "bukit-merah-ridge": {
+      "blocks": 5,
+      "highestFloor": 48
+    },
+    "ghim-moh-ascent": {
+      "blocks": 4,
+      "highestFloor": 31
+    },
+    "kim-keat-heights": {
+      "blocks": 2,
+      "highestFloor": 36
+    },
+    "lakeside-view": {
+      "blocks": 7,
+      "highestFloor": 18
+    },
+    "yishun-beacon": {
+      "blocks": 5,
+      "highestFloor": 14
+    },
+    "dakota-crest": {
+      "blocks": 3,
+      "highestFloor": 22
+    },
+    "grove-spring-yishun": {
+      "blocks": 8,
+      "highestFloor": 15
+    },
+    "king-georges-heights": {
+      "blocks": 1,
+      "highestFloor": 47
+    },
+    "parc-flora-tengah": {
+      "blocks": 4,
+      "highestFloor": 14
+    },
+    "plantation-creek": {
+      "blocks": 6,
+      "highestFloor": 16
+    },
+    "yishun-boardwalk": {
+      "blocks": 8,
+      "highestFloor": 15
+    },
+    "heart-of-yew-tee": {
+      "blocks": 1,
+      "highestFloor": 10
+    },
+    "kent-heights": {
+      "blocks": 1,
+      "highestFloor": 32
+    },
+    "nanyang-opal": {
+      "blocks": 2,
+      "highestFloor": 14
+    },
+    "parc-clover-tengah": {
+      "blocks": 12,
+      "highestFloor": 14
+    },
+    "parc-glen-tengah": {
+      "blocks": 10,
+      "highestFloor": 13
+    },
+    "river-peaks-i-ii": {
+      "blocks": 6,
+      "highestFloor": 47
+    },
+    "tanjong-tree-residences-hougang-2021": {
+      "blocks": 4,
+      "highestFloor": 12
+    },
+    "hougang-citrine": {
+      "blocks": 6,
+      "highestFloor": 13
+    },
+    "kovan-wellspring": {
+      "blocks": 4,
+      "highestFloor": 18
+    },
+    "queens-arc": {
+      "blocks": 2,
+      "highestFloor": 39
+    },
+    "tampines-greenjade": {
+      "blocks": 6,
+      "highestFloor": 17
+    },
+    "tampines-greenquartz": {
+      "blocks": 13,
+      "highestFloor": 17
+    },
+    "toh-guan-grove": {
+      "blocks": 3,
+      "highestFloor": 37
+    },
+    "towner-residences": {
+      "blocks": 2,
+      "highestFloor": 40
+    },
+    "garden-bloom-tengah": {
+      "blocks": 7,
+      "highestFloor": 15
+    },
+    "macpherson-weave": {
+      "blocks": 7,
+      "highestFloor": 19
+    },
+    "telok-blangah-beacon": {
+      "blocks": 1,
+      "highestFloor": 38
+    },
+    "woodgrove-ascent": {
+      "blocks": 7,
+      "highestFloor": 25
+    },
+    "alkaff-breeze": {
+      "blocks": 3,
+      "highestFloor": 16
+    },
+    "bartley-greenrise": {
+      "blocks": 3,
+      "highestFloor": 17
+    },
+    "mcnair-heights": {
+      "blocks": 3,
+      "highestFloor": 40
+    },
+    "parc-woods-tengah": {
+      "blocks": 5,
+      "highestFloor": 14
+    },
+    "parkedge-bidadari": {
+      "blocks": 5,
+      "highestFloor": 14
+    },
+    "west-hill-bukit-batok": {
+      "blocks": 9,
+      "highestFloor": 17
+    },
+    "bishan-towers": {
+      "blocks": 2,
+      "highestFloor": 33
+    },
+    "champions-bliss": {
+      "blocks": 3,
+      "highestFloor": 12
+    },
+    "dakota-one": {
+      "blocks": 3,
+      "highestFloor": 19
+    },
+    "keat-hong-verge": {
+      "blocks": 3,
+      "highestFloor": 22
+    },
+    "kebun-baru-edge": {
+      "blocks": 2,
+      "highestFloor": 29
+    },
+    "parc-residences-tengah": {
+      "blocks": 12,
+      "highestFloor": 14
+    },
+    "tampines-greencrest": {
+      "blocks": 3,
+      "highestFloor": 16
+    },
+    "tampines-greenglade": {
+      "blocks": 3,
+      "highestFloor": 16
+    },
+    "tampines-greenopal": {
+      "blocks": 8,
+      "highestFloor": 17
+    },
+    "urbanville-woodlands": {
+      "blocks": 8,
+      "highestFloor": 32
+    },
+    "garden-vines-tengah": {
+      "blocks": 8,
+      "highestFloor": 14
+    },
+    "plantation-grange": {
+      "blocks": 10,
+      "highestFloor": 15
+    }
+  }
+}

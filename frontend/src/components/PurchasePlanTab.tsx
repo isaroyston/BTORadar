@@ -24,6 +24,7 @@ import type { StageFunding } from "../utils/cpfProjection";
 import { formatDateInputDisplay } from "../utils/date";
 import { currency } from "../utils/format";
 import { useCountUp } from "../utils/motion";
+import { keysAreEstimated, keysMonth } from "../utils/projectFacts";
 import type { PaymentOverride } from "../utils/planStorage";
 import {
   EditChip,
@@ -397,7 +398,7 @@ export function PurchasePlanTab({
                   <h3>{selectedProject.name}</h3>
                   <p className="muted">
                     {selectedProject.location}, {flatType}
-                    {keysPhrase(selectedProject.expectedTop)}
+                    {keysPhrase(selectedProject)}
                     {projectVariant
                       ? `, from ${currency(projectVariant.basePrice)}`
                       : ""}
@@ -789,12 +790,11 @@ function NumberInput({
   );
 }
 
-// Listings say "To be announced" until HDB publishes a completion date.
-function keysPhrase(expectedTop: string | undefined) {
-  if (!expectedTop) return "";
-  return /announced/i.test(expectedTop)
-    ? ", keys date not announced yet"
-    : `, keys estimated ${expectedTop}`;
+// HDB's completion date once published; until then, the waiting time announced at launch.
+function keysPhrase(project: BtoProject) {
+  const month = keysMonth(project);
+  if (!month) return ", keys date not announced yet";
+  return keysAreEstimated(project) ? `, keys about ${month} (from HDB's waiting time)` : `, keys estimated ${month}`;
 }
 
 function calculateMonthlyPayment(
