@@ -10,14 +10,14 @@ colors:
   ink: "oklch(23% 0.015 20)"
   ink-2: "oklch(40% 0.015 20)"
   mute: "oklch(53% 0.012 20)"
-  accent: "oklch(57% 0.21 15)"          # raspberry: actions, headline figures, active nav, icons
+  accent: "oklch(57% 0.21 15)"          # raspberry: primary button, active nav, icons, badges only
   accent-soft: "oklch(95.5% 0.03 12)"   # icon tiles, edit chips, selected segment
   positive: "oklch(48% 0.13 152)"       # within budget, done, grant tile
   caution: "oklch(50% 0.11 62)"         # over budget, not covered
   gold: "oklch(78% 0.15 80)"            # tip and match icons only
 typography:
   face: "Inter only, 400-800. Tabular numerals wherever digits line up."
-  scale: "page title clamp(1.75rem, 2.4vw, 2.1rem)/800; headline figure clamp(2.3rem, 4.4vw, 3.1rem)/800 in raspberry; card title 1.1rem/700; body 15.5px; caption 0.8rem"
+  scale: "page title clamp(1.75rem, 2.4vw, 2.1rem)/800; headline figure clamp(2.3rem, 4.4vw, 3.1rem)/800 in ink; card title 1.1rem/700; body 15.5px; caption 0.8rem"
 rounded:
   card: 22px
   hero: 24px
@@ -47,7 +47,7 @@ A planner people open with a real decision in front of them: can we afford a fla
 
 ## Colour rules
 
-- **Raspberry means "this matters".** Actions, the headline figure, the active nav item, icons and focus rings.
+- **Raspberry is for things that should pop, never for reading.** The primary button, the active nav icon, icon glyphs, the "Open" and "In your plan" badges, a saved heart, the selected project's outline, link underlines and focus rings. Figures, headings, links, chips, selected options and edit chips are ink.
 - **Status has its own colours.** Green for within budget, done and the grant; ochre for over budget. Over budget is never red.
 - Gold appears only inside the tip and match icons.
 
