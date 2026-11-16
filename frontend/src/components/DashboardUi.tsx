@@ -48,7 +48,7 @@ export function PageHeader({
   return (
     <header className="page-head">
       <div>
-        <h1>{title}</h1>
+        <h1 tabIndex={-1}>{title}</h1>
         <p>{subtitle}</p>
       </div>
       {action && <div className="page-head-action">{action}</div>}

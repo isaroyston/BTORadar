@@ -117,7 +117,7 @@ async function main() {
         ? "Nearest MRT distances are straight-line estimates from project coordinates to URA Master Plan 2019 rail station centroids."
         : "Rail station GeoJSON was unavailable, so nearest MRT distances were not generated.",
     },
-    projects: projects.map(compactObject),
+    projects: projects.map(slimForApp).map(compactObject),
   };
 
   await mkdir(dirname(OUTPUT_PATH), { recursive: true });
@@ -658,6 +658,18 @@ function compareProjects(a, b) {
   if (locationA !== locationB) return locationA.localeCompare(locationB);
 
   return a.name.localeCompare(b.name);
+}
+
+// The app reads only these BTOHQ fields. The rest (photos, descriptions, supply tables)
+// stays in data/btohq/projects.json, so every visitor does not download it.
+const BTOHQ_FIELDS_FOR_APP = ["sourceUrl", "ratings", "nearbyAmenities"];
+
+function slimForApp(project) {
+  if (!project.btohq) return project;
+  const btohq = Object.fromEntries(
+    BTOHQ_FIELDS_FOR_APP.filter((key) => project.btohq[key] !== undefined).map((key) => [key, project.btohq[key]])
+  );
+  return { ...project, btohq };
 }
 
 function compactObject(value) {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BtoTab } from "./components/BtoTab";
 import { BudgetTab } from "./components/BudgetTab";
 import { Navigation } from "./components/Navigation";
@@ -6,6 +6,7 @@ import { OverviewTab } from "./components/OverviewTab";
 import { PurchasePlanTab } from "./components/PurchasePlanTab";
 import { SourcesTab } from "./components/SourcesTab";
 import {
+  TABS,
   FLAT_MAX,
   FLAT_MIN,
   BANK_LOAN_TENURE_MAX,
@@ -57,6 +58,7 @@ import {
   createPlannerSnapshot,
   loadPlannerSnapshot,
   savePlannerSnapshot,
+  type PaymentOverride,
 } from "./utils/planStorage";
 
 const APPLICATION_FEE = 10;
@@ -126,6 +128,9 @@ function App() {
   const [confirmedMilestoneDates, setConfirmedMilestoneDates] = useState<
     Record<string, string>
   >(initialPlan?.confirmedMilestoneDates ?? {});
+  const [paymentOverrides, setPaymentOverrides] = useState<Record<string, PaymentOverride>>(
+    initialPlan?.paymentOverrides ?? {}
+  );
 
   const {
     projects: btoProjects,
@@ -292,6 +297,7 @@ function App() {
           applicationMonth,
           completedMilestones: activeCompletedMilestones,
           confirmedMilestoneDates: activeConfirmedMilestoneDates,
+          paymentOverrides,
         })
       );
     } catch {
@@ -310,11 +316,24 @@ function App() {
     flatType,
     loanInterestRate,
     loanTenureYears,
+    paymentOverrides,
     scheme,
     selectedBtoProjectId,
     townQuery,
     yearFilter,
   ]);
+
+  // After moving to another screen, name it in the tab title and move focus to its heading.
+  const firstScreen = useRef(true);
+  useEffect(() => {
+    const label = TABS.find((tab) => tab.id === activeTab)?.label ?? "Budget";
+    document.title = `${label} · BTO Radar`;
+    if (firstScreen.current) {
+      firstScreen.current = false;
+      return;
+    }
+    document.querySelector<HTMLElement>(".main h1")?.focus({ preventScroll: true });
+  }, [activeTab]);
 
   const doneTabs = useMemo(() => {
     const done = new Set<TabKey>();
@@ -442,6 +461,7 @@ function App() {
     setSelectedBtoProjectId(project.id);
     setCompletedMilestones([]);
     setConfirmedMilestoneDates({});
+    setPaymentOverrides({});
 
     if (preferredVariant) {
       setFlatType(preferredVariant.type);
@@ -528,6 +548,8 @@ function App() {
             timeline={timeline}
             completedMilestones={activeCompletedMilestones}
             confirmedMilestoneDates={activeConfirmedMilestoneDates}
+            paymentOverrides={paymentOverrides}
+            onPaymentOverridesChange={setPaymentOverrides}
             loadError={planLoadError}
             onOpenBudget={() => setActiveTab("budget")}
             onOpenRadar={() => setActiveTab("bto")}

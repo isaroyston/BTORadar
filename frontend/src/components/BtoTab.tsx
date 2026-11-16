@@ -16,6 +16,7 @@ import {
   type BtoScoreWeights,
 } from "../utils/btoScoring";
 import { getLaunchMonthSortValue } from "../utils/date";
+import { arrowNavigate } from "../utils/keyboard";
 import { currency } from "../utils/format";
 import {
   BTO_SOURCE_CREDITS,
@@ -190,6 +191,8 @@ export function BtoTab({
     });
   };
 
+  const tabKeys = [...(savedGroup ? [SAVED_KEY] : []), ...launchGroups.map((group) => group.key)];
+
   const comparedProjects = activeComparedProjectIds
     .map((projectId) => selectedLaunch?.projects.find((project) => project.id === projectId))
     .filter((project): project is BtoProject => Boolean(project));
@@ -312,12 +315,23 @@ export function BtoTab({
             </div>
           ) : (
             <>
-              <div className="launch-tabs" role="tablist" aria-label="Launches">
+              <div
+                className="launch-tabs"
+                role="tablist"
+                aria-label="Launches"
+                onKeyDown={(event) => {
+                  const next = arrowNavigate(event, Math.max(tabKeys.indexOf(selectedLaunch?.key ?? ""), 0), tabKeys.length, '[role="tab"]');
+                  if (next !== null) setActiveLaunch(tabKeys[next]);
+                }}
+              >
                 {savedGroup && (
                   <button
                     type="button"
                     role="tab"
+                    id={tabId(SAVED_KEY)}
+                    aria-controls="launch-panel"
                     aria-selected={selectedLaunch?.key === SAVED_KEY}
+                    tabIndex={selectedLaunch?.key === SAVED_KEY ? 0 : -1}
                     className="launch-tab launch-tab-saved"
                     onClick={() => setActiveLaunch(SAVED_KEY)}
                   >
@@ -341,7 +355,13 @@ export function BtoTab({
               </div>
 
               {selectedLaunch && (
-                <div className="launch-body" key={selectedLaunch.key}>
+                <div
+                  className="launch-body"
+                  key={selectedLaunch.key}
+                  id="launch-panel"
+                  role="tabpanel"
+                  aria-labelledby={tabId(selectedLaunch.key)}
+                >
                   <LaunchSummary
                     launch={selectedLaunch}
                     flatType={selectedFlatType}
@@ -457,7 +477,16 @@ function LaunchTab({
   const status = getLaunchStatus(group.key);
 
   return (
-    <button type="button" role="tab" aria-selected={isActive} className="launch-tab" onClick={onClick}>
+    <button
+      type="button"
+      role="tab"
+      id={tabId(group.key)}
+      aria-controls="launch-panel"
+      aria-selected={isActive}
+      tabIndex={isActive ? 0 : -1}
+      className="launch-tab"
+      onClick={onClick}
+    >
       <strong>
         {group.key}
         {status === "upcoming" || status === "this month" ? (
@@ -619,7 +648,7 @@ function ProjectCard({
       <dl className="spec-grid">
         <div>
           <dt>Keys, estimated</dt>
-          <dd>{project.expectedTop ?? "Not listed"}</dd>
+          <dd>{formatKeys(project.expectedTop)}</dd>
         </div>
         <div>
           <dt>Nearest MRT</dt>
@@ -799,7 +828,7 @@ function ProjectSheet({
             <dl className="spec-grid spec-grid-wide">
               <div>
                 <dt>Keys, estimated</dt>
-                <dd>{project.expectedTop ?? "Not listed"}</dd>
+                <dd>{formatKeys(project.expectedTop)}</dd>
               </div>
               <div>
                 <dt>Nearest MRT</dt>
@@ -880,16 +909,27 @@ function ScoreSettingsCard({
     });
   };
   const hasActivePriority = Object.values(scoreWeights).some((weight) => weight > 0);
+  const presetOptions = BTO_SCORE_PRESET_OPTIONS.filter((option) => option.value !== "custom");
+  const presetIndex = presetOptions.findIndex((option) => option.value === scorePreset);
 
   return (
     <div className="card ranking" id="ranking-panel">
-      <div className="ranking-presets" role="radiogroup" aria-label="Start from">
-        {BTO_SCORE_PRESET_OPTIONS.filter((option) => option.value !== "custom").map((option) => (
+      <div
+        className="ranking-presets"
+        role="radiogroup"
+        aria-label="Start from"
+        onKeyDown={(event) => {
+          const next = arrowNavigate(event, Math.max(presetIndex, 0), presetOptions.length, '[role="radio"]');
+          if (next !== null) onScorePresetChange(presetOptions[next].value);
+        }}
+      >
+        {presetOptions.map((option, index) => (
           <button
             key={option.value}
             type="button"
             role="radio"
             aria-checked={scorePreset === option.value}
+            tabIndex={index === (presetIndex < 0 ? 0 : presetIndex) ? 0 : -1}
             className="chip"
             onClick={() => onScorePresetChange(option.value)}
           >
@@ -1002,6 +1042,16 @@ function TypeBadge({ type }: { type: string | undefined }) {
   return <span className={`type-badge type-${lower}`}>{formatProjectType(type)}</span>;
 }
 
+// Listings say "To be announced" until HDB publishes a completion date.
+function formatKeys(expectedTop: string | undefined) {
+  if (!expectedTop) return "Not listed";
+  return /announced/i.test(expectedTop) ? "Not announced" : expectedTop;
+}
+
+function tabId(launchKey: string) {
+  return `launch-tab-${launchKey.toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+}
+
 function flatTypeLabel(type: FlatType) {
   return FLAT_TYPE_OPTIONS.find((option) => option.value === type)?.label ?? type;
 }
@@ -1021,24 +1071,21 @@ function buildCompareRows(
   scores: Map<string, BtoDecisionScore>
 ): CompareRow[] {
   return [
-    plainCompareRow({
-      label: "Decision score",
+    numericCompareRow({
+      label: "Match",
       projects,
-      format: (project) => formatDecisionScoreValue(scores.get(project.id) ?? null),
-    }),
-    plainCompareRow({
-      label: "Score notes",
-      projects,
-      format: (project) => formatDecisionReasons(scores.get(project.id) ?? null),
+      direction: "high",
+      getScore: (project) => scores.get(project.id)?.total ?? undefined,
+      format: (_value, project) => formatDecisionScoreValue(scores.get(project.id) ?? null),
     }),
     numericCompareRow({
-      label: `${selectedFlatType} price`,
+      label: `${flatTypeLabel(selectedFlatType)} price`,
       projects,
       direction: "low",
       getScore: (project) => getSelectedVariant(project, selectedFlatType)?.basePrice,
       format: (value, project) =>
         value === undefined
-          ? `No ${selectedFlatType} price`
+          ? "Not listed"
           : formatPrice(getSelectedVariant(project, selectedFlatType), selectedFlatType),
     }),
     numericCompareRow({
@@ -1059,46 +1106,46 @@ function buildCompareRows(
       format: (value) => (value === undefined ? "Not listed" : currency(value)),
     }),
     plainCompareRow({
-      label: "Expected TOP",
+      label: "Keys, estimated",
       projects,
-      format: (project) => project.expectedTop ?? "Not listed",
+      format: (project) => formatKeys(project.expectedTop),
     }),
     plainCompareRow({
-      label: "Wait time",
+      label: "Wait for keys",
       projects,
       format: (project) => project.waitTimeMonths ?? "Not listed",
     }),
     numericCompareRow({
-      label: "Units",
+      label: "Flats",
       projects,
       direction: "high",
       getScore: (project) => project.totalUnits,
       format: (value) => (value === undefined ? "Not listed" : formatNumber(value)),
     }),
     plainCompareRow({
-      label: "BTO type",
+      label: "Category",
       projects,
       format: (project) => formatProjectType(project.btoType),
     }),
     numericCompareRow({
-      label: "MRT distance",
+      label: "Nearest MRT",
       projects,
       direction: "low",
       getScore: (project) => project.nearestMrtDistanceMeters,
       format: (_value, project) => formatNearestMrt(project),
     }),
     plainCompareRow({
-      label: "Centrality",
+      label: "How central",
       projects,
       format: formatCentrality,
     }),
     plainCompareRow({
-      label: "Location context",
+      label: "Area",
       projects,
       format: formatLocationContext,
     }),
     numericCompareRow({
-      label: "Accessibility",
+      label: "Accessibility rating",
       projects,
       direction: "high",
       getScore: (project) => project.btohq?.ratings?.accessibility,
@@ -1112,7 +1159,7 @@ function buildCompareRows(
       format: (value) => formatRating(value),
     }),
     numericCompareRow({
-      label: "Affordability",
+      label: "Affordability rating",
       projects,
       direction: "high",
       getScore: (project) => project.btohq?.ratings?.affordability,
@@ -1361,21 +1408,7 @@ function formatLocationContext(project: BtoProject) {
 
 function formatDecisionScoreValue(score: BtoDecisionScore | null) {
   if (!score || score.total === null) return "Not enough data";
-  return `${score.total}/100`;
-}
-
-function formatDecisionReasons(score: BtoDecisionScore | null) {
-  if (!score) return "Not listed";
-
-  const reasons = score.reasons.length
-    ? score.reasons.join(", ")
-    : "Not enough comparable data";
-  const missing =
-    score.missingFields.length > 0
-      ? `; missing ${score.missingFields.slice(0, 2).join(", ")}`
-      : "";
-
-  return `${score.confidence}: ${reasons}${missing}`;
+  return `${score.total} of 100`;
 }
 
 function formatNumber(value: number | undefined) {

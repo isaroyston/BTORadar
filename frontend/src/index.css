@@ -2238,11 +2238,14 @@ dd,
 }
 
 .timeline-top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 0.25rem 1rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 1rem;
+}
+
+.timeline-top .input-date {
+  justify-self: end;
 }
 
 .timeline-top h3 {
@@ -2260,8 +2263,29 @@ dd,
 }
 
 .timeline-date {
+  display: grid;
+  justify-items: end;
+  min-height: 2.75rem;
+  padding: 0.2rem 0.6rem;
+  margin: -0.2rem -0.6rem 0 0;
+  border-radius: 10px;
+  text-align: right;
+  line-height: 1.25;
+  transition: background-color 160ms var(--ease);
+}
+
+.timeline-date:hover {
+  background: var(--canvas);
+}
+
+.timeline-date strong {
   font-weight: 700;
-  color: var(--ink-2);
+  color: var(--ink);
+}
+
+.timeline-date span {
+  font-size: 0.75rem;
+  color: var(--mute);
 }
 
 .timeline-pay {
@@ -2310,14 +2334,6 @@ dd,
   gap: 0.4rem 0.6rem;
 }
 
-.timeline-date-field {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.6rem;
-  font-size: 0.875rem;
-  color: var(--mute);
-}
 
 /* ---------- Overview ---------- */
 
@@ -2553,4 +2569,8 @@ dd,
 
 .price-row strong {
   white-space: nowrap;
+}
+
+.page-head h1:focus {
+  outline: none;
 }

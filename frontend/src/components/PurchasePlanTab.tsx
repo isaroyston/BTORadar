@@ -16,6 +16,7 @@ import type { BudgetInputs } from "../utils/budgetStorage";
 import { formatDateInputDisplay } from "../utils/date";
 import { currency } from "../utils/format";
 import { useCountUp } from "../utils/motion";
+import type { PaymentOverride } from "../utils/planStorage";
 import { Icon, PageHeader } from "./DashboardUi";
 import { FundingBar, type FundingPart } from "./FundingBar";
 import { Segmented } from "./Segmented";
@@ -41,6 +42,10 @@ type PurchasePlanTabProps = {
   timeline: TimelineItem[];
   completedMilestones: string[];
   confirmedMilestoneDates: Record<string, string>;
+  paymentOverrides: Record<string, PaymentOverride>;
+  onPaymentOverridesChange: (
+    update: (current: Record<string, PaymentOverride>) => Record<string, PaymentOverride>
+  ) => void;
   loadError: string | null;
   onOpenBudget: () => void;
   onOpenRadar: () => void;
@@ -53,8 +58,6 @@ type PurchasePlanTabProps = {
   onToggleMilestoneComplete: (label: string) => void;
   onMilestoneDateChange: (label: string, value: string) => void;
 };
-
-type PaymentOverride = { total: number; cpf: number; cash: number };
 
 const FINANCING_OPTIONS: { value: FinancingType; label: string }[] = [
   { value: "hdb", label: "HDB loan" },
@@ -96,6 +99,8 @@ export function PurchasePlanTab({
   timeline,
   completedMilestones,
   confirmedMilestoneDates,
+  paymentOverrides,
+  onPaymentOverridesChange,
   loadError,
   onOpenBudget,
   onOpenRadar,
@@ -133,7 +138,6 @@ export function PurchasePlanTab({
   const projectVariant = selectedProject?.flatVariants.find((variant) => variant.type === flatType);
   const shownPrice = useCountUp(flatPrice);
   const shownMonthly = useCountUp(Math.round(monthlyPayment));
-  const [paymentOverrides, setPaymentOverrides] = useState<Record<string, PaymentOverride>>({});
 
   const effectiveTimeline = useMemo(
     () =>
@@ -153,7 +157,7 @@ export function PurchasePlanTab({
     const item = effectiveTimeline.find((entry) => entry.label === label);
     if (!item?.payment) return;
     const { total, cpfOa, cash } = item.payment;
-    setPaymentOverrides((current) => {
+    onPaymentOverridesChange((current) => {
       const base = current[label] ?? { total, cpf: cpfOa, cash };
       // Move the whole payment to the other source; switching again moves it back.
       return base.cpf > 0
@@ -169,7 +173,7 @@ export function PurchasePlanTab({
     const currentTotal = cpfOa + cash;
     if (currentTotal === 0) return;
     const cpfRatio = cpfOa / currentTotal;
-    setPaymentOverrides((current) => ({
+    onPaymentOverridesChange((current) => ({
       ...current,
       [label]: {
         total: newTotal,
@@ -350,7 +354,7 @@ export function PurchasePlanTab({
               <span style={{ width: `${(doneCount / Math.max(effectiveTimeline.length, 1)) * 100}%` }} />
             </div>
             <p className="field-hint">
-              Dates are estimates. Set your own date when you know it, and tick each step off as you go.
+              Dates are estimates. Select a date to set your own, select an amount to replace it with your actual figure, and tick each step off as you go.
             </p>
             <ol className="timeline">
               {effectiveTimeline.map((item, index) => (
@@ -394,10 +398,10 @@ function TimelineStep({
   onPaymentTotalChange: (label: string, value: number) => void;
 }) {
   const [editing, setEditing] = useState(false);
+  const [editingDate, setEditingDate] = useState(false);
   const [amountText, setAmountText] = useState("");
   const payment = item.payment;
   const canSwitch = Boolean(payment && payment.total >= 10000);
-  const dateId = `date-${index}`;
 
   return (
     <li className={isComplete ? "timeline-step is-done" : "timeline-step"} style={{ ["--i" as string]: index } as CSSProperties}>
@@ -417,7 +421,30 @@ function TimelineStep({
             <h3>{item.label}</h3>
             <p className="muted">{item.note}</p>
           </div>
-          <p className="timeline-date">{confirmedDate ? formatDateInputDisplay(confirmedDate) : item.date}</p>
+          {editingDate ? (
+            <input
+              type="date"
+              className="input input-date"
+              aria-label={`Your date for ${item.label}`}
+              value={confirmedDate ?? ""}
+              autoFocus
+              onChange={(event) => onMilestoneDateChange(item.label, event.target.value)}
+              onBlur={() => setEditingDate(false)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === "Escape") setEditingDate(false);
+              }}
+            />
+          ) : (
+            <button
+              type="button"
+              className="timeline-date"
+              aria-label={`${confirmedDate ? "Your date" : "Estimated"} ${confirmedDate ? formatDateInputDisplay(confirmedDate) : item.date}. Change date for ${item.label}`}
+              onClick={() => setEditingDate(true)}
+            >
+              <strong>{confirmedDate ? formatDateInputDisplay(confirmedDate) : item.date}</strong>
+              <span>{confirmedDate ? "Your date" : "Estimated"}</span>
+            </button>
+          )}
         </div>
 
         {payment && (
@@ -474,17 +501,6 @@ function TimelineStep({
             </span>
           </div>
         )}
-
-        <div className="timeline-date-field">
-          <label htmlFor={dateId}>Your date</label>
-          <input
-            id={dateId}
-            type="date"
-            className="input input-date"
-            value={confirmedDate ?? ""}
-            onChange={(event) => onMilestoneDateChange(item.label, event.target.value)}
-          />
-        </div>
       </div>
     </li>
   );
