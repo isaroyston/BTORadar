@@ -18,7 +18,8 @@
     "test:ehg": "node backend/scripts/check-ehg.mjs",
     "test:fees": "node backend/scripts/check-fees.mjs",
     "test:payment-allocation": "node backend/scripts/check-payment-allocation.mjs",
-    "test": "npm run test:scoring && npm run test:affordability && npm run test:ehg && npm run test:fees && npm run test:payment-allocation",
+    "test:cpf": "node backend/scripts/check-cpf-projection.mjs",
+    "test": "npm run test:scoring && npm run test:affordability && npm run test:ehg && npm run test:fees && npm run test:payment-allocation && npm run test:cpf",
     "data:refresh": "npm run data:recordbto:source && npm run data:btohq && npm run data:rail-stations && npm run data:merge-bto"
   }
 }

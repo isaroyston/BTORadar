@@ -40,6 +40,10 @@ export type TimelinePayment = {
   total: number;
   cpfOa: number;
   cash: number;
+  // From the housing grant, which is credited to CPF before signing.
+  grant?: number;
+  // Cash this payment needs beyond the cash the buyers said they have.
+  shortfall?: number;
   note?: string;
 };
 

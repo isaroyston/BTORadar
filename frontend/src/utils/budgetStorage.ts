@@ -2,6 +2,8 @@ export type BudgetInputs = {
   age: number | null;
   cpfOa: number | null;
   cash: number | null;
+  // CPF Ordinary Account added each month, from a CPF statement. Null means estimate it from income and age.
+  cpfMonthly: number | null;
   firstTimers: FirstTimers;
 };
 
@@ -14,6 +16,7 @@ export const EMPTY_BUDGET_INPUTS: BudgetInputs = {
   age: null,
   cpfOa: null,
   cash: null,
+  cpfMonthly: null,
   firstTimers: "both",
 };
 
@@ -30,6 +33,7 @@ export function loadBudgetInputs(): BudgetInputs {
       age: numberOrNull(parsed.age),
       cpfOa: numberOrNull(parsed.cpfOa),
       cash: numberOrNull(parsed.cash),
+      cpfMonthly: numberOrNull(parsed.cpfMonthly),
       firstTimers:
         parsed.firstTimers === "one" || parsed.firstTimers === "none" || parsed.firstTimers === "both"
           ? parsed.firstTimers

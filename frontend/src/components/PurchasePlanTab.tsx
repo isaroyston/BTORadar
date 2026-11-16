@@ -18,6 +18,7 @@ import type {
 } from "../types";
 import type { FinancingEstimate } from "../utils/affordability";
 import type { BudgetInputs } from "../utils/budgetStorage";
+import type { StageFunding } from "../utils/cpfProjection";
 import { formatDateInputDisplay } from "../utils/date";
 import { currency } from "../utils/format";
 import { useCountUp } from "../utils/motion";
@@ -38,6 +39,9 @@ type PurchasePlanTabProps = {
   ehgGrant: number;
   targetEstimate: FinancingEstimate;
   budgetKnown: boolean;
+  stageFunding: { signing: StageFunding; keys: StageFunding } | null;
+  oaAtKeys: number | null;
+  monthlyCpf: number | null;
   budget: BudgetInputs;
   flatPrice: number;
   flatType: FlatType;
@@ -98,6 +102,9 @@ export function PurchasePlanTab({
   ehgGrant,
   targetEstimate,
   budgetKnown,
+  stageFunding,
+  oaAtKeys,
+  monthlyCpf,
   budget,
   flatPrice,
   flatType,
@@ -150,8 +157,10 @@ export function PurchasePlanTab({
     : calculateMonthlyPayment(fallbackLoan, loanInterestRate, loanTenureYears);
   const ownNeeded = Math.max(flatPrice - loan - grant, 0);
   const cpfUsed = known
-    ? Math.min(budget.cpfOa ?? 0, ownNeeded)
+    ? Math.min(oaAtKeys ?? budget.cpfOa ?? 0, ownNeeded)
     : signingCpf + keyCpf;
+  const signingShort = stageFunding ? stageFunding.signing.uncovered : 0;
+  const cpfCoversMonthly = monthlyCpf !== null && monthlyCpf >= monthlyPayment;
   const cashUsed = known
     ? Math.max(ownNeeded - cpfUsed - gap, 0)
     : minCashSigning;
@@ -286,6 +295,19 @@ export function PurchasePlanTab({
         <div className="col">
           <StatTiles tiles={tiles} />
 
+          {known && signingShort > 0 && (
+            <Note>
+              At signing you'd need {currency(signingShort)} more than your grant, CPF by then and cash cover. The
+              Staggered scheme, more cash, or a lower price would close it.
+            </Note>
+          )}
+          {known && monthlyCpf !== null && monthlyPayment > 0 && (
+            <Note>
+              {cpfCoversMonthly
+                ? `After keys, your CPF of about ${currency(monthlyCpf)} a month covers the ${currency(Math.round(monthlyPayment))} repayment.`
+                : `After keys, CPF covers about ${currency(monthlyCpf)} of the ${currency(Math.round(monthlyPayment))} monthly repayment; the rest is cash.`}
+            </Note>
+          )}
           {known && gap > 0 && (
             <Note>
               Your loan, grant and savings don't reach this price by{" "}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BtoTab } from "./components/BtoTab";
 import { BudgetTab } from "./components/BudgetTab";
 import { Navigation } from "./components/Navigation";
@@ -21,7 +21,7 @@ import {
   LOAN_TENURE_MIN,
 } from "./constants";
 import { useBtoProjects } from "./hooks/useBtoProjects";
-import { POLICY_CONFIG } from "./policies/policyConfig";
+import { POLICY_CONFIG, type BtoProject } from "./policies/policyConfig";
 import type {
   FinancingType,
   BtoScoreMode,
@@ -49,7 +49,15 @@ import {
   BTO_SCORE_PRESET_DETAILS,
   type BtoScoreWeights,
 } from "./utils/btoScoring";
-import { parseLaunchMonthInput } from "./utils/date";
+import {
+  affordableCeiling,
+  estimateMonthlyOa,
+  fundStages,
+  projectOa,
+  timingForLaunch,
+  type PurchaseTiming,
+} from "./utils/cpfProjection";
+import { parseLaunchMonthInput, parseMonth, parseMonthYearDate } from "./utils/date";
 import { clampNumber } from "./utils/format";
 import { withViewTransition } from "./utils/motion";
 import { buildPaymentTimeline } from "./utils/paymentTimeline";
@@ -167,14 +175,19 @@ function App() {
   const surveyFee = POLICY_CONFIG.fees.surveyFeeByFlatType[flatType];
   const fireInsurance = POLICY_CONFIG.fees.fireInsuranceByFlatType[flatType];
 
-  // The price ceiling comes from the financing estimate once age and savings are known.
+  // Cash is optional. Without it, the maths assumes enough cash for the cash-only fees and
+  // shows any other cash a payment would need.
+  const feesInCash = APPLICATION_FEE + optionFee + surveyFee + fireInsurance;
+  const cashForMaths = budget.cash ?? feesInCash;
+
+  // The price ceiling comes from the financing estimate once age and CPF are known.
   // Until then the old income-only rule stands in, and BTO Radar says so.
   const budgetInput = useMemo<FinancingEstimateInput>(
     () => ({
       financing,
       purchasePrice: flatPrice,
       grossMonthlyIncome: combinedIncome,
-      availableCash: budget.cash,
+      availableCash: cashForMaths,
       availableCpfOa: budget.cpfOa,
       grantAmount: ehgGrant,
       monthlyDebtPayments: 0,
@@ -190,7 +203,7 @@ function App() {
     }),
     [
       budget.age,
-      budget.cash,
+      cashForMaths,
       budget.cpfOa,
       combinedIncome,
       ehgGrant,
@@ -203,16 +216,40 @@ function App() {
       surveyFee,
     ]
   );
-  const targetEstimate = useMemo(() => calculateFinancingEstimate(budgetInput), [budgetInput]);
-  const budgetMaxPrice = targetEstimate.maxPurchasePrice;
-  const budgetAtMax = useMemo(
-    () =>
-      budgetMaxPrice === null
+  // Payments fall due months or years after booking, and CPF keeps building up until then.
+  // The ceiling is the highest price where each payment can be met on its date.
+  const [today] = useState(() => new Date());
+  const ceilingAt = useCallback(
+    (timing: PurchaseTiming) =>
+      budget.age === null || budget.cpfOa === null
         ? null
-        : calculateFinancingEstimate({ ...budgetInput, purchasePrice: budgetMaxPrice }),
-    [budgetInput, budgetMaxPrice]
+        : affordableCeiling({
+            base: budgetInput,
+            timing,
+            cpfToday: budget.cpfOa,
+            combinedIncome,
+            age: budget.age,
+            monthlyOverride: budget.cpfMonthly,
+            signingShare: downpaymentRule.signing,
+            minCashSigningShare: downpaymentRule.minCashSigning,
+          }),
+    [budget.age, budget.cpfMonthly, budget.cpfOa, budgetInput, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing]
   );
+  // The Budget screen shows a launch applied for now, with keys after the usual wait.
+  const typicalTiming = useMemo(
+    () => timingForLaunch({ today, applicationMonth: today, expectedKeys: null }),
+    [today]
+  );
+  const typicalCeiling = useMemo(() => ceilingAt(typicalTiming), [ceilingAt, typicalTiming]);
+  const budgetMaxPrice = typicalCeiling?.price ?? null;
+  const budgetAtMax = typicalCeiling?.estimate ?? null;
   const budgetKnown = budgetMaxPrice !== null && budgetAtMax !== null;
+  const monthlyCpfAt = useCallback(
+    (timing: PurchaseTiming) =>
+      budget.cpfMonthly ??
+      (budget.age === null ? null : estimateMonthlyOa(combinedIncome, budget.age + timing.monthsToKeys / 12)),
+    [budget.age, budget.cpfMonthly, combinedIncome]
+  );
   const loanAmount = budgetKnown
     ? Math.round(budgetAtMax.loanForTarget ?? 0)
     : combinedIncome * LOAN_MULTIPLIER;
@@ -225,6 +262,68 @@ function App() {
         ? btoProjects.find((project) => project.id === selectedBtoProjectId) ?? null
         : null,
     [btoProjects, selectedBtoProjectId]
+  );
+
+  const planTiming = useMemo(
+    () =>
+      timingForLaunch({
+        today,
+        applicationMonth: parseMonth(applicationMonth),
+        expectedKeys: parseMonthYearDate(selectedBtoProject?.expectedTop),
+      }),
+    [applicationMonth, selectedBtoProject?.expectedTop, today]
+  );
+  const planOa = useMemo(() => {
+    if (budget.age === null || budget.cpfOa === null) return null;
+    const project = (months: number) =>
+      projectOa({
+        cpfToday: budget.cpfOa ?? 0,
+        combinedIncome,
+        age: budget.age ?? 0,
+        monthlyOverride: budget.cpfMonthly,
+        months,
+      });
+    return { signing: project(planTiming.monthsToSigning), keys: project(planTiming.monthsToKeys) };
+  }, [budget.age, budget.cpfMonthly, budget.cpfOa, combinedIncome, planTiming]);
+  const targetEstimate = useMemo(
+    () => calculateFinancingEstimate({ ...budgetInput, availableCpfOa: planOa?.keys ?? budget.cpfOa }),
+    [budget.cpfOa, budgetInput, planOa]
+  );
+  const stageFunding = useMemo(
+    () =>
+      planOa === null
+        ? null
+        : fundStages({
+            signing: signingAmount,
+            keys: keyAmount,
+            minCashSigning,
+            grant: Math.min(ehgGrant, flatPrice * 0.95),
+            oaAtSigning: planOa.signing,
+            oaAtKeys: planOa.keys,
+            cash: budget.cash === null ? null : Math.max(budget.cash - feesInCash, 0),
+          }),
+    [budget.cash, ehgGrant, feesInCash, flatPrice, keyAmount, minCashSigning, planOa, signingAmount]
+  );
+
+  // Each project is checked with its own dates: later keys leave more time for CPF to build up.
+  const projectCeilings = useMemo(() => {
+    const byTiming = new Map<string, number>();
+    const byProject = new Map<string, number>();
+    for (const project of btoProjects) {
+      const timing = timingForLaunch({
+        today,
+        applicationMonth: parseMonthYearDate(project.launchMonth) ?? today,
+        expectedKeys: parseMonthYearDate(project.expectedTop),
+      });
+      const key = `${timing.monthsToSigning}:${timing.monthsToKeys}`;
+      if (!byTiming.has(key)) byTiming.set(key, Math.floor((ceilingAt(timing)?.price ?? 0) / 1000) * 1000);
+      byProject.set(project.id, byTiming.get(key) ?? 0);
+    }
+    return byProject;
+  }, [btoProjects, ceilingAt, today]);
+  const ceilingFor = useCallback(
+    (project: BtoProject) => projectCeilings.get(project.id) ?? totalAffordability,
+    [projectCeilings, totalAffordability]
   );
 
   const timeline = useMemo(
@@ -241,9 +340,12 @@ function App() {
         optionFee,
         surveyFee,
         fireInsurance,
+        signingFunding: stageFunding?.signing,
+        keyFunding: stageFunding?.keys,
       }),
     [
       applicationMonth,
+      stageFunding,
       fireInsurance,
       flatType,
       keyAmount,
@@ -492,6 +594,11 @@ function App() {
             loanTenureYears={loanTenureYears}
             estimateAtMax={budgetAtMax}
             maxPrice={budgetMaxPrice}
+            ceiling={typicalCeiling}
+            timing={typicalTiming}
+            monthlyCpf={monthlyCpfAt(typicalTiming)}
+            estimatedMonthlyCpf={budget.age === null ? null : estimateMonthlyOa(combinedIncome, budget.age)}
+            feesInCash={feesInCash}
             ehg={ehgAssessment}
             onIncomeChange={handleIncomeChange}
             onBudgetChange={handleBudgetChange}
@@ -514,6 +621,7 @@ function App() {
             loanAmount={loanAmount}
             ehgGrant={ehgGrant}
             totalAffordability={totalAffordability}
+            ceilingFor={ceilingFor}
             scorePreset={btoScorePreset}
             scoreWeights={btoScoreWeights}
             selectedProjectId={selectedBtoProjectId}
@@ -537,6 +645,9 @@ function App() {
             ehgGrant={ehgGrant}
             targetEstimate={targetEstimate}
             budgetKnown={budgetKnown}
+            stageFunding={stageFunding}
+            oaAtKeys={planOa?.keys ?? null}
+            monthlyCpf={monthlyCpfAt(planTiming)}
             budget={budget}
             flatPrice={flatPrice}
             flatType={flatType}

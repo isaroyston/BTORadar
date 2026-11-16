@@ -431,11 +431,33 @@ export const POLICY_CONFIG = {
       },
     },
   },
+  // HDB invites buyers to sign the Agreement for Lease within 9 months of booking; it is
+  // usually 4 to 6. The earlier date is used so CPF built up by signing is not overstated.
   defaultOffsets: {
     ballotAfterMonths: 2,
     bookingAfterBallotWeeks: 4,
-    agreementAfterBookingMonths: 9,
+    agreementAfterBookingMonths: 4,
     keyAfterBookingMonths: 42,
+  },
+  // CPF contributions that build up before each payment. Ratios from CPF Board's
+  // "CPF Allocation Rates from 1 January 2026" (private sector). Total rates are the 2026
+  // employer + employee rates. The Ordinary Wage ceiling is per earner; a couple is assumed
+  // to have two earners. The EHG is credited to CPF before the Agreement for Lease, so it
+  // can pay the signing downpayment (MND written answer on grant disbursement).
+  cpf: {
+    ordinaryWageCeilingPerEarner: 8000,
+    earners: 2,
+    bands: [
+      { maxAge: 35, totalRate: 0.37, oaShare: 0.6217 },
+      { maxAge: 45, totalRate: 0.37, oaShare: 0.5677 },
+      { maxAge: 50, totalRate: 0.37, oaShare: 0.5136 },
+      { maxAge: 55, totalRate: 0.37, oaShare: 0.4055 },
+      { maxAge: 60, totalRate: 0.34, oaShare: 0.353 },
+      { maxAge: 65, totalRate: 0.25, oaShare: 0.14 },
+      { maxAge: 70, totalRate: 0.165, oaShare: 0.0607 },
+      { maxAge: Number.POSITIVE_INFINITY, totalRate: 0.125, oaShare: 0.08 },
+    ],
+    grantCreditedBeforeSigning: true,
   },
   ehgFamilies: {
     meta: EHG_FAMILIES_POLICY_META,
@@ -453,6 +475,14 @@ export const POLICY_CONFIG = {
     bookingOptionFee: {
       label: "HDB Booking of Flat",
       url: "https://www.hdb.gov.sg/buying-a-flat/bto-sbf-and-open-booking-of-flats/process-for-buying-a-new-flat/booking-of-flat",
+    },
+    cpfAllocation: {
+      label: "CPF Allocation Rates from 1 January 2026",
+      url: "https://www.cpf.gov.sg/service/article/how-are-my-cpf-contributions-allocated-to-my-cpf-accounts",
+    },
+    grantDisbursement: {
+      label: "MND: disbursement of housing grants through CPF",
+      url: "https://mnd.gov.sg/newsroom/speeches/view/written-answer-by-ministry-of-national-development-on-disbursement-of-housing-grants-through-home-buyers-cpf-accounts",
     },
     agreementLease: {
       label: "HDB Sign Agreement for Lease",

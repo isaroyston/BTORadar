@@ -38,6 +38,8 @@ type BtoTabProps = {
   loanAmount: number;
   ehgGrant: number;
   totalAffordability: number;
+  // The price ceiling for one project, using its own signing and keys dates.
+  ceilingFor: (project: BtoProject) => number;
   scorePreset: BtoScorePreset;
   scoreWeights: BtoScoreWeights;
   selectedProjectId: string | null;
@@ -103,6 +105,7 @@ export function BtoTab({
   loanAmount,
   ehgGrant,
   totalAffordability,
+  ceilingFor,
   scorePreset,
   scoreWeights,
   selectedProjectId,
@@ -381,7 +384,7 @@ export function BtoTab({
                     launch={selectedLaunch}
                     flatType={selectedFlatType}
                     budgetKnown={budgetKnown}
-                    ceiling={ceiling}
+                    ceilingFor={ceilingFor}
                     fitOnly={fitOnly}
                     onToggleFitOnly={() => setFitOnly((current) => !current)}
                   />
@@ -423,7 +426,7 @@ export function BtoTab({
 
                   <div className="project-grid">
                     {selectedLaunch.projects
-                      .filter((project) => !fitOnly || !budgetKnown || fitsBudget(project, selectedFlatType, ceiling))
+                      .filter((project) => !fitOnly || !budgetKnown || fitsBudget(project, selectedFlatType, ceilingFor(project)))
                       .map((project, index) => (
                       <ProjectCard
                         key={project.id}
@@ -431,7 +434,7 @@ export function BtoTab({
                         project={project}
                         selectedFlatType={selectedFlatType}
                         budgetKnown={budgetKnown}
-                        ceiling={ceiling}
+                        ceiling={ceilingFor(project)}
                         decisionScore={projectScores.get(project.id) ?? null}
                         isSelected={project.id === selectedProjectId}
                         isSaved={savedSet.has(project.id)}
@@ -464,7 +467,7 @@ export function BtoTab({
             project={detailProject}
             selectedFlatType={selectedFlatType}
             budgetKnown={budgetKnown}
-            ceiling={ceiling}
+            ceiling={detailProject ? ceilingFor(detailProject) : ceiling}
             decisionScore={detailProject ? projectScores.get(detailProject.id) ?? null : null}
             isSelected={detailProject?.id === selectedProjectId}
             isSaved={detailProject ? savedSet.has(detailProject.id) : false}
@@ -523,19 +526,19 @@ function LaunchSummary({
   launch,
   flatType,
   budgetKnown,
-  ceiling,
+  ceilingFor,
   fitOnly,
   onToggleFitOnly,
 }: {
   launch: LaunchGroup;
   flatType: FlatType;
   budgetKnown: boolean;
-  ceiling: number;
+  ceilingFor: (project: BtoProject) => number;
   fitOnly: boolean;
   onToggleFitOnly: () => void;
 }) {
   const priced = launch.projects.filter((project) => getSelectedVariant(project, flatType));
-  const fitting = priced.filter((project) => fitsBudget(project, flatType, ceiling));
+  const fitting = priced.filter((project) => fitsBudget(project, flatType, ceilingFor(project)));
   const fittingPrices = fitting.map((project) => getSelectedVariant(project, flatType)?.basePrice ?? 0);
   const isSaved = launch.key === SAVED_KEY;
   const status = isSaved ? null : getLaunchStatus(launch.key);
@@ -556,7 +559,7 @@ function LaunchSummary({
     title = `${priced.length} ${priced.length === 1 ? "project has" : "projects have"} ${flatTypeLabel(flatType)} prices`;
     detail = `${context} · from ${currency(launch.lowestPrice ?? 0)}`;
   } else if (fitting.length === 0) {
-    title = `None of ${priced.length} fit your ${currency(ceiling)} budget`;
+    title = `None of ${priced.length} fit your budget yet`;
     detail = `${context} · lowest ${currency(launch.lowestPrice ?? 0)}`;
   } else {
     title = `${fitting.length} of ${priced.length} ${priced.length === 1 ? "project fits" : "projects fit"} your budget`;
@@ -777,6 +780,12 @@ function ProjectSheet({
 
           <section className="sheet-section">
             <h3>Prices by flat size</h3>
+            {budgetKnown && (
+              <p className="muted">
+                For this project you could go up to <strong>{currency(ceiling)}</strong>, counting the CPF you build up
+                before each payment is due.
+              </p>
+            )}
             {variants.length === 0 ? (
               <p className="muted">No prices listed for this project yet.</p>
             ) : (

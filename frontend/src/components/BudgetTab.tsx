@@ -2,6 +2,7 @@ import { useState } from "react";
 import { INCOME_MAX, INCOME_MIN } from "../constants";
 import type { FinancingType } from "../types";
 import type { FinancingEstimate } from "../utils/affordability";
+import type { CeilingResult, PurchaseTiming } from "../utils/cpfProjection";
 import type { BudgetInputs, FirstTimers } from "../utils/budgetStorage";
 import type { EhgAssessment } from "../utils/ehg";
 import { currency } from "../utils/format";
@@ -24,6 +25,11 @@ type BudgetTabProps = {
   loanTenureYears: number;
   estimateAtMax: FinancingEstimate | null;
   maxPrice: number | null;
+  ceiling: CeilingResult | null;
+  timing: PurchaseTiming;
+  monthlyCpf: number | null;
+  estimatedMonthlyCpf: number | null;
+  feesInCash: number;
   ehg: EhgAssessment;
   onIncomeChange: (value: number) => void;
   onBudgetChange: (patch: Partial<BudgetInputs>) => void;
@@ -54,14 +60,19 @@ export function BudgetTab({
   loanTenureYears,
   estimateAtMax,
   maxPrice,
+  ceiling,
+  timing,
+  monthlyCpf,
+  estimatedMonthlyCpf,
+  feesInCash,
   ehg,
   onIncomeChange,
   onBudgetChange,
   onSeeProjects,
   onOpenPlan,
 }: BudgetTabProps) {
-  const complete =
-    budget.age !== null && budget.cpfOa !== null && budget.cash !== null;
+  // Cash is optional: most of a BTO downpayment can come from the grant and CPF.
+  const complete = budget.age !== null && budget.cpfOa !== null;
   const [editing, setEditing] = useState(!complete);
   const showForm = editing || !complete;
   const known = maxPrice !== null && estimateAtMax !== null;
@@ -69,7 +80,6 @@ export function BudgetTab({
     { label: "Household income", done: true },
     { label: "Age of the youngest buyer", done: budget.age !== null },
     { label: "CPF savings", done: budget.cpfOa !== null },
-    { label: "Cash savings", done: budget.cash !== null },
   ];
 
   const openField = (id: string) => {
@@ -102,10 +112,19 @@ export function BudgetTab({
       value: budget.cpfOa === null ? "Not set" : currency(budget.cpfOa),
     },
     {
+      id: "budget-cpf-monthly",
+      icon: "calendar",
+      label: "CPF added each month",
+      value:
+        monthlyCpf === null
+          ? "Not set"
+          : `${currency(monthlyCpf)}${budget.cpfMonthly === null ? " (estimated)" : ""}`,
+    },
+    {
       id: "budget-cash",
       icon: "cash",
-      label: "Cash for the flat",
-      value: budget.cash === null ? "Not set" : currency(budget.cash),
+      label: "Cash you could use",
+      value: budget.cash === null ? `Fees only (${currency(feesInCash)})` : currency(budget.cash),
     },
     {
       id: "budget-first",
@@ -121,6 +140,18 @@ export function BudgetTab({
         title="Budget"
         subtitle="Tell us about your finances, and every project is checked against what you could spend."
       />
+      {known && ceiling && (
+        <Note>
+          Counts the CPF you build up before each payment is due: about {currency(ceiling.oaAtSigning)} by signing
+          (in about {timing.monthsToSigning} months) and {currency(ceiling.oaAtKeys)} by keys (about{" "}
+          {Math.round(timing.monthsToKeys / 6) / 2} years). Your grant is credited before signing.
+          {monthlyCpf !== null && estimateAtMax?.estimatedMonthlyPayment
+            ? monthlyCpf >= estimateAtMax.estimatedMonthlyPayment
+              ? ` After keys, your CPF of about ${currency(monthlyCpf)} a month covers the loan repayment.`
+              : ` After keys, CPF covers about ${currency(monthlyCpf)} of the monthly repayment; the rest is cash.`
+            : ""}
+        </Note>
+      )}
 
       {known ? (
         <BudgetAnswer
@@ -247,9 +278,23 @@ export function BudgetTab({
               />
 
               <MoneyField
+                id="budget-cpf-monthly"
+                label="CPF added to your Ordinary Account each month"
+                hint={
+                  estimatedMonthlyCpf === null
+                    ? "Combined. Leave blank and we'll estimate it from income and age."
+                    : `Combined. Leave blank to use our estimate of ${currency(estimatedMonthlyCpf)} from your income and age, or enter what your CPF statement shows (0 if self-employed).`
+                }
+                value={budget.cpfMonthly}
+                max={SAVINGS_MAX}
+                placeholder={estimatedMonthlyCpf === null ? "e.g. 1,380" : `${estimatedMonthlyCpf.toLocaleString("en-SG")} (estimate)`}
+                onCommit={(value) => onBudgetChange({ cpfMonthly: value })}
+              />
+
+              <MoneyField
                 id="budget-cash"
-                label="Cash you can put towards the flat"
-                hint="Leave out your emergency fund and renovation money. Enter 0 if none."
+                label="Cash you could use (optional)"
+                hint={`Most of the downpayment can come from your grant and CPF. Cash is needed for the ${currency(feesInCash)} in fees, a bank loan's 5%, or a gap CPF can't cover in time. Leave out emergency and renovation money.`}
                 value={budget.cash}
                 max={SAVINGS_MAX}
                 placeholder="e.g. 20,000"
