@@ -116,19 +116,20 @@ export function BudgetTab({
           />
 
           <fieldset className="field">
-            <legend>Are you first-time buyers?</legend>
+            <legend>Are you buying your first HDB flat?</legend>
             <p className="field-hint">
-              First-timer families can get the Enhanced CPF Housing Grant. Singles and second-timers get different
-              amounts.
+              This decides the Enhanced CPF Housing Grant. A couple where only one partner is a first-timer gets a
+              smaller amount; second-timers get none.
             </p>
             <Segmented
               label="First-time buyers"
-              value={budget.firstTimer ? "yes" : "no"}
+              value={budget.firstTimers}
               options={[
-                { value: "yes", label: "Yes, include the grant" },
-                { value: "no", label: "No grant" },
+                { value: "both", label: "Both of us" },
+                { value: "one", label: "One of us" },
+                { value: "none", label: "Neither" },
               ]}
-              onChange={(value) => onBudgetChange({ firstTimer: value === "yes" })}
+              onChange={(value) => onBudgetChange({ firstTimers: value })}
             />
           </fieldset>
         </form>

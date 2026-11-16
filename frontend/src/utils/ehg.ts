@@ -1,4 +1,4 @@
-import { lookupEhgFamiliesGrant } from "../policies/policyConfig.ts";
+import { lookupEhgFamiliesGrant, lookupEhgMixedCoupleGrant } from "../policies/policyConfig.ts";
 import type { EhgMode } from "../types.ts";
 
 export type EhgAssessment = {
@@ -43,6 +43,32 @@ export function calculateEhgAssessment({
           amount: confirmedAmount,
           note: "Uses the EHG amount entered from your HFE letter.",
         };
+  }
+
+  if (mode === "mixed-couple-estimate") {
+    if (!familyEligibilityConfirmed || assessedAverageMonthlyIncome === null) {
+      return {
+        status: "unassessed",
+        amount: null,
+        note: "Confirm the eligibility conditions and enter the assessed 12-month average income.",
+      };
+    }
+
+    const band = lookupEhgMixedCoupleGrant(assessedAverageMonthlyIncome);
+    if (!band) {
+      return {
+        status: "ineligible",
+        amount: 0,
+        note: "Half the household income is above the EHG (Singles) ceiling. HFE remains authoritative.",
+      };
+    }
+
+    return {
+      status: "conditional-estimate",
+      amount: band.grantAmount,
+      note:
+        "Estimate for a couple with one first-timer, from HDB's EHG (Singles) table on half the household income. HDB checks the conditions through HFE.",
+    };
   }
 
   if (mode === "family-estimate") {

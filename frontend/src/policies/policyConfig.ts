@@ -311,9 +311,34 @@ export const EHG_FAMILIES_BANDS_2024: EhgFamiliesBand[] = [
   { minIncome: 8501, maxIncome: 9000, grantAmount: 5000, label: "$8,501 to $9,000" },
 ];
 
+// EHG (Singles) amounts, used for a couple where only one partner is a first-timer.
+// Looked up on HALF the average monthly household income. Source: HDB's EHG table
+// (backend/data/policies/EHG amount Couples and Families Aug 2024.pdf, page 2).
+export const EHG_MIXED_COUPLE_BANDS_2024: EhgFamiliesBand[] = [
+  { minIncome: 0, maxIncome: 750, grantAmount: 60000, label: "Not more than $750" },
+  { minIncome: 751, maxIncome: 1000, grantAmount: 55000, label: "$751 to $1,000" },
+  { minIncome: 1001, maxIncome: 1250, grantAmount: 52500, label: "$1,001 to $1,250" },
+  { minIncome: 1251, maxIncome: 1500, grantAmount: 47500, label: "$1,251 to $1,500" },
+  { minIncome: 1501, maxIncome: 1750, grantAmount: 45000, label: "$1,501 to $1,750" },
+  { minIncome: 1751, maxIncome: 2000, grantAmount: 40000, label: "$1,751 to $2,000" },
+  { minIncome: 2001, maxIncome: 2250, grantAmount: 35000, label: "$2,001 to $2,250" },
+  { minIncome: 2251, maxIncome: 2500, grantAmount: 32500, label: "$2,251 to $2,500" },
+  { minIncome: 2501, maxIncome: 2750, grantAmount: 27500, label: "$2,501 to $2,750" },
+  { minIncome: 2751, maxIncome: 3000, grantAmount: 25000, label: "$2,751 to $3,000" },
+  { minIncome: 3001, maxIncome: 3250, grantAmount: 20000, label: "$3,001 to $3,250" },
+  { minIncome: 3251, maxIncome: 3500, grantAmount: 15000, label: "$3,251 to $3,500" },
+  { minIncome: 3501, maxIncome: 3750, grantAmount: 12500, label: "$3,501 to $3,750" },
+  { minIncome: 3751, maxIncome: 4000, grantAmount: 10000, label: "$3,751 to $4,000" },
+  { minIncome: 4001, maxIncome: 4250, grantAmount: 5000, label: "$4,001 to $4,250" },
+  { minIncome: 4251, maxIncome: 4500, grantAmount: 2500, label: "$4,251 to $4,500" },
+];
+
 export const POLICY_CONFIG = {
   country: "Singapore",
-  lastVerified: "2026-04-24",
+  // 2026-11-16: EHG tables checked against HDB's PDF; HDB-loan LTV (75%), MSR (30%), 3% and 4%
+  // assessment floors, HDB-loan downpayment (10% + 15%) and option fees checked against official
+  // announcements. Bank-loan downpayment timing could not be confirmed from an official page.
+  lastVerified: "2026-11-16",
   updateCadenceDays: 30,
   reviewProcess: "Manual monthly review of HDB, IRAS, and CPF sources",
   fees: {
@@ -384,24 +409,25 @@ export const POLICY_CONFIG = {
         note: "Bank loan DIA: 2.5% cash at signing, 22.5% at key collection.",
       },
     },
+    // Without a loan the whole price is paid, so each split must total 100%.
     none: {
       normal: {
-        signing: 0.2,
-        key: 0.25,
-        minCashSigning: 0.1,
-        note: "No loan normal: 20% at signing (minimum 10% cash), 25% at key collection.",
+        signing: 0.1,
+        key: 0.9,
+        minCashSigning: 0,
+        note: "No loan: 10% at signing, and the remaining 90% at key collection.",
       },
       staggered: {
-        signing: 0.1,
-        key: 0.35,
-        minCashSigning: 0.1,
-        note: "No loan staggered: 10% cash at signing, 35% at key collection.",
+        signing: 0.05,
+        key: 0.95,
+        minCashSigning: 0,
+        note: "No loan, staggered: 5% at signing, and the remaining 95% at key collection.",
       },
       dia: {
         signing: 0.025,
-        key: 0.425,
-        minCashSigning: 0.025,
-        note: "No loan DIA: 2.5% cash at signing, 42.5% at key collection.",
+        key: 0.975,
+        minCashSigning: 0,
+        note: "No loan, deferred: 2.5% at signing, and the remaining 97.5% at key collection.",
       },
     },
   },
@@ -494,6 +520,12 @@ export function getCpfDefaultsForAge(ageYears: number): CpfAgeDefaults {
     oaAllocationRate: allocationBand.oaAllocationRate,
     oaUsableRate: 1,
   };
+}
+
+// For a couple with one first-timer, HDB uses half the household income.
+export function lookupEhgMixedCoupleGrant(averageMonthlyHouseholdIncome: number): EhgFamiliesBand | null {
+  const halfIncome = Math.max(0, averageMonthlyHouseholdIncome) / 2;
+  return EHG_MIXED_COUPLE_BANDS_2024.find((band) => halfIncome <= band.maxIncome) || null;
 }
 
 export function lookupEhgFamiliesGrant(averageMonthlyIncome: number): EhgFamiliesBand | null {

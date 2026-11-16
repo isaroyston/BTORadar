@@ -2,8 +2,11 @@ export type BudgetInputs = {
   age: number | null;
   cpfOa: number | null;
   cash: number | null;
-  firstTimer: boolean;
+  firstTimers: FirstTimers;
 };
+
+// Whether the buyers are first-timers, which decides the housing grant table.
+export type FirstTimers = "both" | "one" | "none";
 
 const STORAGE_KEY = "bto-radar:budget:v1";
 
@@ -11,7 +14,7 @@ export const EMPTY_BUDGET_INPUTS: BudgetInputs = {
   age: null,
   cpfOa: null,
   cash: null,
-  firstTimer: true,
+  firstTimers: "both",
 };
 
 const numberOrNull = (value: unknown) =>
@@ -27,7 +30,12 @@ export function loadBudgetInputs(): BudgetInputs {
       age: numberOrNull(parsed.age),
       cpfOa: numberOrNull(parsed.cpfOa),
       cash: numberOrNull(parsed.cash),
-      firstTimer: parsed.firstTimer !== false,
+      firstTimers:
+        parsed.firstTimers === "one" || parsed.firstTimers === "none" || parsed.firstTimers === "both"
+          ? parsed.firstTimers
+          : parsed.firstTimer === false
+            ? "none"
+            : "both",
     };
   } catch {
     return EMPTY_BUDGET_INPUTS;

@@ -142,12 +142,17 @@ function App() {
   const ehgAssessment = useMemo(
     () =>
       calculateEhgAssessment({
-        mode: budget.firstTimer ? "family-estimate" : "none",
+        mode:
+          budget.firstTimers === "both"
+            ? "family-estimate"
+            : budget.firstTimers === "one"
+              ? "mixed-couple-estimate"
+              : "none",
         assessedAverageMonthlyIncome: combinedIncome,
         confirmedAmount: null,
         familyEligibilityConfirmed: true,
       }),
-    [budget.firstTimer, combinedIncome]
+    [budget.firstTimers, combinedIncome]
   );
   const ehgGrant = ehgAssessment.amount ?? 0;
 

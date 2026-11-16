@@ -53,4 +53,32 @@ const aboveCeiling = calculateEhgAssessment({
 assert.equal(aboveCeiling.status, "ineligible");
 assert.equal(aboveCeiling.amount, 0);
 
+// A couple with one first-timer: HDB's EHG (Singles) table on half the household income.
+assert.equal(
+  calculateEhgAssessment({
+    ...base,
+    mode: "mixed-couple-estimate",
+    assessedAverageMonthlyIncome: 6000,
+    familyEligibilityConfirmed: true,
+  }).amount,
+  25000
+);
+assert.equal(
+  calculateEhgAssessment({
+    ...base,
+    mode: "mixed-couple-estimate",
+    assessedAverageMonthlyIncome: 1500,
+    familyEligibilityConfirmed: true,
+  }).amount,
+  60000
+);
+const mixedAboveCeiling = calculateEhgAssessment({
+  ...base,
+  mode: "mixed-couple-estimate",
+  assessedAverageMonthlyIncome: 9000.02,
+  familyEligibilityConfirmed: true,
+});
+assert.equal(mixedAboveCeiling.status, "ineligible");
+assert.equal(mixedAboveCeiling.amount, 0);
+
 console.log("EHG checks passed.");

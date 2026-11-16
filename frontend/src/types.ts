@@ -50,4 +50,4 @@ export type TimelineItem = {
   payment?: TimelinePayment;
 };
 
-export type EhgMode = "unassessed" | "family-estimate" | "confirmed" | "none";
+export type EhgMode = "unassessed" | "family-estimate" | "mixed-couple-estimate" | "confirmed" | "none";
