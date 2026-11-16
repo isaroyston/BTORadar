@@ -246,7 +246,7 @@ export function BtoTab({
               <span className="filter-label">Your budget</span>
               {budgetKnown ? (
                 <button type="button" className="budget-pill" onClick={onOpenBudget}>
-                  Up to {currency(ceiling)}
+                  About {currency(ceiling)}
                   <Icon name="edit" />
                 </button>
               ) : (

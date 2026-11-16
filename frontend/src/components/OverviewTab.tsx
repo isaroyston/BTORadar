@@ -2,7 +2,7 @@ import type { BtoProject } from "../policies/policyConfig";
 import type { TabKey, TimelineItem } from "../types";
 import { currency } from "../utils/format";
 import { HeroCard } from "./Cards";
-import { Icon, PageHeader } from "./DashboardUi";
+import { Icon, PageHeader, type IconName } from "./DashboardUi";
 
 type OverviewTabProps = {
   budgetKnown: boolean;
@@ -16,6 +16,28 @@ type OverviewTabProps = {
   onSelectTab: (tab: TabKey) => void;
 };
 
+// The three ways people arrive: with a budget question, with a project in mind, or already booked.
+const STARTS: { icon: IconName; title: string; body: string; tab: TabKey }[] = [
+  {
+    icon: "wallet",
+    title: "Work out what we can afford",
+    body: "Income, age and CPF give a price ceiling, then the projects that fit it.",
+    tab: "budget",
+  },
+  {
+    icon: "building",
+    title: "Check a project we like",
+    body: "Pick it, and the plan asks only what it needs to tell you if it fits.",
+    tab: "bto",
+  },
+  {
+    icon: "calendar",
+    title: "We've booked a flat",
+    body: "Choose your project to see each payment, when it's due and how it's paid.",
+    tab: "bto",
+  },
+];
+
 export function OverviewTab({
   budgetKnown,
   budgetCeiling,
@@ -28,8 +50,11 @@ export function OverviewTab({
   onSelectTab,
 }: OverviewTabProps) {
   const ceiling = Math.floor(budgetCeiling / 1000) * 1000;
-  const doneCount = timeline.filter((item) => completedMilestones.includes(item.label)).length;
-  const nextStep = timeline.find((item) => !completedMilestones.includes(item.label)) ?? null;
+  const doneCount = timeline.filter((item) =>
+    completedMilestones.includes(item.label),
+  ).length;
+  const nextStep =
+    timeline.find((item) => !completedMilestones.includes(item.label)) ?? null;
   const allDone = timeline.length > 0 && doneCount === timeline.length;
   const fit =
     !budgetKnown || fundingGap === null
@@ -42,7 +67,9 @@ export function OverviewTab({
     {
       done: budgetKnown,
       title: "Know your budget",
-      state: budgetKnown ? `You could buy up to ${currency(ceiling)}.` : "Four answers give you a price ceiling.",
+      state: budgetKnown
+        ? `You could buy up to ${currency(ceiling)}.`
+        : "Income, age and CPF give you a price ceiling.",
       action: budgetKnown ? "Change" : "Set budget",
       tab: "budget" as TabKey,
     },
@@ -68,21 +95,63 @@ export function OverviewTab({
     },
   ];
   const firstOpen = steps.findIndex((step) => !step.done);
+  const starting = !budgetKnown && !selectedProject;
 
   return (
     <section className="screen">
-      <PageHeader title="Overview" subtitle="What's done, and what comes next." />
+      <PageHeader
+        title="Overview"
+        subtitle={
+          starting
+            ? "Start from where you are. Everything stays in this browser."
+            : "What's done, and what comes next."
+        }
+      />
+
+      {starting && (
+        <div className="start-grid">
+          {STARTS.map((start) => (
+            <button
+              key={start.title}
+              type="button"
+              className="start-card"
+              onClick={() => onSelectTab(start.tab)}
+            >
+              <span className="icon-tile" aria-hidden="true">
+                <Icon name={start.icon} />
+              </span>
+              <span className="start-text">
+                <strong>{start.title}</strong>
+                <span>{start.body}</span>
+              </span>
+              <span className="start-go" aria-hidden="true">
+                <Icon name="arrow" />
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       {selectedProject && nextStep ? (
         <HeroCard art="overview">
           <p className="hero-lead">Next: {nextStep.label.toLowerCase()}</p>
-          <p className="hero-figure">{nextStep.payment ? currency(nextStep.payment.total) : "Nothing to pay"}</p>
+          <p className="hero-figure">
+            {nextStep.payment
+              ? currency(nextStep.payment.total)
+              : "Nothing to pay"}
+          </p>
           <p className="hero-body-text">
-            {nextStep.payment ? `${nextStep.payment.label}, expected ${nextStep.date}. ` : `Expected ${nextStep.date}. `}
+            {nextStep.payment
+              ? `${nextStep.payment.label}, expected ${nextStep.date}. `
+              : `Expected ${nextStep.date}. `}
             {nextStep.note}
           </p>
           <div className="hero-actions">
-            <button type="button" className="btn btn-primary" onClick={() => onSelectTab("plan")}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => onSelectTab("plan")}
+            >
               Open your plan
               <Icon name="arrow" />
             </button>
@@ -90,29 +159,43 @@ export function OverviewTab({
         </HeroCard>
       ) : null}
 
-      <ol className="card journey">
-        {steps.map((step, index) => (
-          <li key={step.title} className={index === firstOpen ? "journey-step is-next" : "journey-step"}>
-            <span className={step.done ? "journey-mark is-done" : "journey-mark"} aria-hidden="true">
-              {step.done ? <Icon name="check" /> : index + 1}
-            </span>
-            <div className="journey-text">
-              <h2>
-                {step.title}
-                {step.done && <span className="sr-only"> (done)</span>}
-              </h2>
-              <p>{step.state}</p>
-            </div>
-            <button
-              type="button"
-              className={index === firstOpen ? "btn btn-primary btn-small" : "text-link"}
-              onClick={() => onSelectTab(step.tab)}
+      {!starting && (
+        <ol className="card journey">
+          {steps.map((step, index) => (
+            <li
+              key={step.title}
+              className={
+                index === firstOpen ? "journey-step is-next" : "journey-step"
+              }
             >
-              {step.action}
-            </button>
-          </li>
-        ))}
-      </ol>
+              <span
+                className={step.done ? "journey-mark is-done" : "journey-mark"}
+                aria-hidden="true"
+              >
+                {step.done ? <Icon name="check" /> : index + 1}
+              </span>
+              <div className="journey-text">
+                <h2>
+                  {step.title}
+                  {step.done && <span className="sr-only"> (done)</span>}
+                </h2>
+                <p>{step.state}</p>
+              </div>
+              <button
+                type="button"
+                className={
+                  index === firstOpen
+                    ? "btn btn-primary btn-small"
+                    : "text-link"
+                }
+                onClick={() => onSelectTab(step.tab)}
+              >
+                {step.action}
+              </button>
+            </li>
+          ))}
+        </ol>
+      )}
     </section>
   );
 }

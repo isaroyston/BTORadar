@@ -88,7 +88,7 @@ function App() {
   const initialPlan = initialPlanResult.snapshot;
 
   const [activeTab, setActiveTabState] = useState<TabKey>(() =>
-    getInitialTab(Boolean(initialPlan?.selectedBtoProjectId))
+    getInitialTab()
   );
   const [budget, setBudget] = useState<BudgetInputs>(loadBudgetInputs);
   const [combinedIncome, setCombinedIncome] = useState(
@@ -451,8 +451,11 @@ function App() {
   }, [activeCompletedMilestones.length, budgetKnown, selectedBtoProjectId, timeline.length]);
 
   const setActiveTab = (tab: TabKey) => {
-    withViewTransition(() => setActiveTabState(tab));
-    window.scrollTo({ top: 0 });
+    // Scroll inside the transition, so the old screen doesn't jump before it fades.
+    withViewTransition(() => {
+      setActiveTabState(tab);
+      window.scrollTo({ top: 0 });
+    });
 
     const url = new URL(window.location.href);
     if (tab === "budget") {
@@ -667,6 +670,9 @@ function App() {
             paymentOverrides={paymentOverrides}
             onPaymentOverridesChange={setPaymentOverrides}
             loadError={planLoadError}
+            combinedIncome={combinedIncome}
+            onIncomeChange={handleIncomeChange}
+            onBudgetChange={handleBudgetChange}
             onOpenBudget={() => setActiveTab("budget")}
             onOpenRadar={() => setActiveTab("bto")}
             onFlatPriceChange={handleFlatPriceChange}
@@ -708,11 +714,11 @@ function getDefaultApplicationMonth() {
   )}`;
 }
 
-// New visitors start at the budget; someone returning to a chosen project lands on their overview.
-function getInitialTab(hasSavedProject: boolean): TabKey {
+// Everyone starts at the overview: new visitors choose where to begin, returning ones see what is next.
+function getInitialTab(): TabKey {
   const tab = new URLSearchParams(window.location.search).get("tab");
   if (tab === "plan" || tab === "bto" || tab === "sources" || tab === "overview" || tab === "budget") return tab;
-  return hasSavedProject ? "overview" : "budget";
+  return "overview";
 }
 
 function getLoanTenureMax(financing: FinancingType) {

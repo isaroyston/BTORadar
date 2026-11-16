@@ -35,6 +35,16 @@ const policyDocuments: SourceLink[] = [
     href: `/data/policies/${encodeURIComponent("EHG amount Couples and Families Aug 2024.pdf")}`,
     description: "Grant amounts for couples and families, by household income.",
   },
+  {
+    label: "When housing grants are paid",
+    href: "https://mnd.gov.sg/newsroom/speeches/view/written-answer-by-ministry-of-national-development-on-disbursement-of-housing-grants-through-home-buyers-cpf-accounts",
+    description: "HDB credits the grant to CPF before you sign the Agreement for Lease, so it can pay that downpayment.",
+  },
+  {
+    label: "Signing the Agreement for Lease",
+    href: "https://www.hdb.gov.sg/residential/buying-a-flat/buying-procedure-for-new-flats/sign-agreement-for-lease",
+    description: "Signing happens within 9 months of booking; BTO Radar assumes 4, so CPF by then isn't overstated.",
+  },
 ];
 
 export function SourcesTab() {

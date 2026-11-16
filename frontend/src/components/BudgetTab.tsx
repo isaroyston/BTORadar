@@ -124,7 +124,10 @@ export function BudgetTab({
       id: "budget-cash",
       icon: "cash",
       label: "Cash you could use",
-      value: budget.cash === null ? `Fees only (${currency(feesInCash)})` : currency(budget.cash),
+      value:
+        budget.cash === null
+          ? `Fees only (${currency(feesInCash)})`
+          : currency(budget.cash),
     },
     {
       id: "budget-first",
@@ -140,25 +143,13 @@ export function BudgetTab({
         title="Budget"
         subtitle="Tell us about your finances, and every project is checked against what you could spend."
       />
-      {known && ceiling && (
-        <Note>
-          Counts the CPF you build up before each payment is due: about {currency(ceiling.oaAtSigning)} by signing
-          (in about {timing.monthsToSigning} months) and {currency(ceiling.oaAtKeys)} by keys (about{" "}
-          {Math.round(timing.monthsToKeys / 6) / 2} years). Your grant is credited before signing.
-          {monthlyCpf !== null && estimateAtMax?.estimatedMonthlyPayment
-            ? monthlyCpf >= estimateAtMax.estimatedMonthlyPayment
-              ? ` After keys, your CPF of about ${currency(monthlyCpf)} a month covers the loan repayment.`
-              : ` After keys, CPF covers about ${currency(monthlyCpf)} of the monthly repayment; the rest is cash.`
-            : ""}
-        </Note>
-      )}
 
       {known ? (
         <BudgetAnswer
           part="hero"
           maxPrice={maxPrice}
           estimate={estimateAtMax}
-          budget={budget}
+          oaAtKeys={ceiling?.oaAtKeys ?? budget.cpfOa ?? 0}
           financing={financing}
           loanTenureYears={loanTenureYears}
           ehg={ehg}
@@ -193,13 +184,27 @@ export function BudgetTab({
               part="breakdown"
               maxPrice={maxPrice}
               estimate={estimateAtMax}
-              budget={budget}
+              oaAtKeys={ceiling?.oaAtKeys ?? budget.cpfOa ?? 0}
               financing={financing}
               loanTenureYears={loanTenureYears}
               ehg={ehg}
               onSeeProjects={onSeeProjects}
               onOpenPlan={onOpenPlan}
             />
+          )}
+          {known && ceiling && (
+            <Note>
+              Counts the CPF you build up before each payment is due: about{" "}
+              {currency(ceiling.oaAtSigning)} by signing (in about{" "}
+              {timing.monthsToSigning} months) and {currency(ceiling.oaAtKeys)}{" "}
+              by keys (about {Math.round(timing.monthsToKeys / 6) / 2} years).
+              Your grant is credited before signing.
+              {monthlyCpf !== null && estimateAtMax?.estimatedMonthlyPayment
+                ? monthlyCpf >= estimateAtMax.estimatedMonthlyPayment
+                  ? ` After keys, your CPF of about ${currency(monthlyCpf)} a month covers the loan repayment.`
+                  : ` After keys, CPF covers about ${currency(monthlyCpf)} of the ${currency(Math.round(estimateAtMax.estimatedMonthlyPayment))} monthly repayment; the other ${currency(Math.round(estimateAtMax.estimatedMonthlyPayment - monthlyCpf))} is cash.`
+                : ""}
+            </Note>
           )}
           <Note>
             Your figures stay in this browser and are never sent anywhere. HDB's
@@ -287,7 +292,11 @@ export function BudgetTab({
                 }
                 value={budget.cpfMonthly}
                 max={SAVINGS_MAX}
-                placeholder={estimatedMonthlyCpf === null ? "e.g. 1,380" : `${estimatedMonthlyCpf.toLocaleString("en-SG")} (estimate)`}
+                placeholder={
+                  estimatedMonthlyCpf === null
+                    ? "e.g. 1,380"
+                    : `${estimatedMonthlyCpf.toLocaleString("en-SG")} (estimate)`
+                }
                 onCommit={(value) => onBudgetChange({ cpfMonthly: value })}
               />
 
@@ -359,6 +368,8 @@ export function BudgetTab({
                 loan: Math.round(estimateAtMax.loanForTarget ?? 0),
                 maxPrice,
                 financing,
+                ceiling,
+                timing,
               })}
               onSeeProjects={onSeeProjects}
             />
@@ -401,7 +412,7 @@ function BudgetAnswer({
   part,
   maxPrice,
   estimate,
-  budget,
+  oaAtKeys,
   financing,
   loanTenureYears,
   ehg,
@@ -411,7 +422,7 @@ function BudgetAnswer({
   part: "hero" | "breakdown";
   maxPrice: number;
   estimate: FinancingEstimate;
-  budget: BudgetInputs;
+  oaAtKeys: number;
   financing: FinancingType;
   loanTenureYears: number;
   ehg: EhgAssessment;
@@ -422,7 +433,7 @@ function BudgetAnswer({
   const loan = Math.round(estimate.loanForTarget ?? 0);
   const grant = Math.round(estimate.usableGrantAmount ?? 0);
   const ownFunds = Math.max(Math.round(maxPrice) - loan - grant, 0);
-  const cpfUsed = Math.min(budget.cpfOa ?? 0, ownFunds);
+  const cpfUsed = Math.min(oaAtKeys, ownFunds);
   const cashUsed = Math.max(ownFunds - cpfUsed, 0);
   const tiles: Tile[] = [
     {
@@ -432,7 +443,7 @@ function BudgetAnswer({
       amount: loan,
     },
     { key: "grant", icon: "sparkle", label: "Housing grant", amount: grant },
-    { key: "cpf", icon: "piggy", label: "CPF savings", amount: cpfUsed },
+    { key: "cpf", icon: "piggy", label: "CPF by keys", amount: cpfUsed },
     { key: "cash", icon: "cash", label: "Cash", amount: cashUsed },
   ];
   const tenure = estimate.effectiveTenureYears;
@@ -513,12 +524,29 @@ function describeLimit({
   loan,
   maxPrice,
   financing,
+  ceiling,
+  timing,
 }: {
   estimate: FinancingEstimate;
   loan: number;
   maxPrice: number;
   financing: FinancingType;
+  ceiling: CeilingResult | null;
+  timing: PurchaseTiming;
 }) {
+  if (ceiling?.limitedBy === "signing") {
+    return {
+      title: "The payment at signing sets this ceiling",
+      body: `Signing comes about ${timing.monthsToSigning} months from now, before much CPF has built up. Your grant and about ${currency(ceiling.oaAtSigning)} of CPF cover it up to this price. More cash, or the Staggered scheme on Plan, would raise it.`,
+    };
+  }
+  if (ceiling?.limitedBy === "keys" && financing !== "none") {
+    const share = Math.round((estimate.ltvLimit ?? 0.75) * 100);
+    return {
+      title: "Your savings by key collection set this ceiling",
+      body: `A loan covers at most ${share}% of the price. The rest comes from your grant, cash and the ${currency(ceiling.oaAtKeys)} of CPF you'll have by keys. Later keys or more CPF each month would raise it.`,
+    };
+  }
   if (financing === "none") {
     return {
       title: "Your savings set this ceiling",
@@ -547,7 +575,7 @@ function describeLimit({
   };
 }
 
-function MoneyField({
+export function MoneyField({
   id,
   label,
   hint,

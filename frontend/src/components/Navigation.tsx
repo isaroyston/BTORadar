@@ -52,8 +52,11 @@ export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps
     <>
       <nav className="side-nav" aria-label="Sections">
         <Brand />
-        <div className="side-group">{journey.map(item)}</div>
-        <div className="side-group side-group-quiet">{other.map(item)}</div>
+        <div className="side-group">
+          {other.filter((tab) => tab.id === "overview").map(item)}
+          {journey.map(item)}
+        </div>
+        <div className="side-group side-group-quiet">{other.filter((tab) => tab.id !== "overview").map(item)}</div>
         <div className="side-foot">
           <p>
             Plan smarter.

@@ -14,8 +14,11 @@
 
 ## What It Does
 
-- Works out a price ceiling from income, age, CPF and cash savings, using HDB's
-  loan-to-value and income limits. HFE remains authoritative.
+- Works out a price ceiling from income, age and CPF (cash is optional), using HDB's
+  loan-to-value and income limits. Each payment is checked on its own date: the grant
+  is credited before signing, and CPF keeps building up until keys at CPF's 2026
+  allocation rates. Each project is checked with its own launch and keys dates.
+  HFE remains authoritative.
 - Looks up Enhanced CPF Housing Grant bands for first-timer families.
 - Models downpayment, option fee, survey fee, and fire insurance scenarios.
 - Builds an average payment timeline from application through key collection.
@@ -24,10 +27,10 @@
 
 ## Product Surfaces
 
-- **Budget**: five questions, one price ceiling, and what sets it.
+- **Overview**: the front door. New visitors pick where they are (budget first, a project in mind, or already booked); returning visitors see the next payment and where each step stands.
+- **Budget**: income, age and CPF (plus optional CPF-per-month and cash), one price ceiling, and what sets it.
 - **Projects**: launches, project cards checked against the ceiling, a detail sheet, saved projects, and side-by-side compare.
-- **Plan**: target price, loan and downpayment choices, whether it fits, and a payment timeline to tick off. Saves automatically.
-- **Overview**: the next payment and where each step stands.
+- **Plan**: target price, loan and downpayment choices, whether it fits (asking income, age and CPF in place if they're missing), whether CPF covers the monthly repayment, and a payment timeline showing grant, CPF and cash per payment. Saves automatically.
 
 The visual system is described in [`DESIGN.md`](DESIGN.md).
 
@@ -51,7 +54,7 @@ npm.cmd run build
 npm.cmd test
 ```
 
-`npm test` runs the scoring, affordability, grant, fee and payment-allocation checks.
+`npm test` runs the scoring, affordability, grant, fee, payment-allocation and CPF-projection checks.
 
 ## Saved Scenarios
 

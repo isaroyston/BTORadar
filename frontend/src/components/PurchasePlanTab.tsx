@@ -5,6 +5,8 @@ import {
   FLAT_MIN,
   FLAT_TYPE_OPTIONS,
   HDB_LOAN_TENURE_MAX,
+  INCOME_MAX,
+  INCOME_MIN,
   LOAN_INTEREST_RATE_MAX,
   LOAN_INTEREST_RATE_MIN,
   LOAN_TENURE_MIN,
@@ -31,6 +33,7 @@ import {
   StatTiles,
   type Tile,
 } from "./Cards";
+import { MoneyField } from "./BudgetTab";
 import { Icon, PageHeader } from "./DashboardUi";
 import { Segmented } from "./Segmented";
 
@@ -65,6 +68,9 @@ type PurchasePlanTabProps = {
     ) => Record<string, PaymentOverride>,
   ) => void;
   loadError: string | null;
+  combinedIncome: number;
+  onIncomeChange: (value: number) => void;
+  onBudgetChange: (patch: Partial<BudgetInputs>) => void;
   onOpenBudget: () => void;
   onOpenRadar: () => void;
   onFlatPriceChange: (value: number) => void;
@@ -124,6 +130,9 @@ export function PurchasePlanTab({
   paymentOverrides,
   onPaymentOverridesChange,
   loadError,
+  combinedIncome,
+  onIncomeChange,
+  onBudgetChange,
   onOpenBudget,
   onOpenRadar,
   onFlatPriceChange,
@@ -172,7 +181,7 @@ export function PurchasePlanTab({
       amount: loan,
     },
     { key: "grant", icon: "sparkle", label: "Housing grant", amount: grant },
-    { key: "cpf", icon: "piggy", label: "CPF savings", amount: cpfUsed },
+    { key: "cpf", icon: "piggy", label: known ? "CPF by keys" : "CPF savings", amount: cpfUsed },
     { key: "cash", icon: "cash", label: "Cash", amount: cashUsed },
   ];
   const projectVariant = selectedProject?.flatVariants.find(
@@ -195,6 +204,8 @@ export function PurchasePlanTab({
             total: override.total,
             cpfOa: override.cpf,
             cash: override.cash,
+            grant: 0,
+            shortfall: 0,
           },
         };
       }),
@@ -316,17 +327,55 @@ export function PurchasePlanTab({
             </Note>
           )}
           {!known && (
-            <Note>
-              These figures use the downpayment rule alone.{" "}
-              <button
-                type="button"
-                className="text-link text-link-inline"
-                onClick={onOpenBudget}
-              >
-                Add your age and savings
-              </button>{" "}
-              to check what you can borrow.
-            </Note>
+            <section className="card form-card">
+              <div className="card-head">
+                <h2>
+                  <span className="head-icon" aria-hidden="true">
+                    <Icon name="wallet" />
+                  </span>
+                  Check this price against your finances
+                </h2>
+              </div>
+              <p className="muted">
+                Three answers check this price against your loan, grant and CPF. The rest of your budget is optional.
+              </p>
+              <MoneyField
+                id="plan-income"
+                label="Household income, per month"
+                hint="Before CPF and tax, for everyone buying."
+                value={combinedIncome}
+                max={INCOME_MAX}
+                onCommit={(value) => onIncomeChange(value ?? INCOME_MIN)}
+              />
+              <div className="field">
+                <label htmlFor="plan-age">Age of the youngest buyer</label>
+                <input
+                  id="plan-age"
+                  className="input input-short"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  placeholder="e.g. 29"
+                  defaultValue={budget.age ?? ""}
+                  onChange={(event) => {
+                    const digits = event.target.value.replace(/\D/g, "");
+                    const age = digits === "" ? null : Number(digits);
+                    onBudgetChange({ age: age === null || age < 21 || age > 70 ? null : age });
+                  }}
+                />
+              </div>
+              <MoneyField
+                id="plan-cpf"
+                label="CPF Ordinary Account savings"
+                hint="Everyone buying, combined. Enter 0 if none."
+                value={budget.cpfOa}
+                max={2000000}
+                placeholder="e.g. 20,000"
+                onCommit={(value) => onBudgetChange({ cpfOa: value })}
+              />
+              <button type="button" className="text-link" onClick={onOpenBudget}>
+                Add cash and grant details on Budget
+              </button>
+            </section>
           )}
 
           <section className="card">
@@ -522,7 +571,8 @@ function TimelineStep({
   const [editingDate, setEditingDate] = useState(false);
   const [amountText, setAmountText] = useState("");
   const payment = item.payment;
-  const canSwitch = Boolean(payment && payment.total >= 10000);
+  // Switching CPF and cash makes sense only where the grant is not paying part of it.
+  const canSwitch = Boolean(payment && payment.total >= 10000 && !(payment.grant ?? 0));
 
   return (
     <li
@@ -621,20 +671,7 @@ function TimelineStep({
               </button>
             )}
             <span className="timeline-split">
-              {payment.cpfOa > 0 && payment.cash > 0 ? (
-                <>
-                  <span className="tag tag-cpf">
-                    CPF {currency(payment.cpfOa)}
-                  </span>
-                  <span className="tag tag-cash">
-                    Cash {currency(payment.cash)}
-                  </span>
-                </>
-              ) : payment.cpfOa > 0 ? (
-                <span className="tag tag-cpf">From CPF</span>
-              ) : (
-                <span className="tag tag-cash">In cash</span>
-              )}
+              <FundingTags payment={payment} />
               {canSwitch && (
                 <button
                   type="button"
@@ -775,4 +812,33 @@ function calculateMonthlyPayment(
 function getLoanTenureMax(financing: FinancingType) {
   if (financing === "hdb") return HDB_LOAN_TENURE_MAX;
   return BANK_LOAN_TENURE_MAX;
+}
+
+// How a payment is covered: grant, CPF and cash, plus any cash still to find.
+function FundingTags({ payment }: { payment: TimelineItem["payment"] & object }) {
+  const parts = [
+    { key: "grant", amount: payment.grant ?? 0, only: "From your grant", label: "Grant" },
+    { key: "cpf", amount: payment.cpfOa, only: "From CPF", label: "CPF" },
+    { key: "cash", amount: payment.cash, only: "In cash", label: "Cash" },
+  ].filter((part) => part.amount > 0);
+  const shortfall = payment.shortfall ?? 0;
+  return (
+    <>
+      {parts.length === 1 ? (
+        <span className={`tag tag-${parts[0].key}`}>{parts[0].only}</span>
+      ) : (
+        parts.map((part) => (
+          <span key={part.key} className={`tag tag-${part.key}`}>
+            {part.label} {currency(part.amount)}
+          </span>
+        ))
+      )}
+      {shortfall > 0 && (
+        <span className="tag tag-short">
+          <Icon name="alert" />
+          {currency(shortfall)} more cash needed
+        </span>
+      )}
+    </>
+  );
 }
