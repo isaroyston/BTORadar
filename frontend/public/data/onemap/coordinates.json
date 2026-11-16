@@ -1,0 +1,619 @@
+{
+  "generatedAt": "2026-11-16T15:17:09.746Z",
+  "source": "https://www.onemap.gov.sg/api/common/elastic/search",
+  "projectCount": 102,
+  "coordinates": {
+    "chencharu-acres": {
+      "lat": 1.413595093021834,
+      "lon": 103.8292334896039,
+      "matched": "CHENCHARU ACRES",
+      "by": "name"
+    },
+    "chencharu-vines": {
+      "lat": 1.42032575346907,
+      "lon": 103.825794763621,
+      "matched": "CHENCHARU VINES",
+      "by": "name"
+    },
+    "costa-riviera-i": {
+      "lat": 1.375504551103353,
+      "lon": 103.9496674805842,
+      "matched": "COSTA RIVIERA I",
+      "by": "name"
+    },
+    "costa-riviera-ii": {
+      "lat": 1.375382489235787,
+      "lon": 103.950988231721,
+      "matched": "COSTA RIVIERA II",
+      "by": "name"
+    },
+    "chencharu-hills": {
+      "lat": 1.417148043574793,
+      "lon": 103.8245217994231,
+      "matched": "CHENCHARU HILLS",
+      "by": "name"
+    },
+    "holland-vista": {
+      "lat": 1.309053945461849,
+      "lon": 103.7940631208877,
+      "matched": "HOLLAND VISTA",
+      "by": "name"
+    },
+    "btohq-rail-garden-cck": {
+      "lat": 1.387660843085521,
+      "lon": 103.7550255067505,
+      "matched": "RAIL GARDEN @ CCK",
+      "by": "name"
+    },
+    "btohq-tanglin-halt-courtyard": {
+      "lat": 1.299651000877353,
+      "lon": 103.7980317419587,
+      "matched": "TANGLIN HALT COURTYARD",
+      "by": "name"
+    },
+    "bedok-south-bloom": {
+      "lat": 1.324301179734837,
+      "lon": 103.9386540336539,
+      "matched": "BEDOK SOUTH BLOOM",
+      "by": "name"
+    },
+    "tanglin-halt-courtyard": {
+      "lat": 1.299651000877353,
+      "lon": 103.7980317419587,
+      "matched": "TANGLIN HALT COURTYARD",
+      "by": "name"
+    },
+    "rail-garden-cck": {
+      "lat": 1.387660843085521,
+      "lon": 103.7550255067505,
+      "matched": "RAIL GARDEN @ CCK",
+      "by": "name"
+    },
+    "tanjong-tree-residences-hougang": {
+      "lat": 1.347051318102499,
+      "lon": 103.8866059634477,
+      "matched": "TANJONG TREE RESIDENCES @ HOUGANG",
+      "by": "name"
+    },
+    "matilda-riverside": {
+      "lat": 1.402450857510928,
+      "lon": 103.8894323637948,
+      "matched": "MATILDA RIVERSIDE",
+      "by": "name"
+    },
+    "woodgrove-edge": {
+      "lat": 1.4290573185099,
+      "lon": 103.7843468890696,
+      "matched": "WOODGROVE EDGE",
+      "by": "name"
+    },
+    "chai-chee-green": {
+      "lat": 1.32943726660869,
+      "lon": 103.9192540471969,
+      "matched": "CHAI CHEE GREEN",
+      "by": "name"
+    },
+    "sin-ming-residences": {
+      "lat": 1.355152396701471,
+      "lon": 103.8396637464713,
+      "matched": "SIN MING RESIDENCES",
+      "by": "name"
+    },
+    "petir-park-edge": {
+      "lat": 1.375203035223649,
+      "lon": 103.767763344969,
+      "matched": "PETIR PARK EDGE",
+      "by": "name"
+    },
+    "jurong-arcadia": {
+      "lat": 1.354514372878062,
+      "lon": 103.72379293844,
+      "matched": "JURONG ARCADIA",
+      "by": "name"
+    },
+    "tenteram-vantage": {
+      "lat": 1.328875983572286,
+      "lon": 103.8603852957009,
+      "matched": "TENTERAM VANTAGE",
+      "by": "name"
+    },
+    "verandah-kallang": {
+      "lat": 1.309732744272527,
+      "lon": 103.8744986303133,
+      "matched": "VERANDAH@KALLANG",
+      "by": "name"
+    },
+    "rajah-residences": {
+      "lat": 1.327399888726798,
+      "lon": 103.8543434500161,
+      "matched": "RAJAH RESIDENCES",
+      "by": "name"
+    },
+    "bedok-south-blossoms": {
+      "lat": 1.322083399714181,
+      "lon": 103.9434087491653,
+      "matched": "BEDOK SOUTH BLOSSOMS",
+      "by": "name"
+    },
+    "farrer-park-arena": {
+      "lat": 1.312062626880306,
+      "lon": 103.849479603967,
+      "matched": "FARRER PARK ARENA",
+      "by": "name"
+    },
+    "serangoon-north-vista": {
+      "lat": 1.364376439649593,
+      "lon": 103.8735928084411,
+      "matched": "SERANGOON NORTH VISTA",
+      "by": "name"
+    },
+    "parc-meadow-tengah": {
+      "lat": 1.365585891973513,
+      "lon": 103.7366029991369,
+      "matched": "PARC MEADOW @ TENGAH",
+      "by": "name"
+    },
+    "plantation-verge": {
+      "lat": 1.349548885545597,
+      "lon": 103.7359596772414,
+      "matched": "PLANTATION VERGE",
+      "by": "name"
+    },
+    "brickland-weave": {
+      "lat": 1.370586796237006,
+      "lon": 103.7450240242526,
+      "matched": "BRICKLAND WEAVE",
+      "by": "name"
+    },
+    "jurong-west-crystal": {
+      "lat": 1.336661212490976,
+      "lon": 103.6934554952635,
+      "matched": "JURONG WEST CRYSTAL",
+      "by": "name"
+    },
+    "farrer-park-fields": {
+      "lat": 1.310487141103651,
+      "lon": 103.8505235682108,
+      "matched": "FARRER PARK FIELDS",
+      "by": "name"
+    },
+    "rajah-summit": {
+      "lat": 1.3278357567305,
+      "lon": 103.8521740388708,
+      "matched": "RAJAH SUMMIT",
+      "by": "name"
+    },
+    "ulu-pandan-glades": {
+      "lat": 1.309997829325251,
+      "lon": 103.783028088738,
+      "matched": "ULU PANDAN GLADES",
+      "by": "name"
+    },
+    "buangkok-woods": {
+      "lat": 1.385621999419377,
+      "lon": 103.8837680158515,
+      "matched": "BUANGKOK WOODS",
+      "by": "name"
+    },
+    "west-glades-bukit-batok": {
+      "lat": 1.357361410090417,
+      "lon": 103.7453997035435,
+      "matched": "WEST GLADES @ BUKIT BATOK",
+      "by": "name"
+    },
+    "kallang-horizon": {
+      "lat": 1.312163343022619,
+      "lon": 103.8706428583497,
+      "matched": "KALLANG HORIZON",
+      "by": "name"
+    },
+    "ghim-moh-natura": {
+      "lat": 1.309905402812876,
+      "lon": 103.7899985451713,
+      "matched": "GHIM MOH NATURA",
+      "by": "name"
+    },
+    "queensway-canopy": {
+      "lat": 1.291751547614957,
+      "lon": 103.7994743503545,
+      "matched": "QUEENSWAY CANOPY",
+      "by": "name"
+    },
+    "ulu-pandan-banks": {
+      "lat": 1.31047570363015,
+      "lon": 103.7812820110229,
+      "matched": "ULU PANDAN BANKS",
+      "by": "name"
+    },
+    "garden-waterfront-i-ii-tengah": {
+      "lat": 1.355607991661873,
+      "lon": 103.7310264379144,
+      "matched": "TENGAH GARDEN AVENUE",
+      "by": "road: Tengah Garden Avenue"
+    },
+    "aranda-breeze-yishun": {
+      "lat": 1.423220726795671,
+      "lon": 103.8528114269642,
+      "matched": "ARANDA BREEZE @ YISHUN",
+      "by": "name"
+    },
+    "miltonia-breeze-yishun": {
+      "lat": 1.418611584259159,
+      "lon": 103.8500824713275,
+      "matched": "MILTONIA BREEZE @ YISHUN",
+      "by": "name"
+    },
+    "vanda-breeze-yishun": {
+      "lat": 1.422584418648061,
+      "lon": 103.8515893767146,
+      "matched": "VANDA BREEZE @ YISHUN",
+      "by": "name"
+    },
+    "central-weave-amk": {
+      "lat": 1.373895607664848,
+      "lon": 103.8473658926082,
+      "matched": "CENTRAL WEAVE @ AMK",
+      "by": "name"
+    },
+    "havelock-hillside": {
+      "lat": 1.288600025634311,
+      "lon": 103.8305059484683,
+      "matched": "HAVELOCK HILLSIDE",
+      "by": "name"
+    },
+    "keat-hong-grange": {
+      "lat": 1.374942747120147,
+      "lon": 103.749023588303,
+      "matched": "KEAT HONG GRANGE",
+      "by": "name"
+    },
+    "jurong-east-breeze": {
+      "lat": 1.343799454078529,
+      "lon": 103.7438853184174,
+      "matched": "JURONG EAST BREEZE",
+      "by": "name"
+    },
+    "alexandra-vale": {
+      "lat": 1.289756389097169,
+      "lon": 103.8177276965739,
+      "matched": "ALEXANDRA VALE",
+      "by": "name"
+    },
+    "sun-plaza-spring": {
+      "lat": 1.3585795422464,
+      "lon": 103.9495318949848,
+      "matched": "SUN PLAZA SPRING",
+      "by": "name"
+    },
+    "woodlands-south-plains": {
+      "lat": 1.42655027696658,
+      "lon": 103.7967574549471,
+      "matched": "WOODLANDS SOUTH PLAINS",
+      "by": "name"
+    },
+    "bukit-merah-ridge": {
+      "lat": 1.285973426979239,
+      "lon": 103.8243645317856,
+      "matched": "BUKIT MERAH RIDGE",
+      "by": "name"
+    },
+    "lakeside-view": {
+      "lat": 1.341292033122244,
+      "lon": 103.7210366423895,
+      "matched": "LAKESIDE VIEW",
+      "by": "name"
+    },
+    "ghim-moh-ascent": {
+      "lat": 1.31108897751095,
+      "lon": 103.7898384904573,
+      "matched": "GHIM MOH ASCENT",
+      "by": "name"
+    },
+    "kim-keat-heights": {
+      "lat": 1.338241319148454,
+      "lon": 103.8546351092463,
+      "matched": "KIM KEAT HEIGHTS",
+      "by": "name"
+    },
+    "yishun-beacon": {
+      "lat": 1.424293992479539,
+      "lon": 103.8356960509806,
+      "matched": "YISHUN BEACON",
+      "by": "name"
+    },
+    "dakota-crest": {
+      "lat": 1.307064873648534,
+      "lon": 103.8852550920155,
+      "matched": "DAKOTA CREST",
+      "by": "name"
+    },
+    "parc-flora-tengah": {
+      "lat": 1.363462799095308,
+      "lon": 103.7328145518459,
+      "matched": "PARC FLORA @ TENGAH",
+      "by": "name"
+    },
+    "plantation-creek": {
+      "lat": 1.353844854279874,
+      "lon": 103.7298516418516,
+      "matched": "PLANTATION CREEK",
+      "by": "name"
+    },
+    "king-georges-heights": {
+      "lat": 1.307044129826033,
+      "lon": 103.8594280367998,
+      "matched": "KING GEORGE'S HEIGHTS",
+      "by": "name"
+    },
+    "grove-spring-yishun": {
+      "lat": 1.431415113210867,
+      "lon": 103.8488883650668,
+      "matched": "GROVE SPRING @ YISHUN",
+      "by": "name"
+    },
+    "yishun-boardwalk": {
+      "lat": 1.433279153572161,
+      "lon": 103.8457352785157,
+      "matched": "YISHUN BOARDWALK",
+      "by": "name"
+    },
+    "kent-heights": {
+      "lat": 1.317044776782569,
+      "lon": 103.8507696843921,
+      "matched": "KENT HEIGHTS",
+      "by": "name"
+    },
+    "heart-of-yew-tee": {
+      "lat": 1.397394124829957,
+      "lon": 103.7460558740795,
+      "matched": "HEART OF YEW TEE",
+      "by": "name"
+    },
+    "hougang-olive": {
+      "lat": 1.348010691679788,
+      "lon": 103.8892314706365,
+      "matched": "HOUGANG OLIVE",
+      "by": "name"
+    },
+    "tanjong-tree-residences-hougang-2021": {
+      "lat": 1.347051318102499,
+      "lon": 103.8866059634477,
+      "matched": "TANJONG TREE RESIDENCES @ HOUGANG",
+      "by": "name"
+    },
+    "nanyang-opal": {
+      "lat": 1.340960443688392,
+      "lon": 103.6908191527289,
+      "matched": "NANYANG OPAL",
+      "by": "name"
+    },
+    "parc-clover-tengah": {
+      "lat": 1.36068443168877,
+      "lon": 103.7355828640955,
+      "matched": "PARC CLOVER @ TENGAH",
+      "by": "name"
+    },
+    "parc-glen-tengah": {
+      "lat": 1.362998667034323,
+      "lon": 103.73773555621,
+      "matched": "PARC GLEN @ TENGAH",
+      "by": "name"
+    },
+    "hougang-citrine": {
+      "lat": 1.346922924911635,
+      "lon": 103.889769301822,
+      "matched": "HOUGANG CITRINE",
+      "by": "name"
+    },
+    "kovan-wellspring": {
+      "lat": 1.360362715113763,
+      "lon": 103.8872114239383,
+      "matched": "KOVAN WELLSPRING",
+      "by": "name"
+    },
+    "toh-guan-grove": {
+      "lat": 1.340174118006529,
+      "lon": 103.7452332605846,
+      "matched": "TOH GUAN GROVE",
+      "by": "name"
+    },
+    "towner-residences": {
+      "lat": 1.3208293764864,
+      "lon": 103.856916171104,
+      "matched": "TOWNER RESIDENCES",
+      "by": "name"
+    },
+    "queens-arc": {
+      "lat": 1.289663717175992,
+      "lon": 103.8011617144156,
+      "matched": "QUEEN'S ARC",
+      "by": "name"
+    },
+    "tampines-greenjade": {
+      "lat": 1.341957982480229,
+      "lon": 103.9347031455347,
+      "matched": "TAMPINES GREENJADE",
+      "by": "name"
+    },
+    "tampines-greenquartz": {
+      "lat": 1.34061465956409,
+      "lon": 103.9392715068836,
+      "matched": "TAMPINES GREENQUARTZ",
+      "by": "name"
+    },
+    "macpherson-weave": {
+      "lat": 1.327134053856689,
+      "lon": 103.8885888235046,
+      "matched": "MACPHERSON WEAVE",
+      "by": "name"
+    },
+    "telok-blangah-beacon": {
+      "lat": 1.273256000806134,
+      "lon": 103.8081717923612,
+      "matched": "TELOK BLANGAH BEACON",
+      "by": "name"
+    },
+    "garden-bloom-tengah": {
+      "lat": 1.360553071996712,
+      "lon": 103.728441416772,
+      "matched": "GARDEN BLOOM @ TENGAH",
+      "by": "name"
+    },
+    "woodgrove-ascent": {
+      "lat": 1.433189737242163,
+      "lon": 103.7831482152621,
+      "matched": "WOODGROVE ASCENT",
+      "by": "name"
+    },
+    "bartley-greenrise": {
+      "lat": 1.343041435010336,
+      "lon": 103.8773630261184,
+      "matched": "BARTLEY GREENRISE",
+      "by": "name"
+    },
+    "alkaff-breeze": {
+      "lat": 1.336266083381404,
+      "lon": 103.8746394281159,
+      "matched": "ALKAFF BREEZE",
+      "by": "name"
+    },
+    "parkedge-bidadari": {
+      "lat": 1.340592530325069,
+      "lon": 103.8758401882438,
+      "matched": "PARKEDGE @ BIDADARI",
+      "by": "name"
+    },
+    "west-hill-bukit-batok": {
+      "lat": 1.359189808201749,
+      "lon": 103.7439543209721,
+      "matched": "WEST HILL @ BUKIT BATOK",
+      "by": "name"
+    },
+    "mcnair-heights": {
+      "lat": 1.317950006183319,
+      "lon": 103.8573651483607,
+      "matched": "MCNAIR HEIGHTS",
+      "by": "name"
+    },
+    "parc-woods-tengah": {
+      "lat": 1.362201550323683,
+      "lon": 103.7342780272389,
+      "matched": "PARC WOODS @ TENGAH",
+      "by": "name"
+    },
+    "bishan-ridges": {
+      "lat": 1.351532785438159,
+      "lon": 103.8528738090869,
+      "matched": "BISHAN RIDGES",
+      "by": "name"
+    },
+    "sun-sails": {
+      "lat": 1.443577417807587,
+      "lon": 103.8227680877782,
+      "matched": "SUN SAILS",
+      "by": "name"
+    },
+    "tampines-greenemerald": {
+      "lat": 1.338670771477477,
+      "lon": 103.9373318189377,
+      "matched": "TAMPINES GREENEMERALD",
+      "by": "name"
+    },
+    "garden-court-tengah": {
+      "lat": 1.357884298000403,
+      "lon": 103.7294493812017,
+      "matched": "GARDEN COURT @ TENGAH",
+      "by": "name"
+    },
+    "garden-terrace-tengah": {
+      "lat": 1.357615659333214,
+      "lon": 103.730112972709,
+      "matched": "GARDEN TERRACE @ TENGAH",
+      "by": "name"
+    },
+    "bartley-beacon": {
+      "lat": 1.341699117903391,
+      "lon": 103.879564725676,
+      "matched": "BARTLEY BEACON",
+      "by": "name"
+    },
+    "parkview-bidadari": {
+      "lat": 1.338503213312561,
+      "lon": 103.8752562895124,
+      "matched": "PARKVIEW @ BIDADARI",
+      "by": "name"
+    },
+    "kebun-baru-edge": {
+      "lat": 1.367626517080631,
+      "lon": 103.8338613032043,
+      "matched": "KEBUN BARU EDGE",
+      "by": "name"
+    },
+    "bishan-towers": {
+      "lat": 1.34473077142922,
+      "lon": 103.8565920947262,
+      "matched": "BISHAN TOWERS",
+      "by": "name"
+    },
+    "keat-hong-verge": {
+      "lat": 1.375230650528037,
+      "lon": 103.7502499947341,
+      "matched": "KEAT HONG VERGE",
+      "by": "name"
+    },
+    "dakota-one": {
+      "lat": 1.309926780578243,
+      "lon": 103.8871482893256,
+      "matched": "DAKOTA ONE",
+      "by": "name"
+    },
+    "tampines-greencrest": {
+      "lat": 1.369789586909691,
+      "lon": 103.935498500589,
+      "matched": "TAMPINES GREENCREST",
+      "by": "name"
+    },
+    "tampines-greenglade": {
+      "lat": 1.367711419863079,
+      "lon": 103.9345283038166,
+      "matched": "TAMPINES GREENGLADE",
+      "by": "name"
+    },
+    "tampines-greenopal": {
+      "lat": 1.338167948719592,
+      "lon": 103.9380683962106,
+      "matched": "TAMPINES GREENOPAL",
+      "by": "name"
+    },
+    "champions-bliss": {
+      "lat": 1.427740713215152,
+      "lon": 103.79148248388,
+      "matched": "CHAMPIONS BLISS",
+      "by": "name"
+    },
+    "parc-residences-tengah": {
+      "lat": 1.359415221679537,
+      "lon": 103.7378898452494,
+      "matched": "PARC RESIDENCES @ TENGAH",
+      "by": "name"
+    },
+    "urbanville-woodlands": {
+      "lat": 1.437982173083939,
+      "lon": 103.7836000654206,
+      "matched": "URBANVILLE @ WOODLANDS",
+      "by": "name"
+    },
+    "btohq-sky-vista-bukit-batok": {
+      "lat": 1.349367502406749,
+      "lon": 103.7453473588241,
+      "matched": "SKY VISTA @ BUKIT BATOK",
+      "by": "name"
+    },
+    "btohq-west-scape-bukit-batok": {
+      "lat": 1.360391104717827,
+      "lon": 103.7430043243801,
+      "matched": "WEST SCAPE @ BUKIT BATOK",
+      "by": "name"
+    }
+  }
+}

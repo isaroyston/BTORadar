@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T14:50:44.712Z",
+  "generatedAt": "2026-11-16T15:17:16.873Z",
   "source": "merged",
   "sources": {
     "recordbto": {
@@ -1061,6 +1061,11 @@
         "4-room",
         "5-room"
       ],
+      "projectCoordinates": {
+        "lat": 1.413595093021834,
+        "lon": 103.8292334896039,
+        "source": "onemap-search"
+      },
       "btohq": {
         "sourceUrl": "https://www.btohq.com/bto-project-spec/chencharu-acres",
         "ratings": {
@@ -1070,6 +1075,8 @@
         },
         "nearbyAmenities": {}
       },
+      "nearestMrtDistanceMeters": 597,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -1086,6 +1093,7 @@
         "lowestPricePerSqm": 3906,
         "totalUnits": 1582,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 597,
         "centralityScore": 50,
         "accessibilityRating": 3,
         "amenitiesRating": 3,
@@ -5563,6 +5571,11 @@
       "nearestMrtDistanceSource": "RecordBTO listing MRT distance",
       "constructionProgress": 10,
       "sourceUrl": "https://recordbto.com/bto/chencharu-vines",
+      "projectCoordinates": {
+        "lat": 1.42032575346907,
+        "lon": 103.825794763621,
+        "source": "onemap-search"
+      },
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -6294,6 +6307,13 @@
       "totalUnits": 276,
       "nearestMrt": "Pasir Ris MRT",
       "sourceUrl": "https://recordbto.com/bto/costa-riviera-i",
+      "projectCoordinates": {
+        "lat": 1.375504551103353,
+        "lon": 103.9496674805842,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 460,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 60,
         "centralityLabel": "Regional access",
@@ -6308,6 +6328,7 @@
       "comparisonMetrics": {
         "totalUnits": 276,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 460,
         "centralityScore": 60,
         "availableFlatTypes": []
       },
@@ -6404,6 +6425,13 @@
       "totalUnits": 491,
       "nearestMrt": "Pasir Ris MRT",
       "sourceUrl": "https://recordbto.com/bto/costa-riviera-ii",
+      "projectCoordinates": {
+        "lat": 1.375382489235787,
+        "lon": 103.950988231721,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 491,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 60,
         "centralityLabel": "Regional access",
@@ -6418,6 +6446,7 @@
       "comparisonMetrics": {
         "totalUnits": 491,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 491,
         "centralityScore": 60,
         "availableFlatTypes": []
       },
@@ -7106,6 +7135,13 @@
       "totalUnits": 580,
       "nearestMrt": "Holland Village MRT (CC21)",
       "sourceUrl": "https://recordbto.com/bto/holland-vista",
+      "projectCoordinates": {
+        "lat": 1.309053945461849,
+        "lon": 103.7940631208877,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 382,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 92,
         "centralityLabel": "Central / city fringe",
@@ -7120,6 +7156,7 @@
       "comparisonMetrics": {
         "totalUnits": 580,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 382,
         "centralityScore": 92,
         "availableFlatTypes": []
       },
@@ -7322,6 +7359,11 @@
       "expectedTop": "Sep 2028",
       "totalUnits": 465,
       "sourceUrl": "https://www.btohq.com/bto-project-spec/rail-garden-cck",
+      "projectCoordinates": {
+        "lat": 1.387660843085521,
+        "lon": 103.7550255067505,
+        "source": "onemap-search"
+      },
       "btohq": {
         "sourceUrl": "https://www.btohq.com/bto-project-spec/rail-garden-cck",
         "ratings": {
@@ -7331,10 +7373,24 @@
         },
         "nearbyAmenities": {}
       },
+      "nearestMrt": "Choa Chu Kang MRT",
+      "nearestMrtDistanceMeters": 1215,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
+      "locationSignals": {
+        "centralityScore": 52,
+        "centralityLabel": "Outer-town access",
+        "contextTags": [],
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 13305,
+        "matchedStation": "Choa Chu Kang",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
+      },
       "comparisonMetrics": {
         "topSortValue": 24345,
         "totalUnits": 465,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1215,
+        "centralityScore": 52,
         "accessibilityRating": 1,
         "amenitiesRating": 1,
         "affordabilityRating": 4,
@@ -7502,6 +7558,11 @@
       "expectedTop": "Sep 2029",
       "totalUnits": 251,
       "sourceUrl": "https://www.btohq.com/bto-project-spec/tanglin-halt-courtyard",
+      "projectCoordinates": {
+        "lat": 1.299651000877353,
+        "lon": 103.7980317419587,
+        "source": "onemap-search"
+      },
       "btohq": {
         "sourceUrl": "https://www.btohq.com/bto-project-spec/tanglin-halt-courtyard",
         "ratings": {
@@ -7511,20 +7572,29 @@
         },
         "nearbyAmenities": {}
       },
+      "nearestMrt": "Commonwealth MRT",
+      "nearestMrtDistanceMeters": 302,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "City fringe",
+        "centralityScore": 100,
+        "centralityLabel": "Central / city fringe",
         "contextTags": [
           "City fringe",
           "Central mature town",
           "Waterfront access",
           "Prime/Plus context"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 3764,
+        "matchedStation": "Commonwealth",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "topSortValue": 24357,
         "totalUnits": 251,
         "btoType": "prime",
+        "nearestMrtDistanceMeters": 302,
+        "centralityScore": 100,
         "accessibilityRating": 5,
         "amenitiesRating": 4,
         "affordabilityRating": 2,
@@ -7661,6 +7731,13 @@
       "totalUnits": 620,
       "nearestMrt": "Bedok MRT (EW5)",
       "sourceUrl": "https://recordbto.com/bto/bedok-south-bloom",
+      "projectCoordinates": {
+        "lat": 1.324301179734837,
+        "lon": 103.9386540336539,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 939,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 66,
         "centralityLabel": "Regional access",
@@ -7676,6 +7753,7 @@
       "comparisonMetrics": {
         "totalUnits": 620,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 939,
         "centralityScore": 66,
         "availableFlatTypes": []
       },
@@ -7700,6 +7778,13 @@
       "totalUnits": 590,
       "nearestMrt": "Queenstown MRT (EW19)",
       "sourceUrl": "https://recordbto.com/bto/tanglin-halt-courtyard",
+      "projectCoordinates": {
+        "lat": 1.299651000877353,
+        "lon": 103.7980317419587,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1060,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -7716,6 +7801,7 @@
       "comparisonMetrics": {
         "totalUnits": 590,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1060,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -7740,6 +7826,13 @@
       "totalUnits": 660,
       "nearestMrt": "Choa Chu Kang MRT (NS1/BP1)",
       "sourceUrl": "https://recordbto.com/bto/rail-garden-cck",
+      "projectCoordinates": {
+        "lat": 1.387660843085521,
+        "lon": 103.7550255067505,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1245,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -7752,6 +7845,7 @@
       "comparisonMetrics": {
         "totalUnits": 660,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1245,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -7776,6 +7870,13 @@
       "totalUnits": 610,
       "nearestMrt": "Hougang MRT (NE14)",
       "sourceUrl": "https://recordbto.com/bto/tanjong-tree-residences-hougang",
+      "projectCoordinates": {
+        "lat": 1.347051318102499,
+        "lon": 103.8866059634477,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2782,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 72,
         "centralityLabel": "Good central access",
@@ -7788,6 +7889,7 @@
       "comparisonMetrics": {
         "totalUnits": 610,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2782,
         "centralityScore": 72,
         "availableFlatTypes": []
       },
@@ -7812,6 +7914,13 @@
       "totalUnits": 580,
       "nearestMrt": "Punggol MRT (NE17)",
       "sourceUrl": "https://recordbto.com/bto/matilda-riverside",
+      "projectCoordinates": {
+        "lat": 1.402450857510928,
+        "lon": 103.8894323637948,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1480,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -7827,6 +7936,7 @@
       "comparisonMetrics": {
         "totalUnits": 580,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1480,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -7851,6 +7961,13 @@
       "totalUnits": 550,
       "nearestMrt": "Woodlands MRT (NS9/TE2)",
       "sourceUrl": "https://recordbto.com/bto/woodgrove-edge",
+      "projectCoordinates": {
+        "lat": 1.4290573185099,
+        "lon": 103.7843468890696,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 894,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -7866,6 +7983,7 @@
       "comparisonMetrics": {
         "totalUnits": 550,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 894,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -8429,6 +8547,13 @@
       "totalUnits": 620,
       "nearestMrt": "Bedok MRT (EW5)",
       "sourceUrl": "https://recordbto.com/bto/chai-chee-green",
+      "projectCoordinates": {
+        "lat": 1.32943726660869,
+        "lon": 103.9192540471969,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1360,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 66,
         "centralityLabel": "Regional access",
@@ -8444,6 +8569,7 @@
       "comparisonMetrics": {
         "totalUnits": 620,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1360,
         "centralityScore": 66,
         "availableFlatTypes": []
       },
@@ -8468,6 +8594,13 @@
       "totalUnits": 610,
       "nearestMrt": "Bishan MRT (NS17/CC15)",
       "sourceUrl": "https://recordbto.com/bto/sin-ming-residences",
+      "projectCoordinates": {
+        "lat": 1.355152396701471,
+        "lon": 103.8396637464713,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1066,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -8482,6 +8615,7 @@
       "comparisonMetrics": {
         "totalUnits": 610,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1066,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -8506,6 +8640,13 @@
       "totalUnits": 590,
       "nearestMrt": "Bukit Panjang MRT (BP6/DT1)",
       "sourceUrl": "https://recordbto.com/bto/petir-park-edge",
+      "projectCoordinates": {
+        "lat": 1.375203035223649,
+        "lon": 103.767763344969,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 730,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -8518,6 +8659,7 @@
       "comparisonMetrics": {
         "totalUnits": 590,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 730,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -8542,6 +8684,13 @@
       "totalUnits": 550,
       "nearestMrt": "Boon Lay MRT (EW27)",
       "sourceUrl": "https://recordbto.com/bto/jurong-arcadia",
+      "projectCoordinates": {
+        "lat": 1.354514372878062,
+        "lon": 103.72379293844,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2622,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -8554,6 +8703,7 @@
       "comparisonMetrics": {
         "totalUnits": 550,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2622,
         "centralityScore": 50,
         "availableFlatTypes": []
       },
@@ -9100,17 +9250,30 @@
       "totalUnits": 540,
       "nearestMrt": "Bendemeer MRT (NE9)",
       "sourceUrl": "https://recordbto.com/bto/tenteram-vantage",
+      "projectCoordinates": {
+        "lat": 1.328875983572286,
+        "lon": 103.8603852957009,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1002,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "City fringe",
+        "centralityScore": 94,
+        "centralityLabel": "Central / city fringe",
         "contextTags": [
           "City fringe",
           "Central mature town"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Dhoby Ghaut Interchange",
+        "centralAnchorDistanceMeters": 4370,
+        "matchedStation": "Potong Pasir",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "totalUnits": 540,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1002,
+        "centralityScore": 94,
         "availableFlatTypes": []
       },
       "blocks": 4,
@@ -9134,6 +9297,13 @@
       "totalUnits": 610,
       "nearestMrt": "Kallang MRT (EW10)",
       "sourceUrl": "https://recordbto.com/bto/verandah-kallang",
+      "projectCoordinates": {
+        "lat": 1.309732744272527,
+        "lon": 103.8744986303133,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 390,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -9149,6 +9319,7 @@
       "comparisonMetrics": {
         "totalUnits": 610,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 390,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -9173,18 +9344,31 @@
       "totalUnits": 590,
       "nearestMrt": "Bukit Merah MRT (NE12)",
       "sourceUrl": "https://recordbto.com/bto/rajah-residences",
+      "projectCoordinates": {
+        "lat": 1.327399888726798,
+        "lon": 103.8543434500161,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1010,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "City fringe",
+        "centralityScore": 100,
+        "centralityLabel": "Central / city fringe",
         "contextTags": [
           "City fringe",
           "Central mature town",
           "Waterfront access"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 3628,
+        "matchedStation": "Toa Payoh",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "totalUnits": 590,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1010,
+        "centralityScore": 100,
         "availableFlatTypes": []
       },
       "blocks": 2,
@@ -9587,6 +9771,13 @@
       "totalUnits": 580,
       "nearestMrt": "Bedok MRT (EW5)",
       "sourceUrl": "https://recordbto.com/bto/bedok-south-blossoms",
+      "projectCoordinates": {
+        "lat": 1.322083399714181,
+        "lon": 103.9434087491653,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1482,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 66,
         "centralityLabel": "Regional access",
@@ -9602,6 +9793,7 @@
       "comparisonMetrics": {
         "totalUnits": 580,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1482,
         "centralityScore": 66,
         "availableFlatTypes": []
       },
@@ -9626,6 +9818,13 @@
       "totalUnits": 640,
       "nearestMrt": "Farrer Park MRT (NE8)",
       "sourceUrl": "https://recordbto.com/bto/farrer-park-arena",
+      "projectCoordinates": {
+        "lat": 1.312062626880306,
+        "lon": 103.849479603967,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 521,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -9641,6 +9840,7 @@
       "comparisonMetrics": {
         "totalUnits": 640,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 521,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -9665,6 +9865,13 @@
       "totalUnits": 520,
       "nearestMrt": "Serangoon North MRT (CC12)",
       "sourceUrl": "https://recordbto.com/bto/serangoon-north-vista",
+      "projectCoordinates": {
+        "lat": 1.364376439649593,
+        "lon": 103.8735928084411,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1637,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 87,
         "centralityLabel": "Central / city fringe",
@@ -9680,6 +9887,7 @@
       "comparisonMetrics": {
         "totalUnits": 520,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1637,
         "centralityScore": 87,
         "availableFlatTypes": []
       },
@@ -9704,6 +9912,13 @@
       "totalUnits": 660,
       "nearestMrt": "Tengah MRT (JE2)",
       "sourceUrl": "https://recordbto.com/bto/parc-meadow-tengah",
+      "projectCoordinates": {
+        "lat": 1.365585891973513,
+        "lon": 103.7366029991369,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 729,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -9718,6 +9933,7 @@
       "comparisonMetrics": {
         "totalUnits": 660,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 729,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -9742,6 +9958,13 @@
       "totalUnits": 590,
       "nearestMrt": "Tengah MRT (JE2)",
       "sourceUrl": "https://recordbto.com/bto/plantation-verge",
+      "projectCoordinates": {
+        "lat": 1.349548885545597,
+        "lon": 103.7359596772414,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1939,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -9756,6 +9979,7 @@
       "comparisonMetrics": {
         "totalUnits": 590,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1939,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -10115,6 +10339,13 @@
       "totalUnits": 580,
       "nearestMrt": "Bukit Panjang MRT (BP6/DT1)",
       "sourceUrl": "https://recordbto.com/bto/brickland-weave",
+      "projectCoordinates": {
+        "lat": 1.370586796237006,
+        "lon": 103.7450240242526,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2097,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -10127,6 +10358,7 @@
       "comparisonMetrics": {
         "totalUnits": 580,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2097,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -10151,6 +10383,13 @@
       "totalUnits": 560,
       "nearestMrt": "Boon Lay MRT (EW27)",
       "sourceUrl": "https://recordbto.com/bto/jurong-west-crystal",
+      "projectCoordinates": {
+        "lat": 1.336661212490976,
+        "lon": 103.6934554952635,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1445,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -10163,6 +10402,7 @@
       "comparisonMetrics": {
         "totalUnits": 560,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1445,
         "centralityScore": 50,
         "availableFlatTypes": []
       },
@@ -10187,6 +10427,13 @@
       "totalUnits": 620,
       "nearestMrt": "Farrer Park MRT (NE8)",
       "sourceUrl": "https://recordbto.com/bto/farrer-park-fields",
+      "projectCoordinates": {
+        "lat": 1.310487141103651,
+        "lon": 103.8505235682108,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 451,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -10202,6 +10449,7 @@
       "comparisonMetrics": {
         "totalUnits": 620,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 451,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -10226,18 +10474,31 @@
       "totalUnits": 500,
       "nearestMrt": "Bukit Merah MRT (NE12)",
       "sourceUrl": "https://recordbto.com/bto/rajah-summit",
+      "projectCoordinates": {
+        "lat": 1.3278357567305,
+        "lon": 103.8521740388708,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 796,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "City fringe",
+        "centralityScore": 100,
+        "centralityLabel": "Central / city fringe",
         "contextTags": [
           "City fringe",
           "Central mature town",
           "Waterfront access"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 3628,
+        "matchedStation": "Toa Payoh",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "totalUnits": 500,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 796,
+        "centralityScore": 100,
         "availableFlatTypes": []
       },
       "blocks": 2,
@@ -10261,6 +10522,13 @@
       "totalUnits": 732,
       "nearestMrt": "Dover MRT (EW22)",
       "sourceUrl": "https://recordbto.com/bto/ulu-pandan-glades",
+      "projectCoordinates": {
+        "lat": 1.309997829325251,
+        "lon": 103.783028088738,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 507,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 83,
         "centralityLabel": "Good central access",
@@ -10277,6 +10545,7 @@
       "comparisonMetrics": {
         "totalUnits": 732,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 507,
         "centralityScore": 83,
         "availableFlatTypes": []
       },
@@ -10301,6 +10570,13 @@
       "totalUnits": 540,
       "nearestMrt": "Buangkok MRT (NE15)",
       "sourceUrl": "https://recordbto.com/bto/buangkok-woods",
+      "projectCoordinates": {
+        "lat": 1.385621999419377,
+        "lon": 103.8837680158515,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1088,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 51,
         "centralityLabel": "Outer-town access",
@@ -10315,6 +10591,7 @@
       "comparisonMetrics": {
         "totalUnits": 540,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1088,
         "centralityScore": 51,
         "availableFlatTypes": []
       },
@@ -11004,6 +11281,13 @@
       "totalUnits": 790,
       "nearestMrt": "Bukit Gombak",
       "sourceUrl": "https://recordbto.com/bto/west-glades-bukit-batok",
+      "projectCoordinates": {
+        "lat": 1.357361410090417,
+        "lon": 103.7453997035435,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 726,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -11019,6 +11303,7 @@
         "topSortValue": 24338,
         "totalUnits": 790,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 726,
         "centralityScore": 52,
         "availableFlatTypes": [
           "2-room",
@@ -11073,6 +11358,13 @@
       "totalUnits": 477,
       "nearestMrt": "Kallang",
       "sourceUrl": "https://recordbto.com/bto/kallang-horizon",
+      "projectCoordinates": {
+        "lat": 1.312163343022619,
+        "lon": 103.8706428583497,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 120,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -11092,6 +11384,7 @@
         "topSortValue": 24338,
         "totalUnits": 477,
         "btoType": "prime",
+        "nearestMrtDistanceMeters": 120,
         "centralityScore": 100,
         "availableFlatTypes": [
           "3-room",
@@ -11157,6 +11450,13 @@
       "totalUnits": 991,
       "nearestMrt": "Buona Vista",
       "sourceUrl": "https://recordbto.com/bto/ghim-moh-natura",
+      "projectCoordinates": {
+        "lat": 1.309905402812876,
+        "lon": 103.7899985451713,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 295,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -11177,6 +11477,7 @@
         "topSortValue": 24338,
         "totalUnits": 991,
         "btoType": "prime",
+        "nearestMrtDistanceMeters": 295,
         "centralityScore": 100,
         "availableFlatTypes": [
           "2-room",
@@ -11243,6 +11544,13 @@
       "totalUnits": 996,
       "nearestMrt": "Queenstown",
       "sourceUrl": "https://recordbto.com/bto/queensway-canopy",
+      "projectCoordinates": {
+        "lat": 1.291751547614957,
+        "lon": 103.7994743503545,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 795,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -11262,6 +11570,7 @@
         "topSortValue": 24347,
         "totalUnits": 996,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 795,
         "centralityScore": 100,
         "availableFlatTypes": [
           "2-room",
@@ -11315,6 +11624,13 @@
       "totalUnits": 1330,
       "nearestMrt": "Dover",
       "sourceUrl": "https://recordbto.com/bto/ulu-pandan-banks",
+      "projectCoordinates": {
+        "lat": 1.31047570363015,
+        "lon": 103.7812820110229,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 306,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 83,
         "centralityLabel": "Good central access",
@@ -11334,6 +11650,7 @@
         "topSortValue": 24356,
         "totalUnits": 1330,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 306,
         "centralityScore": 83,
         "availableFlatTypes": [
           "3-room",
@@ -11412,12 +11729,23 @@
       "totalUnits": 2077,
       "nearestMrt": "Jurong Region Line (Future)",
       "sourceUrl": "https://recordbto.com/bto/garden-waterfront-i-ii-tengah",
+      "projectCoordinates": {
+        "lat": 1.355607991661873,
+        "lon": 103.7310264379144,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 331,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "Emerging estate",
+        "centralityScore": 48,
+        "centralityLabel": "Outer-town access",
         "contextTags": [
           "Emerging estate"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 12485,
+        "matchedStation": "Tengah Plantation",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "lowestPrice": 142500,
@@ -11425,6 +11753,8 @@
         "topSortValue": 24326,
         "totalUnits": 2077,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 331,
+        "centralityScore": 48,
         "availableFlatTypes": [
           "2-room",
           "3-room",
@@ -11491,6 +11821,13 @@
       "totalUnits": 699,
       "nearestMrt": "Yishun",
       "sourceUrl": "https://recordbto.com/bto/aranda-breeze-yishun",
+      "projectCoordinates": {
+        "lat": 1.423220726795671,
+        "lon": 103.8528114269642,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2094,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -11508,6 +11845,7 @@
         "topSortValue": 24338,
         "totalUnits": 699,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2094,
         "centralityScore": 50,
         "availableFlatTypes": [
           "2-room",
@@ -11574,6 +11912,13 @@
       "totalUnits": 1334,
       "nearestMrt": "Khatib",
       "sourceUrl": "https://recordbto.com/bto/miltonia-breeze-yishun",
+      "projectCoordinates": {
+        "lat": 1.418611584259159,
+        "lon": 103.8500824713275,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1905,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -11591,6 +11936,7 @@
         "topSortValue": 24353,
         "totalUnits": 1334,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1905,
         "centralityScore": 50,
         "availableFlatTypes": [
           "2-room",
@@ -11670,6 +12016,13 @@
       "totalUnits": 961,
       "nearestMrt": "Khatib",
       "sourceUrl": "https://recordbto.com/bto/vanda-breeze-yishun",
+      "projectCoordinates": {
+        "lat": 1.422584418648061,
+        "lon": 103.8515893767146,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2146,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -11687,6 +12040,7 @@
         "topSortValue": 24353,
         "totalUnits": 961,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2146,
         "centralityScore": 50,
         "availableFlatTypes": [
           "2-room",
@@ -12185,6 +12539,13 @@
       "totalUnits": 590,
       "nearestMrt": "Ang Mo Kio MRT (NS16)",
       "sourceUrl": "https://recordbto.com/bto/central-weave-amk",
+      "projectCoordinates": {
+        "lat": 1.373895607664848,
+        "lon": 103.8473658926082,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 517,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 88,
         "centralityLabel": "Central / city fringe",
@@ -12199,6 +12560,7 @@
       "comparisonMetrics": {
         "totalUnits": 590,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 517,
         "centralityScore": 88,
         "availableFlatTypes": []
       },
@@ -12223,6 +12585,13 @@
       "totalUnits": 540,
       "nearestMrt": "Tiong Bahru MRT (EW17)",
       "sourceUrl": "https://recordbto.com/bto/havelock-hillside",
+      "projectCoordinates": {
+        "lat": 1.288600025634311,
+        "lon": 103.8305059484683,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 452,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -12239,6 +12608,7 @@
       "comparisonMetrics": {
         "totalUnits": 540,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 452,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -12263,6 +12633,13 @@
       "totalUnits": 560,
       "nearestMrt": "Choa Chu Kang MRT (NS1/BP1)",
       "sourceUrl": "https://recordbto.com/bto/keat-hong-grange",
+      "projectCoordinates": {
+        "lat": 1.374942747120147,
+        "lon": 103.749023588303,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1238,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -12275,6 +12652,7 @@
       "comparisonMetrics": {
         "totalUnits": 560,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1238,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -12299,6 +12677,13 @@
       "totalUnits": 610,
       "nearestMrt": "Jurong East MRT (NS1/EW24)",
       "sourceUrl": "https://recordbto.com/bto/jurong-east-breeze",
+      "projectCoordinates": {
+        "lat": 1.343799454078529,
+        "lon": 103.7438853184174,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1268,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 65,
         "centralityLabel": "Regional access",
@@ -12313,6 +12698,7 @@
       "comparisonMetrics": {
         "totalUnits": 610,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1268,
         "centralityScore": 65,
         "availableFlatTypes": []
       },
@@ -12337,6 +12723,13 @@
       "totalUnits": 520,
       "nearestMrt": "Queenstown MRT (EW19)",
       "sourceUrl": "https://recordbto.com/bto/alexandra-vale",
+      "projectCoordinates": {
+        "lat": 1.289756389097169,
+        "lon": 103.8177276965739,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1400,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -12353,6 +12746,7 @@
       "comparisonMetrics": {
         "totalUnits": 520,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1400,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -12415,6 +12809,13 @@
       "totalUnits": 680,
       "nearestMrt": "Woodlands South MRT (TE3)",
       "sourceUrl": "https://recordbto.com/bto/woodlands-south-plains",
+      "projectCoordinates": {
+        "lat": 1.42655027696658,
+        "lon": 103.7967574549471,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1647,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -12430,6 +12831,7 @@
       "comparisonMetrics": {
         "totalUnits": 680,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1647,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -12792,18 +13194,31 @@
       "totalUnits": 580,
       "nearestMrt": "Bukit Merah MRT (NE12)",
       "sourceUrl": "https://recordbto.com/bto/bukit-merah-ridge",
+      "projectCoordinates": {
+        "lat": 1.285973426979239,
+        "lon": 103.8243645317856,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 317,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "City fringe",
+        "centralityScore": 100,
+        "centralityLabel": "Central / city fringe",
         "contextTags": [
           "City fringe",
           "Central mature town",
           "Waterfront access"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 2039,
+        "matchedStation": "Tiong Bahru",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "totalUnits": 580,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 317,
+        "centralityScore": 100,
         "availableFlatTypes": []
       },
       "blocks": 5,
@@ -12827,6 +13242,13 @@
       "totalUnits": 600,
       "nearestMrt": "Lakeside MRT (EW26)",
       "sourceUrl": "https://recordbto.com/bto/lakeside-view",
+      "projectCoordinates": {
+        "lat": 1.341292033122244,
+        "lon": 103.7210366423895,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 344,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -12839,6 +13261,7 @@
       "comparisonMetrics": {
         "totalUnits": 600,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 344,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -12863,6 +13286,13 @@
       "totalUnits": 480,
       "nearestMrt": "Queenstown MRT (EW19)",
       "sourceUrl": "https://recordbto.com/bto/ghim-moh-ascent",
+      "projectCoordinates": {
+        "lat": 1.31108897751095,
+        "lon": 103.7898384904573,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2579,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -12879,6 +13309,7 @@
       "comparisonMetrics": {
         "totalUnits": 480,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2579,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -12903,6 +13334,13 @@
       "totalUnits": 520,
       "nearestMrt": "Toa Payoh MRT (NS19)",
       "sourceUrl": "https://recordbto.com/bto/kim-keat-heights",
+      "projectCoordinates": {
+        "lat": 1.338241319148454,
+        "lon": 103.8546351092463,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1026,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -12918,6 +13356,7 @@
       "comparisonMetrics": {
         "totalUnits": 520,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1026,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -12942,6 +13381,13 @@
       "totalUnits": 540,
       "nearestMrt": "Yishun MRT (NS13)",
       "sourceUrl": "https://recordbto.com/bto/yishun-beacon",
+      "projectCoordinates": {
+        "lat": 1.424293992479539,
+        "lon": 103.8356960509806,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 574,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -12956,6 +13402,7 @@
       "comparisonMetrics": {
         "totalUnits": 540,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 574,
         "centralityScore": 50,
         "availableFlatTypes": []
       },
@@ -13384,6 +13831,13 @@
       "totalUnits": 540,
       "nearestMrt": "Dakota MRT (CC8)",
       "sourceUrl": "https://recordbto.com/bto/dakota-crest",
+      "projectCoordinates": {
+        "lat": 1.307064873648534,
+        "lon": 103.8852550920155,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 385,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 94,
         "centralityLabel": "Central / city fringe",
@@ -13399,6 +13853,7 @@
       "comparisonMetrics": {
         "totalUnits": 540,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 385,
         "centralityScore": 94,
         "availableFlatTypes": []
       },
@@ -13423,6 +13878,13 @@
       "totalUnits": 720,
       "nearestMrt": "Tengah MRT (JE2)",
       "sourceUrl": "https://recordbto.com/bto/parc-flora-tengah",
+      "projectCoordinates": {
+        "lat": 1.363462799095308,
+        "lon": 103.7328145518459,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 414,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -13437,6 +13899,7 @@
       "comparisonMetrics": {
         "totalUnits": 720,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 414,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -13461,6 +13924,13 @@
       "totalUnits": 680,
       "nearestMrt": "Tengah MRT (JE2)",
       "sourceUrl": "https://recordbto.com/bto/plantation-creek",
+      "projectCoordinates": {
+        "lat": 1.353844854279874,
+        "lon": 103.7298516418516,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1348,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -13475,6 +13945,7 @@
       "comparisonMetrics": {
         "totalUnits": 680,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1348,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -13538,6 +14009,13 @@
       "totalUnits": 620,
       "nearestMrt": "Yishun MRT (NS13)",
       "sourceUrl": "https://recordbto.com/bto/grove-spring-yishun",
+      "projectCoordinates": {
+        "lat": 1.431415113210867,
+        "lon": 103.8488883650668,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1557,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -13552,6 +14030,7 @@
       "comparisonMetrics": {
         "totalUnits": 620,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1557,
         "centralityScore": 50,
         "availableFlatTypes": []
       },
@@ -13576,6 +14055,13 @@
       "totalUnits": 560,
       "nearestMrt": "Yishun MRT (NS13)",
       "sourceUrl": "https://recordbto.com/bto/yishun-boardwalk",
+      "projectCoordinates": {
+        "lat": 1.433279153572161,
+        "lon": 103.8457352785157,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1266,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 50,
         "centralityLabel": "Outer-town access",
@@ -13590,6 +14076,7 @@
       "comparisonMetrics": {
         "totalUnits": 560,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1266,
         "centralityScore": 50,
         "availableFlatTypes": []
       },
@@ -14187,6 +14674,13 @@
       "totalUnits": 620,
       "nearestMrt": "Yew Tee MRT (NS5)",
       "sourceUrl": "https://recordbto.com/bto/heart-of-yew-tee",
+      "projectCoordinates": {
+        "lat": 1.397394124829957,
+        "lon": 103.7460558740795,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 155,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 42,
         "centralityLabel": "Longer city access",
@@ -14199,6 +14693,7 @@
       "comparisonMetrics": {
         "totalUnits": 620,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 155,
         "centralityScore": 42,
         "availableFlatTypes": []
       },
@@ -14223,6 +14718,13 @@
       "totalUnits": 390,
       "nearestMrt": "Hougang MRT (NE14)",
       "sourceUrl": "https://recordbto.com/bto/hougang-olive",
+      "projectCoordinates": {
+        "lat": 1.348010691679788,
+        "lon": 103.8892314706365,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2623,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 72,
         "centralityLabel": "Good central access",
@@ -14236,6 +14738,7 @@
         "topSortValue": 24303,
         "totalUnits": 390,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2623,
         "centralityScore": 72,
         "availableFlatTypes": []
       }
@@ -14258,6 +14761,13 @@
       "totalUnits": 590,
       "nearestMrt": "Hougang MRT (NE14)",
       "sourceUrl": "https://recordbto.com/bto/tanjong-tree-residences-hougang-2021",
+      "projectCoordinates": {
+        "lat": 1.347051318102499,
+        "lon": 103.8866059634477,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2782,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 72,
         "centralityLabel": "Good central access",
@@ -14270,6 +14780,7 @@
       "comparisonMetrics": {
         "totalUnits": 590,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2782,
         "centralityScore": 72,
         "availableFlatTypes": []
       },
@@ -14294,6 +14805,13 @@
       "totalUnits": 520,
       "nearestMrt": "Pioneer MRT (EW28)",
       "sourceUrl": "https://recordbto.com/bto/nanyang-opal",
+      "projectCoordinates": {
+        "lat": 1.340960443688392,
+        "lon": 103.6908191527289,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 825,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 42,
         "centralityLabel": "Longer city access",
@@ -14306,6 +14824,7 @@
       "comparisonMetrics": {
         "totalUnits": 520,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 825,
         "centralityScore": 42,
         "availableFlatTypes": []
       },
@@ -14369,6 +14888,13 @@
       "totalUnits": 680,
       "nearestMrt": "Tengah MRT (JE2)",
       "sourceUrl": "https://recordbto.com/bto/parc-clover-tengah",
+      "projectCoordinates": {
+        "lat": 1.36068443168877,
+        "lon": 103.7355828640955,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 849,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -14383,6 +14909,7 @@
       "comparisonMetrics": {
         "totalUnits": 680,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 849,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -14407,6 +14934,13 @@
       "totalUnits": 640,
       "nearestMrt": "Tengah MRT (JE2)",
       "sourceUrl": "https://recordbto.com/bto/parc-glen-tengah",
+      "projectCoordinates": {
+        "lat": 1.362998667034323,
+        "lon": 103.73773555621,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 915,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -14421,6 +14955,7 @@
       "comparisonMetrics": {
         "totalUnits": 640,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 915,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -14926,6 +15461,13 @@
       "nearestMrt": "Hougang MRT (NE14)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/hougang-citrine",
+      "projectCoordinates": {
+        "lat": 1.346922924911635,
+        "lon": 103.889769301822,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2735,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 72,
         "centralityLabel": "Good central access",
@@ -14938,6 +15480,7 @@
       "comparisonMetrics": {
         "totalUnits": 590,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2735,
         "centralityScore": 72,
         "availableFlatTypes": []
       },
@@ -14963,6 +15506,13 @@
       "nearestMrt": "Kovan MRT (NE13)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/kovan-wellspring",
+      "projectCoordinates": {
+        "lat": 1.360362715113763,
+        "lon": 103.8872114239383,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 236,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 64,
         "centralityLabel": "Regional access",
@@ -14975,6 +15525,7 @@
       "comparisonMetrics": {
         "totalUnits": 580,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 236,
         "centralityScore": 64,
         "availableFlatTypes": []
       },
@@ -15000,6 +15551,13 @@
       "nearestMrt": "Jurong East MRT (NS1/EW24)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/toh-guan-grove",
+      "projectCoordinates": {
+        "lat": 1.340174118006529,
+        "lon": 103.7452332605846,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 915,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 65,
         "centralityLabel": "Regional access",
@@ -15014,6 +15572,7 @@
       "comparisonMetrics": {
         "totalUnits": 610,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 915,
         "centralityScore": 65,
         "availableFlatTypes": []
       },
@@ -15039,17 +15598,30 @@
       "nearestMrt": "Bendemeer MRT (NE9)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/towner-residences",
+      "projectCoordinates": {
+        "lat": 1.3208293764864,
+        "lon": 103.856916171104,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 536,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "City fringe",
+        "centralityScore": 100,
+        "centralityLabel": "Central / city fringe",
         "contextTags": [
           "City fringe",
           "Central mature town"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Dhoby Ghaut Interchange",
+        "centralAnchorDistanceMeters": 2772,
+        "matchedStation": "Boon Keng",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "totalUnits": 560,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 536,
+        "centralityScore": 100,
         "availableFlatTypes": []
       },
       "blocks": 2,
@@ -15074,6 +15646,13 @@
       "nearestMrt": "Queenstown MRT (EW19)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/queens-arc",
+      "projectCoordinates": {
+        "lat": 1.289663717175992,
+        "lon": 103.8011617144156,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 767,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -15090,6 +15669,7 @@
       "comparisonMetrics": {
         "totalUnits": 540,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 767,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -15115,6 +15695,13 @@
       "nearestMrt": "Tampines MRT (EW2/DT3)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/tampines-greenjade",
+      "projectCoordinates": {
+        "lat": 1.341957982480229,
+        "lon": 103.9347031455347,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1707,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 56,
         "centralityLabel": "Outer-town access",
@@ -15130,6 +15717,7 @@
       "comparisonMetrics": {
         "totalUnits": 675,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1707,
         "centralityScore": 56,
         "availableFlatTypes": []
       },
@@ -15155,6 +15743,13 @@
       "nearestMrt": "Tampines West MRT (DT2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/tampines-greenquartz",
+      "projectCoordinates": {
+        "lat": 1.34061465956409,
+        "lon": 103.9392715068836,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1540,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 56,
         "centralityLabel": "Outer-town access",
@@ -15170,6 +15765,7 @@
       "comparisonMetrics": {
         "totalUnits": 640,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1540,
         "centralityScore": 56,
         "availableFlatTypes": []
       },
@@ -15464,6 +16060,13 @@
       "nearestMrt": "MacPherson MRT (CC10/DT26)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/macpherson-weave",
+      "projectCoordinates": {
+        "lat": 1.327134053856689,
+        "lon": 103.8885888235046,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 151,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 92,
         "centralityLabel": "Central / city fringe",
@@ -15476,6 +16079,7 @@
       "comparisonMetrics": {
         "totalUnits": 620,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 151,
         "centralityScore": 92,
         "availableFlatTypes": []
       },
@@ -15501,6 +16105,13 @@
       "nearestMrt": "Telok Blangah MRT (CC28)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/telok-blangah-beacon",
+      "projectCoordinates": {
+        "lat": 1.273256000806134,
+        "lon": 103.8081717923612,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 341,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 94,
         "centralityLabel": "Central / city fringe",
@@ -15516,6 +16127,7 @@
       "comparisonMetrics": {
         "totalUnits": 610,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 341,
         "centralityScore": 94,
         "availableFlatTypes": []
       },
@@ -15541,6 +16153,13 @@
       "nearestMrt": "Tengah MRT (JE2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/garden-bloom-tengah",
+      "projectCoordinates": {
+        "lat": 1.360553071996712,
+        "lon": 103.728441416772,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 628,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -15555,6 +16174,7 @@
       "comparisonMetrics": {
         "totalUnits": 690,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 628,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -15580,6 +16200,13 @@
       "nearestMrt": "Woodlands MRT (NS9/TE2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/woodgrove-ascent",
+      "projectCoordinates": {
+        "lat": 1.433189737242163,
+        "lon": 103.7831482152621,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 530,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -15595,6 +16222,7 @@
       "comparisonMetrics": {
         "totalUnits": 725,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 530,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -16080,6 +16708,13 @@
       "nearestMrt": "Bartley MRT (CC12)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/bartley-greenrise",
+      "projectCoordinates": {
+        "lat": 1.343041435010336,
+        "lon": 103.8773630261184,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 244,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 74,
         "centralityLabel": "Good central access",
@@ -16092,6 +16727,7 @@
       "comparisonMetrics": {
         "totalUnits": 600,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 244,
         "centralityScore": 74,
         "availableFlatTypes": []
       },
@@ -16117,6 +16753,13 @@
       "nearestMrt": "Potong Pasir MRT (NE10)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/alkaff-breeze",
+      "projectCoordinates": {
+        "lat": 1.336266083381404,
+        "lon": 103.8746394281159,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 825,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 90,
         "centralityLabel": "Central / city fringe",
@@ -16132,6 +16775,7 @@
       "comparisonMetrics": {
         "totalUnits": 635,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 825,
         "centralityScore": 90,
         "availableFlatTypes": []
       },
@@ -16157,6 +16801,13 @@
       "nearestMrt": "Woodleigh MRT (NE11)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/parkedge-bidadari",
+      "projectCoordinates": {
+        "lat": 1.340592530325069,
+        "lon": 103.8758401882438,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 591,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 90,
         "centralityLabel": "Central / city fringe",
@@ -16172,6 +16823,7 @@
       "comparisonMetrics": {
         "totalUnits": 715,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 591,
         "centralityScore": 90,
         "availableFlatTypes": []
       },
@@ -16197,6 +16849,13 @@
       "nearestMrt": "Bukit Batok MRT (NS2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/west-hill-bukit-batok",
+      "projectCoordinates": {
+        "lat": 1.359189808201749,
+        "lon": 103.7439543209721,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1297,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -16209,6 +16868,7 @@
       "comparisonMetrics": {
         "totalUnits": 650,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1297,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -16234,17 +16894,30 @@
       "nearestMrt": "Bendemeer MRT (NE9)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/mcnair-heights",
+      "projectCoordinates": {
+        "lat": 1.317950006183319,
+        "lon": 103.8573651483607,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 469,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
-        "centralityLabel": "City fringe",
+        "centralityScore": 100,
+        "centralityLabel": "Central / city fringe",
         "contextTags": [
           "City fringe",
           "Central mature town"
         ],
-        "source": "Curated town context"
+        "nearestCentralAnchor": "Dhoby Ghaut Interchange",
+        "centralAnchorDistanceMeters": 2772,
+        "matchedStation": "Boon Keng",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
       },
       "comparisonMetrics": {
         "totalUnits": 620,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 469,
+        "centralityScore": 100,
         "availableFlatTypes": []
       },
       "blocks": 3,
@@ -16269,6 +16942,13 @@
       "nearestMrt": "Tengah MRT (JE2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/parc-woods-tengah",
+      "projectCoordinates": {
+        "lat": 1.362201550323683,
+        "lon": 103.7342780272389,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 628,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -16283,6 +16963,7 @@
       "comparisonMetrics": {
         "totalUnits": 720,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 628,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -16823,6 +17504,13 @@
       "totalUnits": 1502,
       "nearestMrt": "Bishan",
       "sourceUrl": "https://recordbto.com/bto/bishan-ridges",
+      "projectCoordinates": {
+        "lat": 1.351532785438159,
+        "lon": 103.8528738090869,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 521,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -16840,6 +17528,7 @@
         "topSortValue": 24317,
         "totalUnits": 1502,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 521,
         "centralityScore": 100,
         "availableFlatTypes": [
           "2-room",
@@ -16919,6 +17608,13 @@
       "totalUnits": 726,
       "nearestMrt": "Canberra",
       "sourceUrl": "https://recordbto.com/bto/sun-sails",
+      "projectCoordinates": {
+        "lat": 1.443577417807587,
+        "lon": 103.8227680877782,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 753,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 39,
         "centralityLabel": "Longer city access",
@@ -16936,6 +17632,7 @@
         "topSortValue": 24305,
         "totalUnits": 726,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 753,
         "centralityScore": 39,
         "availableFlatTypes": [
           "2-room",
@@ -17003,6 +17700,13 @@
       "totalUnits": 750,
       "nearestMrt": "Bedok Reservoir",
       "sourceUrl": "https://recordbto.com/bto/tampines-greenemerald",
+      "projectCoordinates": {
+        "lat": 1.338670771477477,
+        "lon": 103.9373318189377,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 575,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 56,
         "centralityLabel": "Outer-town access",
@@ -17021,6 +17725,7 @@
         "topSortValue": 24305,
         "totalUnits": 750,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 575,
         "centralityScore": 56,
         "availableFlatTypes": [
           "2-room",
@@ -17100,6 +17805,13 @@
       "totalUnits": 790,
       "nearestMrt": "Hong Kah",
       "sourceUrl": "https://recordbto.com/bto/garden-court-tengah",
+      "projectCoordinates": {
+        "lat": 1.357884298000403,
+        "lon": 103.7294493812017,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 366,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -17117,6 +17829,7 @@
         "topSortValue": 24290,
         "totalUnits": 790,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 366,
         "centralityScore": 48,
         "availableFlatTypes": [
           "2-room",
@@ -17197,6 +17910,13 @@
       "totalUnits": 789,
       "nearestMrt": "Hong Kah",
       "sourceUrl": "https://recordbto.com/bto/garden-terrace-tengah",
+      "projectCoordinates": {
+        "lat": 1.357615659333214,
+        "lon": 103.730112972709,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 443,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -17214,6 +17934,7 @@
         "topSortValue": 24290,
         "totalUnits": 789,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 443,
         "centralityScore": 48,
         "availableFlatTypes": [
           "2-room",
@@ -17281,6 +18002,13 @@
       "totalUnits": 880,
       "nearestMrt": "Bartley",
       "sourceUrl": "https://recordbto.com/bto/bartley-beacon",
+      "projectCoordinates": {
+        "lat": 1.341699117903391,
+        "lon": 103.879564725676,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 141,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 83,
         "centralityLabel": "Good central access",
@@ -17299,6 +18027,7 @@
         "topSortValue": 24305,
         "totalUnits": 880,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 141,
         "centralityScore": 83,
         "availableFlatTypes": [
           "3-room",
@@ -17365,6 +18094,13 @@
       "totalUnits": 358,
       "nearestMrt": "Woodleigh",
       "sourceUrl": "https://recordbto.com/bto/parkview-bidadari",
+      "projectCoordinates": {
+        "lat": 1.338503213312561,
+        "lon": 103.8752562895124,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 505,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 93,
         "centralityLabel": "Central / city fringe",
@@ -17383,6 +18119,7 @@
         "topSortValue": 24302,
         "totalUnits": 358,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 505,
         "centralityScore": 93,
         "availableFlatTypes": [
           "3-room",
@@ -18163,6 +18900,13 @@
       "nearestMrt": "Mayflower MRT (TE4)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/kebun-baru-edge",
+      "projectCoordinates": {
+        "lat": 1.367626517080631,
+        "lon": 103.8338613032043,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 625,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 80,
         "centralityLabel": "Good central access",
@@ -18177,6 +18921,7 @@
       "comparisonMetrics": {
         "totalUnits": 565,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 625,
         "centralityScore": 80,
         "availableFlatTypes": []
       },
@@ -18202,6 +18947,13 @@
       "nearestMrt": "Bishan MRT (NS17/CC15)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/bishan-towers",
+      "projectCoordinates": {
+        "lat": 1.34473077142922,
+        "lon": 103.8565920947262,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1151,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 100,
         "centralityLabel": "Central / city fringe",
@@ -18216,6 +18968,7 @@
       "comparisonMetrics": {
         "totalUnits": 690,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1151,
         "centralityScore": 100,
         "availableFlatTypes": []
       },
@@ -18241,9 +18994,27 @@
       "nearestMrt": "Keat Hong LRT (BP3)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/keat-hong-verge",
+      "projectCoordinates": {
+        "lat": 1.375230650528037,
+        "lon": 103.7502499947341,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1220,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
+      "locationSignals": {
+        "centralityScore": 52,
+        "centralityLabel": "Outer-town access",
+        "contextTags": [],
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 13237,
+        "matchedStation": "Choa Chu Kang West",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
+      },
       "comparisonMetrics": {
         "totalUnits": 650,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1220,
+        "centralityScore": 52,
         "availableFlatTypes": []
       },
       "blocks": 3,
@@ -18268,6 +19039,13 @@
       "nearestMrt": "Dakota MRT (CC8)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/dakota-one",
+      "projectCoordinates": {
+        "lat": 1.309926780578243,
+        "lon": 103.8871482893256,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 234,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 94,
         "centralityLabel": "Central / city fringe",
@@ -18283,6 +19061,7 @@
       "comparisonMetrics": {
         "totalUnits": 330,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 234,
         "centralityScore": 94,
         "availableFlatTypes": []
       },
@@ -18308,6 +19087,13 @@
       "nearestMrt": "Tampines MRT (EW2/DT3)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/tampines-greencrest",
+      "projectCoordinates": {
+        "lat": 1.369789586909691,
+        "lon": 103.935498500589,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2152,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 56,
         "centralityLabel": "Outer-town access",
@@ -18323,6 +19109,7 @@
       "comparisonMetrics": {
         "totalUnits": 720,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2152,
         "centralityScore": 56,
         "availableFlatTypes": []
       },
@@ -18348,6 +19135,13 @@
       "nearestMrt": "Tampines West MRT (DT2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/tampines-greenglade",
+      "projectCoordinates": {
+        "lat": 1.367711419863079,
+        "lon": 103.9345283038166,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 2018,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 56,
         "centralityLabel": "Outer-town access",
@@ -18363,6 +19157,7 @@
       "comparisonMetrics": {
         "totalUnits": 665,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 2018,
         "centralityScore": 56,
         "availableFlatTypes": []
       },
@@ -18388,6 +19183,13 @@
       "nearestMrt": "Tampines East MRT (DT3)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/tampines-greenopal",
+      "projectCoordinates": {
+        "lat": 1.338167948719592,
+        "lon": 103.9380683962106,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1843,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 56,
         "centralityLabel": "Outer-town access",
@@ -18403,6 +19205,7 @@
       "comparisonMetrics": {
         "totalUnits": 680,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1843,
         "centralityScore": 56,
         "availableFlatTypes": []
       },
@@ -18428,6 +19231,13 @@
       "nearestMrt": "Woodlands South MRT (TE3)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/champions-bliss",
+      "projectCoordinates": {
+        "lat": 1.427740713215152,
+        "lon": 103.79148248388,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1178,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 46,
         "centralityLabel": "Outer-town access",
@@ -18442,6 +19252,7 @@
       "comparisonMetrics": {
         "totalUnits": 490,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1178,
         "centralityScore": 46,
         "availableFlatTypes": []
       },
@@ -18467,6 +19278,13 @@
       "nearestMrt": "Tengah MRT (JE2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/parc-residences-tengah",
+      "projectCoordinates": {
+        "lat": 1.359415221679537,
+        "lon": 103.7378898452494,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 1135,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 48,
         "centralityLabel": "Outer-town access",
@@ -18481,6 +19299,7 @@
       "comparisonMetrics": {
         "totalUnits": 1140,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1135,
         "centralityScore": 48,
         "availableFlatTypes": []
       },
@@ -18506,6 +19325,13 @@
       "nearestMrt": "Woodlands MRT (NS9/TE2)",
       "constructionProgress": 100,
       "sourceUrl": "https://recordbto.com/bto/urbanville-woodlands",
+      "projectCoordinates": {
+        "lat": 1.437982173083939,
+        "lon": 103.7836000654206,
+        "source": "onemap-search"
+      },
+      "nearestMrtDistanceMeters": 308,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
       "locationSignals": {
         "centralityScore": 52,
         "centralityLabel": "Outer-town access",
@@ -18521,6 +19347,7 @@
       "comparisonMetrics": {
         "totalUnits": 1785,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 308,
         "centralityScore": 52,
         "availableFlatTypes": []
       },
@@ -21638,6 +22465,11 @@
       "expectedTop": "Mar 2022",
       "totalUnits": 257,
       "sourceUrl": "https://www.btohq.com/bto-project-spec/sky-vista-bukit-batok",
+      "projectCoordinates": {
+        "lat": 1.349367502406749,
+        "lon": 103.7453473588241,
+        "source": "onemap-search"
+      },
       "btohq": {
         "sourceUrl": "https://www.btohq.com/bto-project-spec/sky-vista-bukit-batok",
         "ratings": {
@@ -21656,10 +22488,24 @@
           "hospital": "St Luke's Hospital"
         }
       },
+      "nearestMrt": "Bukit Batok MRT",
+      "nearestMrtDistanceMeters": 460,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
+      "locationSignals": {
+        "centralityScore": 52,
+        "centralityLabel": "Outer-town access",
+        "contextTags": [],
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 10473,
+        "matchedStation": "Bukit Batok",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
+      },
       "comparisonMetrics": {
         "topSortValue": 24267,
         "totalUnits": 257,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 460,
+        "centralityScore": 52,
         "accessibilityRating": 4,
         "amenitiesRating": 4,
         "affordabilityRating": 3,
@@ -21691,6 +22537,11 @@
       "expectedTop": "Dec 2021",
       "totalUnits": 1140,
       "sourceUrl": "https://www.btohq.com/bto-project-spec/west-scape-bukit-batok",
+      "projectCoordinates": {
+        "lat": 1.360391104717827,
+        "lon": 103.7430043243801,
+        "source": "onemap-search"
+      },
       "btohq": {
         "sourceUrl": "https://www.btohq.com/bto-project-spec/west-scape-bukit-batok",
         "ratings": {
@@ -21709,10 +22560,24 @@
           "hospital": "St Luke's Hospital"
         }
       },
+      "nearestMrt": "Bukit Gombak MRT",
+      "nearestMrtDistanceMeters": 1010,
+      "nearestMrtDistanceSource": "URA Master Plan 2019 rail station centroid, straight-line estimate",
+      "locationSignals": {
+        "centralityScore": 52,
+        "centralityLabel": "Outer-town access",
+        "contextTags": [],
+        "nearestCentralAnchor": "Orchard",
+        "centralAnchorDistanceMeters": 10793,
+        "matchedStation": "Bukit Gombak",
+        "source": "Station centrality estimate from URA rail station geometry and curated town context"
+      },
       "comparisonMetrics": {
         "topSortValue": 24264,
         "totalUnits": 1140,
         "btoType": "standard",
+        "nearestMrtDistanceMeters": 1010,
+        "centralityScore": 52,
         "accessibilityRating": 2,
         "amenitiesRating": 2,
         "affordabilityRating": 3,

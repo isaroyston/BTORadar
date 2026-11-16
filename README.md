@@ -79,6 +79,11 @@ folds these in and adds `estimatedKeys` (launch month + 3 months to booking + th
 waiting time) for projects without a published completion date. The app shows those
 as "About Apr 2030" and uses them for payment dates and the "soonest keys" ranking.
 
+Site coordinates come from BTOHQ's map links. For projects BTOHQ doesn't place,
+`npm run data:onemap` searches OneMap for the project name, then each road in its
+address, and writes `frontend/public/data/onemap/coordinates.json`; the merge uses a
+point only if it is within 3 km of the MRT station the listing names.
+
 Project maps are not stored: each card loads a static street map from OneMap
 (Singapore Land Authority, keyless, at most 512 px a side) using the project's
 coordinates.

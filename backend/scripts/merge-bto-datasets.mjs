@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const RECORDBTO_URL = new URL("../../frontend/public/data/recordbto/projects.json", import.meta.url);
 const BTOHQ_URL = new URL("../../frontend/public/data/btohq/projects.json", import.meta.url);
+const GEOCODES_PATH = fileURLToPath(new URL("../../frontend/public/data/onemap/coordinates.json", import.meta.url));
 const DETAILS_PATH = fileURLToPath(new URL("../../frontend/public/data/recordbto/details.json", import.meta.url));
 const OUTPUT_URL = new URL("../../frontend/public/data/bto/projects.json", import.meta.url);
 const RAIL_STATIONS_URL = new URL("../data/geospatial/rail-stations.geojson", import.meta.url);
@@ -59,6 +60,7 @@ async function main() {
   const btohqPayload = JSON.parse(await readFile(BTOHQ_PATH, "utf8"));
   const railStations = await loadRailStations();
   const details = await loadDetails();
+  geocodes = await loadGeocodes();
   const recordProjects = recordbtoPayload.projects ?? [];
   const btohqProjects = btohqPayload.projects ?? [];
   const btohqByKey = new Map();
@@ -180,14 +182,36 @@ function fromBtohqProject(project) {
   };
 }
 
+// OneMap search results for projects BTOHQ's map doesn't place (backfill-onemap-coordinates.mjs).
+let geocodes = {};
+const GEOCODE_MAX_FROM_LISTED_MRT_METERS = 3000;
+
+async function loadGeocodes() {
+  try {
+    return JSON.parse(await readFile(GEOCODES_PATH, "utf8")).coordinates ?? {};
+  } catch {
+    return {};
+  }
+}
+
+// A searched point is used only if it sits near the MRT station the listing names.
+function geocodeFor(project, matchedStation) {
+  const found = geocodes[project.id];
+  if (!found) return undefined;
+  if (matchedStation && haversineMeters(found.lat, found.lon, matchedStation.lat, matchedStation.lon) > GEOCODE_MAX_FROM_LISTED_MRT_METERS) {
+    return undefined;
+  }
+  return { lat: found.lat, lon: found.lon, source: "onemap-search" };
+}
+
 function enrichProject(project, railStations) {
   const flatVariants = normalizeFlatVariants(project.flatVariants);
-  const projectCoordinates =
-    project.projectCoordinates ?? parseMapCoordinates(project.btohq?.media?.mapUrl);
   const matchedStation =
     project.nearestMrt
       ? findRailStationByName(project.nearestMrt, railStations)
       : null;
+  const projectCoordinates =
+    project.projectCoordinates ?? parseMapCoordinates(project.btohq?.media?.mapUrl) ?? geocodeFor(project, matchedStation);
   const nearestStation = projectCoordinates
     ? matchedStation
       ? {
