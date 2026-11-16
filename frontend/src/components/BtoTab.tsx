@@ -22,6 +22,7 @@ import {
 } from "../utils/sourceCredits";
 import { Icon, PageHeader } from "./DashboardUi";
 import { Segmented } from "./Segmented";
+import { SiteMap } from "./SiteMap";
 
 type BtoTabProps = {
   btoLoading: boolean;
@@ -716,16 +717,14 @@ function ProjectCard({
 function ProjectMap({
   project,
   className,
-  large = false,
   children,
 }: {
   project: BtoProject;
   className: string;
-  large?: boolean;
   children?: ReactNode;
 }) {
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
-  const src = locationMapUrl(project, 512, large ? 214 : 200);
+  const src = locationMapUrl(project, 512, 200);
   return (
     <div className={className}>
       {src && failedSrc !== src ? (
@@ -925,7 +924,7 @@ function ProjectSheet({
             {project.name}
           </h2>
 
-          <ProjectMap project={project} className="sheet-map" large />
+          <SiteMap key={project.id} project={project} />
 
           {project.highlights && project.highlights.length > 0 && (
             <ul className="highlights">

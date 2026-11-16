@@ -40,7 +40,7 @@ A planner people open with a real decision in front of them: can we afford a fla
 - **Edit is a chip.** Pale pink pill with a pencil, top-right of the thing it edits.
 - **Banners for context.** The tip card (Budget) and match banner (Projects) are white cards with a pale gold icon tile and one action.
 - **Pink is the headline card only.** Panels, banners and selected states are white or ink; pink appears as the headline card, pale icon tiles and raspberry glyphs.
-- **Inputs stay in reach.** Budget's headline card ends with "Based on" chips for each answer and an "Edit details" button; any chip opens and focuses its field.
+- **One place to edit.** Budget's answers card sits directly under the headline card (first column), with one Edit chip; each row also opens its field. No duplicate edit buttons elsewhere on the screen.
 
 ## Copy rules
 

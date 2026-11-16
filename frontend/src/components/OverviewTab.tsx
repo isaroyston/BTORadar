@@ -21,7 +21,7 @@ const STARTS: { icon: IconName; title: string; body: string; tab: TabKey }[] = [
   {
     icon: "wallet",
     title: "Work out what we can afford",
-    body: "Income, age and CPF give a price ceiling, then the projects that fit it.",
+    body: "Income and CPF give a price ceiling, then the projects that fit it.",
     tab: "budget",
   },
   {
@@ -69,7 +69,7 @@ export function OverviewTab({
       title: "Know your budget",
       state: budgetKnown
         ? `You could buy up to ${currency(ceiling)}.`
-        : "Income, age and CPF give you a price ceiling.",
+        : "Income and CPF give you a price ceiling.",
       action: budgetKnown ? "Change" : "Set budget",
       tab: "budget" as TabKey,
     },

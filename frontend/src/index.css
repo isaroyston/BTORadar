@@ -708,53 +708,6 @@ dd,
   margin-top: 0.85rem;
 }
 
-/* What the headline figure rests on: each chip opens its field. */
-.hero-basis {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: 1.1rem;
-  padding-top: 0.95rem;
-  border-top: 1px solid oklch(23% 0.015 20 / 0.1);
-}
-
-.hero-basis-label {
-  margin-right: 0.15rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ink-2);
-}
-
-.hero-basis ul {
-  display: contents;
-  list-style: none;
-}
-
-.basis-chip {
-  min-height: 2rem;
-  padding: 0.25rem 0.7rem;
-  border-radius: var(--r-pill);
-  background: oklch(100% 0 0 / 0.65);
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ink);
-  transition: background-color 160ms var(--ease);
-}
-
-.basis-chip:hover {
-  background: var(--card);
-}
-
-.hero-basis .btn {
-  margin-left: auto;
-}
-
-.hero-basis .btn svg {
-  width: 0.95rem;
-  height: 0.95rem;
-}
-
 .privacy-line {
   display: flex;
   align-items: flex-start;
@@ -769,11 +722,6 @@ dd,
   width: 0.95rem;
   height: 0.95rem;
   margin-top: 0.15rem;
-}
-
-.tip .btn svg {
-  width: 0.95rem;
-  height: 0.95rem;
 }
 
 .checklist {
@@ -1020,20 +968,7 @@ dd,
   color: var(--ink-2);
 }
 
-.tip .btn {
-  flex: none;
-  margin-left: auto;
-}
 
-@media (max-width: 560px) {
-  .tip {
-    flex-wrap: wrap;
-  }
-
-  .tip .btn {
-    margin-left: 3.5rem;
-  }
-}
 
 /* Disclosure card */
 
@@ -2140,8 +2075,7 @@ dd,
   padding: 1rem 1.2rem 0.9rem;
 }
 
-.project-map,
-.sheet-map {
+.project-map {
   position: relative;
   overflow: hidden;
   background: var(--canvas-deep);
@@ -2151,13 +2085,7 @@ dd,
   aspect-ratio: 512 / 200;
 }
 
-.sheet-map {
-  aspect-ratio: 512 / 214;
-  border-radius: 16px;
-}
-
-.project-map img,
-.sheet-map img {
+.project-map img {
   display: block;
   width: 100%;
   height: 100%;
@@ -2610,6 +2538,69 @@ dd,
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--ink);
+}
+
+/* Interactive site map in the project sheet (Leaflet + OneMap tiles). */
+.site-map {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.site-map-canvas {
+  height: clamp(14rem, 34vh, 19rem);
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--canvas-deep);
+  isolation: isolate;
+  font: inherit;
+}
+
+.site-map-canvas .leaflet-control-attribution {
+  font-size: 0.65rem;
+}
+
+.site-map-canvas .leaflet-bar a {
+  color: var(--ink);
+}
+
+.site-pin {
+  background: none;
+  border: 0;
+}
+
+.site-map-failed {
+  display: grid;
+  place-items: center;
+  height: 8rem;
+  border-radius: 16px;
+  background: var(--canvas-deep);
+  font-size: 0.875rem;
+  color: var(--mute);
+}
+
+.site-map-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem 1rem;
+  font-size: 0.8rem;
+}
+
+.site-map-foot a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-underline-offset: 3px;
+}
+
+.site-map-foot svg {
+  width: 0.85rem;
+  height: 0.85rem;
 }
 
 .highlights {

@@ -14,7 +14,7 @@
 
 ## What It Does
 
-- Works out a price ceiling from income, age and CPF (cash is optional), using HDB's
+- Works out a price ceiling from income and CPF (cash is optional; buyers are assumed under 35), using HDB's
   loan-to-value and income limits. Each payment is checked on its own date: the grant
   is credited before signing, and CPF keeps building up until keys at CPF's 2026
   allocation rates. Each project is checked with its own launch and keys dates.
@@ -28,9 +28,9 @@
 ## Product Surfaces
 
 - **Overview**: the front door. New visitors pick where they are (budget first, a project in mind, or already booked); returning visitors see the next payment and where each step stands.
-- **Budget**: one price ceiling, with the answers it rests on as chips in the headline card (each opens its field), what sets the ceiling and how to raise it, then the breakdown.
+- **Budget**: one price ceiling; your answers (income, CPF savings, optional cash, first-timer status) directly under it as the one place to edit; what sets the ceiling; then the breakdown. Age and monthly CPF are not asked: buyers are assumed under 35 and monthly CPF is worked out from income.
 - **Projects**: launches; a "What matters most" choice that is always visible (best all-round, lowest price, near the MRT, soonest keys, or a fine-tuned mix); cards with a OneMap street map of the site, a rank, the price checked against the ceiling, and facts led by what the buyer ranked highest; a detail sheet with highlights, keys date, blocks and nearby schools and parks; saved projects; and side-by-side compare.
-- **Plan**: target price, loan and downpayment choices, whether it fits (asking income, age and CPF in place if they're missing), whether CPF covers the monthly repayment, and a payment timeline showing grant, CPF and cash per payment. Saves automatically.
+- **Plan**: target price, loan and downpayment choices, whether it fits (asking income and CPF in place if they're missing), whether CPF covers the monthly repayment, and a payment timeline showing grant, CPF and cash per payment. Saves automatically.
 
 The visual system is described in [`DESIGN.md`](DESIGN.md).
 

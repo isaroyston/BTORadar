@@ -34,7 +34,7 @@ export function locationMapUrl(project: BtoProject, width = 512, height = 240) {
   const lat = point.lat.toFixed(5);
   const lon = point.lon.toFixed(5);
   const params = new URLSearchParams({
-    layerchosen: "grey",
+    layerchosen: "default",
     lat,
     lng: lon,
     zoom: "15",

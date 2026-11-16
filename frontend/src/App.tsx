@@ -19,6 +19,7 @@ import {
   LOAN_INTEREST_RATE_MIN,
   LOAN_MULTIPLIER,
   LOAN_TENURE_MIN,
+  ASSUMED_BUYER_AGE,
 } from "./constants";
 import { useBtoProjects } from "./hooks/useBtoProjects";
 import { POLICY_CONFIG, type BtoProject } from "./policies/policyConfig";
@@ -197,13 +198,12 @@ function App() {
       cashOnlyPurchaseAmount: optionFee,
       fixedAdditionalCosts: APPLICATION_FEE + surveyFee + fireInsurance,
       cashOnlyCosts: APPLICATION_FEE,
-      ageForLoanRules: budget.age,
+      ageForLoanRules: ASSUMED_BUYER_AGE,
       outstandingHousingLoans: 0,
       requestedTenureYears: loanTenureYears,
       repaymentRatePercent: loanInterestRate,
     }),
     [
-      budget.age,
       cashForMaths,
       budget.cpfOa,
       combinedIncome,
@@ -222,19 +222,19 @@ function App() {
   const [today] = useState(() => new Date());
   const ceilingAt = useCallback(
     (timing: PurchaseTiming) =>
-      budget.age === null || budget.cpfOa === null
+      budget.cpfOa === null
         ? null
         : affordableCeiling({
             base: budgetInput,
             timing,
             cpfToday: budget.cpfOa,
             combinedIncome,
-            age: budget.age,
-            monthlyOverride: budget.cpfMonthly,
+            age: ASSUMED_BUYER_AGE,
+            monthlyOverride: null,
             signingShare: downpaymentRule.signing,
             minCashSigningShare: downpaymentRule.minCashSigning,
           }),
-    [budget.age, budget.cpfMonthly, budget.cpfOa, budgetInput, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing]
+    [budget.cpfOa, budgetInput, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing]
   );
   // The Budget screen shows a launch applied for now, with keys after the usual wait.
   const typicalTiming = useMemo(
@@ -247,9 +247,8 @@ function App() {
   const budgetKnown = budgetMaxPrice !== null && budgetAtMax !== null;
   const monthlyCpfAt = useCallback(
     (timing: PurchaseTiming) =>
-      budget.cpfMonthly ??
-      (budget.age === null ? null : estimateMonthlyOa(combinedIncome, budget.age + timing.monthsToKeys / 12)),
-    [budget.age, budget.cpfMonthly, combinedIncome]
+      estimateMonthlyOa(combinedIncome, ASSUMED_BUYER_AGE + timing.monthsToKeys / 12),
+    [combinedIncome]
   );
   const loanAmount = budgetKnown
     ? Math.round(budgetAtMax.loanForTarget ?? 0)
@@ -275,17 +274,17 @@ function App() {
     [applicationMonth, selectedBtoProject, today]
   );
   const planOa = useMemo(() => {
-    if (budget.age === null || budget.cpfOa === null) return null;
+    if (budget.cpfOa === null) return null;
     const project = (months: number) =>
       projectOa({
         cpfToday: budget.cpfOa ?? 0,
         combinedIncome,
-        age: budget.age ?? 0,
-        monthlyOverride: budget.cpfMonthly,
+        age: ASSUMED_BUYER_AGE,
+        monthlyOverride: null,
         months,
       });
     return { signing: project(planTiming.monthsToSigning), keys: project(planTiming.monthsToKeys) };
-  }, [budget.age, budget.cpfMonthly, budget.cpfOa, combinedIncome, planTiming]);
+  }, [budget.cpfOa, combinedIncome, planTiming]);
   const targetEstimate = useMemo(
     () => calculateFinancingEstimate({ ...budgetInput, availableCpfOa: planOa?.keys ?? budget.cpfOa }),
     [budget.cpfOa, budgetInput, planOa]
@@ -601,7 +600,6 @@ function App() {
             ceiling={typicalCeiling}
             timing={typicalTiming}
             monthlyCpf={monthlyCpfAt(typicalTiming)}
-            estimatedMonthlyCpf={budget.age === null ? null : estimateMonthlyOa(combinedIncome, budget.age)}
             feesInCash={feesInCash}
             ehg={ehgAssessment}
             onIncomeChange={handleIncomeChange}

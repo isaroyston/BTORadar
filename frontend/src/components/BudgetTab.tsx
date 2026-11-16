@@ -27,7 +27,6 @@ type BudgetTabProps = {
   ceiling: CeilingResult | null;
   timing: PurchaseTiming;
   monthlyCpf: number | null;
-  estimatedMonthlyCpf: number | null;
   feesInCash: number;
   ehg: EhgAssessment;
   onIncomeChange: (value: number) => void;
@@ -36,20 +35,12 @@ type BudgetTabProps = {
   onOpenPlan: () => void;
 };
 
-const AGE_MIN = 21;
-const AGE_MAX = 70;
 const SAVINGS_MAX = 2000000;
 
 const financingLabel: Record<FinancingType, string> = {
   hdb: "an HDB loan",
   bank: "a bank loan",
   none: "no loan",
-};
-
-const firstTimerShort: Record<FirstTimers, string> = {
-  both: "Both first-timers",
-  one: "One first-timer",
-  none: "Second-timers",
 };
 
 const firstTimerLabel: Record<FirstTimers, string> = {
@@ -68,7 +59,6 @@ export function BudgetTab({
   ceiling,
   timing,
   monthlyCpf,
-  estimatedMonthlyCpf,
   feesInCash,
   ehg,
   onIncomeChange,
@@ -77,13 +67,12 @@ export function BudgetTab({
   onOpenPlan,
 }: BudgetTabProps) {
   // Cash is optional: most of a BTO downpayment can come from the grant and CPF.
-  const complete = budget.age !== null && budget.cpfOa !== null;
+  const complete = budget.cpfOa !== null;
   const [editing, setEditing] = useState(!complete);
   const showForm = editing || !complete;
   const known = maxPrice !== null && estimateAtMax !== null;
   const checklist = [
     { label: "Household income", done: true },
-    { label: "Age of the youngest buyer", done: budget.age !== null },
     { label: "CPF savings", done: budget.cpfOa !== null },
   ];
 
@@ -95,15 +84,6 @@ export function BudgetTab({
       field?.focus({ preventScroll: true });
     });
   };
-
-  // What the figure rests on, shown in the headline card so the inputs are one tap away.
-  const basis = [
-    { id: "budget-income", text: `${currency(combinedIncome)} a month` },
-    { id: "budget-age", text: budget.age === null ? "Age not set" : `Age ${budget.age}` },
-    { id: "budget-cpf", text: budget.cpfOa === null ? "CPF not set" : `${currency(budget.cpfOa)} CPF` },
-    { id: "budget-cash", text: budget.cash === null ? "Cash for fees only" : `${currency(budget.cash)} cash` },
-    { id: "budget-first", text: firstTimerShort[budget.firstTimers] },
-  ];
 
   const cpfNote =
     known && ceiling
@@ -129,25 +109,10 @@ export function BudgetTab({
       value: `${currency(combinedIncome)} a month`,
     },
     {
-      id: "budget-age",
-      icon: "user",
-      label: "Youngest buyer's age",
-      value: budget.age === null ? "Not set" : String(budget.age),
-    },
-    {
       id: "budget-cpf",
       icon: "piggy",
       label: "CPF savings",
       value: budget.cpfOa === null ? "Not set" : currency(budget.cpfOa),
-    },
-    {
-      id: "budget-cpf-monthly",
-      icon: "calendar",
-      label: "CPF added each month",
-      value:
-        monthlyCpf === null
-          ? "Not set"
-          : `${currency(monthlyCpf)}${budget.cpfMonthly === null ? " (estimated)" : ""}`,
     },
     {
       id: "budget-cash",
@@ -182,8 +147,6 @@ export function BudgetTab({
           financing={financing}
           loanTenureYears={loanTenureYears}
           ehg={ehg}
-          basis={basis}
-          onEditField={openField}
           onSeeProjects={onSeeProjects}
           onOpenPlan={onOpenPlan}
         />
@@ -208,39 +171,7 @@ export function BudgetTab({
           </ul>
         </HeroCard>
       )}
-      {known && estimateAtMax && maxPrice !== null && (
-        <TipCard
-          limit={describeLimit({
-            estimate: estimateAtMax,
-            loan: Math.round(estimateAtMax.loanForTarget ?? 0),
-            maxPrice,
-            financing,
-            ceiling,
-            timing,
-          })}
-          onEdit={() => openField(ceiling?.limitedBy === "loan" ? "budget-income" : "budget-cpf")}
-        />
-      )}
       <div className="two-col">
-        <div className="col">
-          {known && (
-            <BudgetAnswer
-              part="breakdown"
-              maxPrice={maxPrice}
-              estimate={estimateAtMax}
-              oaAtKeys={ceiling?.oaAtKeys ?? budget.cpfOa ?? 0}
-              financing={financing}
-              loanTenureYears={loanTenureYears}
-              ehg={ehg}
-              cpfNote={cpfNote}
-              basis={basis}
-              onEditField={openField}
-              onSeeProjects={onSeeProjects}
-              onOpenPlan={onOpenPlan}
-            />
-          )}
-        </div>
-
         <div className="col">
           {showForm ? (
             <form
@@ -274,33 +205,6 @@ export function BudgetTab({
                 onCommit={(value) => onIncomeChange(value ?? INCOME_MIN)}
               />
 
-              <div className="field">
-                <label htmlFor="budget-age">Age of the youngest buyer</label>
-                <p className="field-hint" id="budget-age-hint">
-                  An HDB loan has to end by 65, so age can shorten it. Between{" "}
-                  {AGE_MIN} and {AGE_MAX}.
-                </p>
-                <input
-                  id="budget-age"
-                  className="input input-short"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  placeholder="e.g. 29"
-                  defaultValue={budget.age ?? ""}
-                  aria-describedby="budget-age-hint"
-                  onChange={(event) => {
-                    const digits = event.target.value.replace(/\D/g, "");
-                    const age = digits === "" ? null : Number(digits);
-                    onBudgetChange({
-                      age:
-                        age === null || age < AGE_MIN || age > AGE_MAX
-                          ? null
-                          : age,
-                    });
-                  }}
-                />
-              </div>
-
               <MoneyField
                 id="budget-cpf"
                 label="CPF Ordinary Account savings"
@@ -309,24 +213,6 @@ export function BudgetTab({
                 max={SAVINGS_MAX}
                 placeholder="e.g. 60,000"
                 onCommit={(value) => onBudgetChange({ cpfOa: value })}
-              />
-
-              <MoneyField
-                id="budget-cpf-monthly"
-                label="CPF added to your Ordinary Account each month"
-                hint={
-                  estimatedMonthlyCpf === null
-                    ? "Combined. Leave blank and we'll estimate it from income and age."
-                    : `Combined. Leave blank to use our estimate of ${currency(estimatedMonthlyCpf)} from your income and age, or enter what your CPF statement shows (0 if self-employed).`
-                }
-                value={budget.cpfMonthly}
-                max={SAVINGS_MAX}
-                placeholder={
-                  estimatedMonthlyCpf === null
-                    ? "e.g. 1,380"
-                    : `${estimatedMonthlyCpf.toLocaleString("en-SG")} (estimate)`
-                }
-                onCommit={(value) => onBudgetChange({ cpfMonthly: value })}
               />
 
               <MoneyField
@@ -395,18 +281,41 @@ export function BudgetTab({
             Your figures stay in this browser. HDB's HFE letter is the final word on what you can borrow.
           </p>
         </div>
+
+        <div className="col">
+          {known && estimateAtMax && maxPrice !== null && (
+            <TipCard
+              limit={describeLimit({
+                estimate: estimateAtMax,
+                loan: Math.round(estimateAtMax.loanForTarget ?? 0),
+                maxPrice,
+                financing,
+                ceiling,
+                timing,
+              })}
+            />
+          )}
+          {known && (
+            <BudgetAnswer
+              part="breakdown"
+              maxPrice={maxPrice}
+              estimate={estimateAtMax}
+              oaAtKeys={ceiling?.oaAtKeys ?? budget.cpfOa ?? 0}
+              financing={financing}
+              loanTenureYears={loanTenureYears}
+              ehg={ehg}
+              cpfNote={cpfNote}
+              onSeeProjects={onSeeProjects}
+              onOpenPlan={onOpenPlan}
+            />
+          )}
+        </div>
       </div>
     </section>
   );
 }
 
-function TipCard({
-  limit,
-  onEdit,
-}: {
-  limit: { title: string; body: string };
-  onEdit: () => void;
-}) {
+function TipCard({ limit }: { limit: { title: string; body: string } }) {
   return (
     <section className="tip">
       <span className="tip-icon" aria-hidden="true">
@@ -416,10 +325,6 @@ function TipCard({
         <h2>{limit.title}</h2>
         <p>{limit.body}</p>
       </div>
-      <button type="button" className="btn btn-quiet btn-small" onClick={onEdit}>
-        <Icon name="edit" />
-        Change figures
-      </button>
     </section>
   );
 }
@@ -433,15 +338,11 @@ function BudgetAnswer({
   loanTenureYears,
   ehg,
   cpfNote = null,
-  basis,
-  onEditField,
   onSeeProjects,
   onOpenPlan,
 }: {
   part: "hero" | "breakdown";
   cpfNote?: string | null;
-  basis: { id: string; text: string }[];
-  onEditField: (id: string) => void;
   maxPrice: number;
   estimate: FinancingEstimate;
   oaAtKeys: number;
@@ -481,6 +382,11 @@ function BudgetAnswer({
         <details className="card disclosure-card">
           <summary>How this is worked out</summary>
           <ul>
+            <li>
+              Assumes the buyers are under 35, so the HDB loan can run 25 years, and that
+              CPF goes into the Ordinary Account at the usual rate for your income, up to the
+              S$8,000 salary ceiling each.
+            </li>
             {cpfNote && <li>{cpfNote}</li>}
             <li>{ehg.note}</li>
             {estimate.warnings.map((warning) => (
@@ -504,22 +410,6 @@ function BudgetAnswer({
           With {financingLabel[financing]}, some of the price has to come from
           savings or a grant. Add CPF or cash savings to see a ceiling.
         </p>
-      <div className="hero-basis">
-        <p className="hero-basis-label">Based on</p>
-        <ul>
-          {basis.map((item) => (
-            <li key={item.id}>
-              <button type="button" className="basis-chip" onClick={() => onEditField(item.id)}>
-                {item.text}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <button type="button" className="btn btn-white btn-small" onClick={() => onEditField("budget-income")}>
-          <Icon name="edit" />
-          Edit details
-        </button>
-      </div>
       </HeroCard>
     );
   }
@@ -552,22 +442,6 @@ function BudgetAnswer({
         </button>
         <button type="button" className="text-link" onClick={onOpenPlan}>
           Change loan type
-        </button>
-      </div>
-      <div className="hero-basis">
-        <p className="hero-basis-label">Based on</p>
-        <ul>
-          {basis.map((item) => (
-            <li key={item.id}>
-              <button type="button" className="basis-chip" onClick={() => onEditField(item.id)}>
-                {item.text}
-              </button>
-            </li>
-          ))}
-        </ul>
-        <button type="button" className="btn btn-white btn-small" onClick={() => onEditField("budget-income")}>
-          <Icon name="edit" />
-          Edit details
         </button>
       </div>
     </HeroCard>

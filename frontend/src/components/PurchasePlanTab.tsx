@@ -338,7 +338,7 @@ export function PurchasePlanTab({
                 </h2>
               </div>
               <p className="muted">
-                Three answers check this price against your loan, grant and CPF. The rest of your budget is optional.
+                Two answers check this price against your loan, grant and CPF. The rest of your budget is optional.
               </p>
               <MoneyField
                 id="plan-income"
@@ -348,22 +348,6 @@ export function PurchasePlanTab({
                 max={INCOME_MAX}
                 onCommit={(value) => onIncomeChange(value ?? INCOME_MIN)}
               />
-              <div className="field">
-                <label htmlFor="plan-age">Age of the youngest buyer</label>
-                <input
-                  id="plan-age"
-                  className="input input-short"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  placeholder="e.g. 29"
-                  defaultValue={budget.age ?? ""}
-                  onChange={(event) => {
-                    const digits = event.target.value.replace(/\D/g, "");
-                    const age = digits === "" ? null : Number(digits);
-                    onBudgetChange({ age: age === null || age < 21 || age > 70 ? null : age });
-                  }}
-                />
-              </div>
               <MoneyField
                 id="plan-cpf"
                 label="CPF Ordinary Account savings"
