@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode, type RefObject } from "react";
 import { FLAT_TYPE_OPTIONS, INCOME_MIN } from "../constants";
 import type { FlatType } from "../types";
-import type { BudgetInputs, FirstTimers } from "../utils/budgetStorage";
+import type { BudgetInputs, FirstTimers, Household } from "../utils/budgetStorage";
 import { currency } from "../utils/format";
 import {
   FLAT_LABELS,
   INCOME_CEILINGS,
+  SINGLES_MIN_AGE,
   type CeilingSplit,
   type LaunchSnapshot,
 } from "../utils/journey";
@@ -14,8 +15,31 @@ import { loadSetupSplit, restoreSetupSplit, saveSetupSplit, type SetupSplit } fr
 import { Icon } from "./DashboardUi";
 import { MoneySplit } from "./MoneySplit";
 
-type Step = "income" | "cpf" | "first" | "cash" | "size" | "result";
-const STEPS: Step[] = ["income", "cpf", "first", "cash", "size", "result"];
+type Step = "who" | "income" | "cpf" | "first" | "cash" | "size" | "result";
+const STEPS: Step[] = ["who", "income", "cpf", "first", "cash", "size", "result"];
+
+const WHO_OPTIONS: { value: Household; title: string; body: string }[] = [
+  { value: "couple", title: "A couple", body: "Married, engaged, or buying with family." },
+  { value: "single", title: "Just me", body: `A single buyer aged ${SINGLES_MIN_AGE} or over.` },
+];
+
+const SINGLE_FIRST_OPTIONS: { value: FirstTimers; title: string; body: string }[] = [
+  { value: "both", title: "Yes", body: "You haven't bought a flat from HDB or had a housing grant." },
+  { value: "none", title: "No", body: "You've bought from HDB or had a grant before." },
+];
+
+// HDB uses a couple's income-weighted average age for the loan tenure.
+function weightedAge(split: SetupSplit, single: boolean) {
+  if (single) return split.ageYou;
+  const people = [
+    { age: split.ageYou, income: split.incomeYou ?? 0 },
+    { age: split.agePartner, income: split.incomePartner ?? 0 },
+  ].filter((person): person is { age: number; income: number } => person.age !== null);
+  if (people.length === 0) return null;
+  const weight = people.reduce((sum, person) => sum + person.income, 0);
+  if (weight <= 0) return Math.round(people.reduce((sum, person) => sum + person.age, 0) / people.length);
+  return Math.round(people.reduce((sum, person) => sum + person.age * person.income, 0) / weight);
+}
 const QUESTION_COUNT = STEPS.length - 1;
 
 const FIRST_OPTIONS: { value: FirstTimers; title: string; body: string }[] = [
@@ -61,6 +85,7 @@ export function SetupFlow({
   const [stepIndex, setStepIndex] = useState(0);
   const step = STEPS[stepIndex];
   const returning = budget.cpfOa !== null;
+  const single = budget.household === "single";
   const [savedAtOpen] = useState(loadSetupSplit);
   const [split, setSplit] = useState<SetupSplit>(() => {
     // Use each person's figures only if they still add up to the totals, which Budget can change.
@@ -78,6 +103,8 @@ export function SetupFlow({
       incomePartner: null,
       cpfYou: returning ? budget.cpfOa : null,
       cpfPartner: null,
+      ageYou: budget.household === "single" ? budget.age : null,
+      agePartner: null,
     };
   });
 
@@ -105,11 +132,32 @@ export function SetupFlow({
     saveSetupSplit(next);
     const income = (next.incomeYou ?? 0) + (next.incomePartner ?? 0);
     if (income >= INCOME_MIN) onIncomeChange(income);
+    const changes: Partial<BudgetInputs> = { age: weightedAge(next, single) };
     if ("cpfYou" in patch || "cpfPartner" in patch) {
       const given = next.cpfYou !== null || next.cpfPartner !== null;
-      onBudgetChange({ cpfOa: given ? (next.cpfYou ?? 0) + (next.cpfPartner ?? 0) : null });
+      changes.cpfOa = given ? (next.cpfYou ?? 0) + (next.cpfPartner ?? 0) : null;
     }
+    onBudgetChange(changes);
   };
+
+  // Switching to a single buyer drops the partner's figures and points at a 2-room Flexi.
+  const chooseHousehold = (household: Household) => {
+    if (household === budget.household) return;
+    const next = household === "single" ? { ...split, incomePartner: null, cpfPartner: null, agePartner: null } : split;
+    setSplit(next);
+    saveSetupSplit(next);
+    const income = (next.incomeYou ?? 0) + (next.incomePartner ?? 0);
+    if (income >= INCOME_MIN) onIncomeChange(income);
+    const cpfGivenNext = next.cpfYou !== null || next.cpfPartner !== null;
+    onBudgetChange({
+      household,
+      age: weightedAge(next, household === "single"),
+      cpfOa: cpfGivenNext ? (next.cpfYou ?? 0) + (next.cpfPartner ?? 0) : budget.cpfOa,
+      firstTimers: household === "single" && budget.firstTimers === "one" ? "both" : budget.firstTimers,
+    });
+    if (household === "single") onFlatTypeChange("2-room");
+  };
+  const ceiling = single ? INCOME_CEILINGS.singles : INCOME_CEILINGS.newFlat;
 
   const canContinue =
     step === "income" ? incomeTotal >= INCOME_MIN : step === "cpf" ? cpfGiven : true;
@@ -183,11 +231,41 @@ export function SetupFlow({
         ) : (
           <div className="setup-body">
             <form className="setup-question" key={step} onSubmit={next} noValidate>
+              {step === "who" && (
+                <>
+                  <Question
+                    headingRef={headingRef}
+                    title="Who's buying?"
+                    lede="This sets which flats you can buy, the grant table and the loan rules."
+                  />
+                  <Choices
+                    label="Who's buying"
+                    value={budget.household}
+                    options={WHO_OPTIONS.map((option) => ({ ...option, key: option.value }))}
+                    onChange={chooseHousehold}
+                  />
+                  <div className="setup-pair">
+                    <AgeInput id="setup-age-you" label={single ? "Your age" : "Your age (optional)"} value={split.ageYou} onChange={(value) => updateSplit({ ageYou: value })} />
+                    {!single && (
+                      <AgeInput id="setup-age-partner" label="Partner's age (optional)" value={split.agePartner} onChange={(value) => updateSplit({ agePartner: value })} />
+                    )}
+                  </div>
+                  <p className={`setup-total ${single && split.ageYou !== null && split.ageYou < SINGLES_MIN_AGE ? "is-caution" : ""}`.trim()}>
+                    <Icon name={single && split.ageYou !== null && split.ageYou < SINGLES_MIN_AGE ? "alert" : "info"} />
+                    {single
+                      ? split.ageYou !== null && split.ageYou < SINGLES_MIN_AGE
+                        ? `Singles can buy a new flat from age ${SINGLES_MIN_AGE}.`
+                        : "Singles can buy a 2-room Flexi in any new project."
+                      : "Ages set how long the HDB loan can run (until 65). Left blank, we assume you're under 35."}
+                  </p>
+                </>
+              )}
+
               {step === "income" && (
                 <>
                   <Question
                     headingRef={headingRef}
-                    title="What do you each earn a month?"
+                    title={single ? "What do you earn a month?" : "What do you each earn a month?"}
                     lede="Before CPF and tax. HDB averages the 12 months before you apply, so include regular allowances."
                   />
                   <div className="setup-pair">
@@ -198,20 +276,24 @@ export function SetupFlow({
                       max={30000}
                       onChange={(value) => updateSplit({ incomeYou: value })}
                     />
-                    <Amount
-                      id="setup-income-partner"
-                      label="Your partner"
-                      value={split.incomePartner}
-                      max={30000}
-                      onChange={(value) => updateSplit({ incomePartner: value })}
-                    />
+                    {!single && (
+                      <Amount
+                        id="setup-income-partner"
+                        label="Your partner"
+                        value={split.incomePartner}
+                        max={30000}
+                        onChange={(value) => updateSplit({ incomePartner: value })}
+                      />
+                    )}
                   </div>
                   {incomeTotal > 0 && (
-                    <p className={`setup-total ${incomeTotal > INCOME_CEILINGS.newFlat ? "is-caution" : ""}`.trim()}>
-                      <Icon name={incomeTotal > INCOME_CEILINGS.newFlat ? "alert" : "team"} />
-                      {incomeTotal > INCOME_CEILINGS.newFlat
-                        ? `${currency(incomeTotal)} together is above HDB's ${currency(INCOME_CEILINGS.newFlat)} ceiling for new flats.`
-                        : `${currency(incomeTotal)} a month together.`}
+                    <p className={`setup-total ${incomeTotal > ceiling ? "is-caution" : ""}`.trim()}>
+                      <Icon name={incomeTotal > ceiling ? "alert" : "team"} />
+                      {incomeTotal > ceiling
+                        ? `${currency(incomeTotal)}${single ? "" : " together"} is above HDB's ${currency(ceiling)} ceiling for new flats.`
+                        : single
+                          ? `Within HDB's ${currency(ceiling)} ceiling for singles.`
+                          : `${currency(incomeTotal)} a month together.`}
                     </p>
                   )}
                 </>
@@ -221,7 +303,7 @@ export function SetupFlow({
                 <>
                   <Question
                     headingRef={headingRef}
-                    title="How much is in your CPF Ordinary Accounts?"
+                    title={single ? "How much is in your CPF Ordinary Account?" : "How much is in your CPF Ordinary Accounts?"}
                     lede="Open the CPF app and look for Ordinary Account. Enter 0 if you have none yet."
                   />
                   <div className="setup-pair">
@@ -232,13 +314,15 @@ export function SetupFlow({
                       max={2000000}
                       onChange={(value) => updateSplit({ cpfYou: value })}
                     />
-                    <Amount
-                      id="setup-cpf-partner"
-                      label="Your partner"
-                      value={split.cpfPartner}
-                      max={2000000}
-                      onChange={(value) => updateSplit({ cpfPartner: value })}
-                    />
+                    {!single && (
+                      <Amount
+                        id="setup-cpf-partner"
+                        label="Your partner"
+                        value={split.cpfPartner}
+                        max={2000000}
+                        onChange={(value) => updateSplit({ cpfPartner: value })}
+                      />
+                    )}
                   </div>
                   {cpfGiven && (
                     <p className="setup-total">
@@ -255,12 +339,12 @@ export function SetupFlow({
                   <Question
                     headingRef={headingRef}
                     title="Is this your first flat from HDB?"
-                    lede="This decides the Enhanced CPF Housing Grant, worth up to S$ 120,000."
+                    lede={`This decides the Enhanced CPF Housing Grant, worth up to ${single ? "S$ 60,000 for singles" : "S$ 120,000"}.`}
                   />
                   <Choices
                     label="First-timer status"
                     value={budget.firstTimers}
-                    options={FIRST_OPTIONS.map((option) => ({ ...option, key: option.value }))}
+                    options={(single ? SINGLE_FIRST_OPTIONS : FIRST_OPTIONS).map((option) => ({ ...option, key: option.value }))}
                     onChange={(value) => onBudgetChange({ firstTimers: value })}
                   />
                   <p className={`setup-total ${grant > 0 ? "is-positive" : ""}`.trim()}>
@@ -268,8 +352,10 @@ export function SetupFlow({
                     {grant > 0
                       ? `Grant of ${currency(grant)} at your income.`
                       : budget.firstTimers === "none"
-                        ? "No grant, since neither of you is a first-timer."
-                        : `No grant above ${currency(INCOME_CEILINGS.ehg)} a month of income.`}
+                        ? single
+                          ? "No grant, since you've bought before."
+                          : "No grant, since neither of you is a first-timer."
+                        : `No grant above ${currency(single ? INCOME_CEILINGS.ehgSingles : INCOME_CEILINGS.ehg)} a month of income.`}
                   </p>
                 </>
               )}
@@ -283,7 +369,7 @@ export function SetupFlow({
                   />
                   <Amount
                     id="setup-cash"
-                    label="Cash, both of you"
+                    label={single ? "Cash" : "Cash, both of you"}
                     value={budget.cash}
                     max={2000000}
                     onChange={(value) => onBudgetChange({ cash: value })}
@@ -359,6 +445,31 @@ function Question({
         {title}
       </h2>
       <p>{lede}</p>
+    </div>
+  );
+}
+
+function AgeInput({ id, label, value, onChange }: { id: string; label: string; value: number | null; onChange: (value: number | null) => void }) {
+  const [text, setText] = useState(value === null ? "" : String(value));
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      <div className="input input-suffix input-large">
+        <input
+          id={id}
+          inputMode="numeric"
+          autoComplete="off"
+          placeholder="30"
+          value={text}
+          onChange={(event) => {
+            const digits = event.target.value.replace(/\D/g, "").slice(0, 2);
+            setText(digits);
+            const age = Number(digits);
+            onChange(digits && age >= 18 ? age : null);
+          }}
+        />
+        <span aria-hidden="true">years</span>
+      </div>
     </div>
   );
 }

@@ -14,8 +14,8 @@ export function oaRateForAge(age: number) {
 }
 
 /** Ordinary Account contributions a month for the household, from gross monthly income. */
-export function estimateMonthlyOa(combinedIncome: number, age: number) {
-  const { ordinaryWageCeilingPerEarner, earners } = POLICY_CONFIG.cpf;
+export function estimateMonthlyOa(combinedIncome: number, age: number, earners: number = POLICY_CONFIG.cpf.earners) {
+  const { ordinaryWageCeilingPerEarner } = POLICY_CONFIG.cpf;
   const wages = Math.min(Math.max(combinedIncome, 0), ordinaryWageCeilingPerEarner * earners);
   return Math.round(wages * oaRateForAge(age));
 }
@@ -30,18 +30,21 @@ export function projectOa({
   age,
   monthlyOverride,
   months,
+  earners,
 }: {
   cpfToday: number;
   combinedIncome: number;
   age: number;
   monthlyOverride: number | null;
   months: number;
+  /** Two for a couple, one for a single buyer: each earner has their own wage ceiling. */
+  earners?: number;
 }) {
   const span = Math.max(Math.floor(months), 0);
   if (monthlyOverride !== null) return cpfToday + monthlyOverride * span;
   let total = cpfToday;
   for (let month = 0; month < span; month += 1) {
-    total += estimateMonthlyOa(combinedIncome, age + month / 12);
+    total += estimateMonthlyOa(combinedIncome, age + month / 12, earners);
   }
   return Math.round(total);
 }
@@ -96,7 +99,9 @@ export function affordableCeiling({
   monthlyOverride,
   signingShare,
   minCashSigningShare,
+  earners,
 }: {
+  earners?: number;
   base: FinancingEstimateInput;
   timing: PurchaseTiming;
   cpfToday: number;
@@ -106,8 +111,8 @@ export function affordableCeiling({
   signingShare: number;
   minCashSigningShare: number;
 }): CeilingResult | null {
-  const oaAtSigning = projectOa({ cpfToday, combinedIncome, age, monthlyOverride, months: timing.monthsToSigning });
-  const oaAtKeys = projectOa({ cpfToday, combinedIncome, age, monthlyOverride, months: timing.monthsToKeys });
+  const oaAtSigning = projectOa({ cpfToday, combinedIncome, age, monthlyOverride, months: timing.monthsToSigning, earners });
+  const oaAtKeys = projectOa({ cpfToday, combinedIncome, age, monthlyOverride, months: timing.monthsToKeys, earners });
   const atKeys = calculateFinancingEstimate({ ...base, availableCpfOa: oaAtKeys });
   if (atKeys.maxPurchasePrice === null) return null;
 

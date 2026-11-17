@@ -20,7 +20,17 @@ const dataSources: SourceLink[] = [
   {
     label: "data.gov.sg",
     href: "https://data.gov.sg",
-    description: "Singapore's open data portal, used for MRT station locations.",
+    description: "Singapore's open data portal: MRT station locations, and HDB resale prices for the last 12 months (median by town and flat size).",
+  },
+  {
+    label: "HDB application rates, Nov 2026",
+    href: "https://www.99.co/singapore/insider/november-2026-bto-application-rates/",
+    description: "HDB's applicants per flat for each project and flat size at 12.10pm on 10 Nov 2026, during the window, as reported by 99.co. Used for the rough ballot odds.",
+  },
+  {
+    label: "Town council S&CC rates",
+    href: "https://www.ectc.org.sg/OurServices/SccCharges",
+    description: "Normal monthly service and conservancy charges from East Coast, Tanjong Pagar and Punggol town councils, including GST.",
   },
   {
     label: "OneMap",
@@ -44,6 +54,21 @@ const policyDocuments: SourceLink[] = [
     label: "When housing grants are paid",
     href: "https://mnd.gov.sg/newsroom/speeches/view/written-answer-by-ministry-of-national-development-on-disbursement-of-housing-grants-through-home-buyers-cpf-accounts",
     description: "HDB credits the grant to CPF before you sign the Agreement for Lease, so it can pay that downpayment.",
+  },
+  {
+    label: "Income ceilings from 24 August 2026",
+    href: "https://propertynoob.com/blog/2026/08/28/hdb-income-ceiling-finally-rises",
+    description: "As reported after National Day Rally 2026 (not yet checked against HDB's own page): S$16,000 for families and HDB loans (from S$14,000), S$8,000 for singles (from S$7,000), for HFE applications from 24 Aug 2026. Grant ceilings unchanged.",
+  },
+  {
+    label: "Ballot chances",
+    href: "https://www.hdb.gov.sg/cs/infoweb/residential/buying-a-flat/buying-procedure-for-new-flats/application/priority-schemes",
+    description: "First-timer families get 2 chances (3 for FT(PMC)); one more per Standard application after two unsuccessful ones, up to 4 (5). None extra for Plus or Prime.",
+  },
+  {
+    label: "Owner-occupier property tax, 2025",
+    href: "https://www.iras.gov.sg/taxes/property-tax/property-owners/property-tax-rates",
+    description: "0% on the first S$12,000 of annual value, 4% on the next S$28,000, and so on.",
   },
   {
     label: "Signing the Agreement for Lease",

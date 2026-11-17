@@ -42,14 +42,15 @@ A planner people open with a real decision in front of them: can we afford a fla
 - **The scene** (`components/HeroArt.tsx`) is the drawn HDB blocks at dusk: dark blocks, warm lit windows, a pale moon, raspberry roof band. Palette only, no images.
 - **Where the money comes from is one bar.** `MoneySplit` draws loan, grant, CPF by keys and cash in fixed colours, with a legend carrying the figures. The same four colours mean the same thing everywhere.
 - **Every figure has an icon.** Icon tiles are neutral with raspberry glyphs.
-- **Edit is a chip.** White pill with a pencil, top-right of what it edits.
+- **Edit is a chip.** White pill with a pencil, top-right of what it edits. Home's header carries Share, Add to calendar and Print as the same chips.
+- **Dark mode** redefines the same tokens (`prefers-color-scheme`, or `data-theme` from the switch). Text on an ink fill uses `--on-ink`, which flips; text on raspberry or green uses `--on-accent`, which doesn't. Pale status fills (`--gold-pale`, `--info-pale`, `--positive-pale`, `--caution-pale`) have dark-mode versions, so no literal colours are needed outside the drawn scene.
 
 ## Flow
 
 - **New visitors land on Home** with one start card ("Find your price ceiling in five questions") and the current launch, so the page is useful before any input.
 - **The guided setup** (`SetupFlow`) is a modal dialog: one question per step (each person's income, each person's CPF, first-timer status, optional cash, flat size), a progress bar, Back and Continue, Enter to advance. A deep-ink panel beside the questions shows the price ceiling building up as each answer lands. It ends on a result card that counts up to the ceiling, then three plain facts (projects that fit, the grant, whether CPF covers the repayment).
 - **Closing the setup early puts every answer back.** Only "Open my dashboard" or "See the projects" keeps the changes.
-- **Home is the dashboard** once the budget is known: the answer card (ceiling, monthly repayment, split, what sets the ceiling), the launch card, what you qualify for, what would raise the ceiling, and the road to keys.
+- **Home is the dashboard** once the budget is known: the answer card and the launch card, then three labelled sections (Before you apply; Choosing a project; Once you own it), then the road to keys. Section labels are small uppercase captions, not headings with slogans.
 - **Budget stays the one place to edit fields directly**; it also offers the step-by-step setup when empty.
 
 ## Copy rules
@@ -70,6 +71,8 @@ A planner people open with a real decision in front of them: can we afford a fla
 - **Money split.** `MoneySplit`, `.split-on-dark` inside answer cards.
 - **Checks.** Round status mark (check, alert, info) plus a title and one line of why.
 - **Levers.** A change and a green delta pill; "No change" in grey.
+- **Name-and-figure rows** (`.odds`, `.places`, `.cost-rows`): name and a muted second line on the left, a figure or pill on the right. Odds pills are green (good), gold (fair) or ochre.
+- **Shared plan banner.** A white card with a raspberry ring above the screen; loading is always the visitor's choice.
 - **Road to keys.** Five numbered steps, horizontal from 900px, vertical below; with a chosen project each step shows its date and what is paid from grant, CPF and cash.
 - **Setup choices.** Large radio cards with a ring that fills ink when chosen; arrow keys move the choice.
 - **Stat tiles, project cards, detail sheet, segmented control, launch tabs, payments** as before.

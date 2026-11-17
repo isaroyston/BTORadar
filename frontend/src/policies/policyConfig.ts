@@ -560,6 +560,12 @@ export function getCpfDefaultsForAge(ageYears: number): CpfAgeDefaults {
   };
 }
 
+// A single first-timer: the EHG (Singles) table on their own income, up to S$4,500.
+export function lookupEhgSinglesGrant(averageMonthlyIncome: number): EhgFamiliesBand | null {
+  const income = Math.max(0, averageMonthlyIncome);
+  return EHG_MIXED_COUPLE_BANDS_2024.find((band) => income <= band.maxIncome) || null;
+}
+
 // For a couple with one first-timer, HDB uses half the household income.
 export function lookupEhgMixedCoupleGrant(averageMonthlyHouseholdIncome: number): EhgFamiliesBand | null {
   const halfIncome = Math.max(0, averageMonthlyHouseholdIncome) / 2;

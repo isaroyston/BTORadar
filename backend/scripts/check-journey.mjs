@@ -16,16 +16,19 @@ assert.match(checks.grant.title, /40,000/);
 assert.equal(checks.priority.status, "ok");
 
 // A 2-room Flexi has the lower ceiling.
-checks = byKey(eligibilityChecks({ income: 8000, firstTimers: "both", flatType: "2-room", grant: 15000 }));
+checks = byKey(eligibilityChecks({ income: 8500, firstTimers: "both", flatType: "2-room", grant: 15000 }));
 assert.equal(checks.ceiling.status, "caution");
 assert.equal(checks.loan.status, "ok");
 
-// Above S$14,000: no new flat and no HDB loan; above S$9,000: no grant.
+// Above S$16,000 (from 24 Aug 2026): no new flat and no HDB loan; above S$9,000: no grant.
 checks = byKey(eligibilityChecks({ income: 14500, firstTimers: "both", flatType: "4-room", grant: 0 }));
+assert.equal(checks.ceiling.status, "ok");
+checks = byKey(eligibilityChecks({ income: 16500, firstTimers: "both", flatType: "4-room", grant: 0 }));
 assert.equal(checks.ceiling.status, "caution");
 assert.equal(checks.loan.status, "caution");
 assert.equal(checks.grant.status, "info");
-assert.equal(INCOME_CEILINGS.newFlat, 14000);
+assert.equal(INCOME_CEILINGS.newFlat, 16000);
+assert.equal(INCOME_CEILINGS.singles, 8000);
 
 // Second-timers: no grant line about income, and no ballot priority.
 checks = byKey(eligibilityChecks({ income: 6000, firstTimers: "none", flatType: "4-room", grant: 0 }));

@@ -1,18 +1,25 @@
 import type { BtoProject } from "../policies/policyConfig";
 import type { FlatType, TimelineItem } from "../types";
-import type { FirstTimers } from "./budgetStorage";
+import type { FirstTimers, Household } from "./budgetStorage";
 import type { CeilingResult } from "./cpfProjection";
 import { addMonths, formatMonthYear, getLaunchMonthSortValue, parseMonthYearDate } from "./date";
 import { currency } from "./format";
 
-// HDB's monthly household income ceilings for couples and families (HDB eligibility pages,
-// checked 2026-11-17). A 2-room Flexi has a lower ceiling than bigger flats.
+// HDB's monthly income ceilings, raised for HFE applications from 24 Aug 2026 (National Day
+// Rally 2026: families S$14,000 to S$16,000, singles S$7,000 to S$8,000). The grant ceilings
+// did not change. Checked 2026-11-17 against several reports of the announcement; HDB's HFE
+// letter is the final word.
 export const INCOME_CEILINGS = {
-  newFlat: 14000,
-  twoRoomFlexi: 7000,
-  hdbLoan: 14000,
+  newFlat: 16000,
+  twoRoomFlexi: 8000,
+  hdbLoan: 16000,
+  singles: 8000,
+  singlesLoan: 8000,
   ehg: 9000,
+  ehgSingles: 4500,
 } as const;
+
+export const SINGLES_MIN_AGE = 35;
 
 export const FLAT_LABELS: Record<FlatType, string> = {
   "2-room": "2-room Flexi",
@@ -25,55 +32,90 @@ export const FLAT_LABELS: Record<FlatType, string> = {
 export type CheckStatus = "ok" | "caution" | "info";
 export type EligibilityCheck = { key: string; status: CheckStatus; title: string; body: string };
 
-/** Plain checks a couple can act on: income ceilings, the HDB loan, the grant and ballot priority. */
+/** Plain checks a buyer can act on: who can buy, income ceilings, the HDB loan, the grant and ballot priority. */
 export function eligibilityChecks({
   income,
   firstTimers,
   flatType,
   grant,
+  household = "couple",
+  age = null,
+  hfe = false,
 }: {
   income: number;
   firstTimers: FirstTimers;
   flatType: FlatType;
   grant: number;
+  household?: Household;
+  age?: number | null;
+  /** True when the loan and grant come from an HFE letter. */
+  hfe?: boolean;
 }): EligibilityCheck[] {
   const checks: EligibilityCheck[] = [];
-  const flatCeiling = flatType === "2-room" ? INCOME_CEILINGS.twoRoomFlexi : INCOME_CEILINGS.newFlat;
+  const single = household === "single";
   const flat = FLAT_LABELS[flatType];
 
+
+  if (single) {
+    checks.push(
+      age !== null && age < SINGLES_MIN_AGE
+        ? {
+            key: "who",
+            status: "caution",
+            title: `Singles can buy from age ${SINGLES_MIN_AGE}`,
+            body: "Until then, a single can't buy a new HDB flat alone. Buying with a fiancé(e) or family counts as a couple.",
+          }
+        : {
+            key: "who",
+            status: flatType === "2-room" ? "ok" : "caution",
+            title: flatType === "2-room" ? "Singles can buy a 2-room Flexi" : `Singles can't buy a new ${flat}`,
+            body: "First-timer singles aged 35 and over can buy a new 2-room Flexi in Standard, Plus and Prime projects.",
+          },
+    );
+  }
+
+  const flatCeiling = single ? INCOME_CEILINGS.singles : flatType === "2-room" ? INCOME_CEILINGS.twoRoomFlexi : INCOME_CEILINGS.newFlat;
   checks.push(
     income <= flatCeiling
       ? {
           key: "ceiling",
           status: "ok",
           title: `Within the income ceiling for a ${flat}`,
-          body: `HDB allows up to ${currency(flatCeiling)} a month; you earn ${currency(income)} together.`,
+          body: `HDB allows up to ${currency(flatCeiling)} a month; you earn ${currency(income)}${single ? "" : " together"}.`,
         }
       : {
           key: "ceiling",
           status: "caution",
           title: `Above the income ceiling for a ${flat}`,
           body:
-            flatType === "2-room"
+            !single && flatType === "2-room"
               ? `A 2-room Flexi is for households earning up to ${currency(flatCeiling)} a month. Bigger flats allow up to ${currency(INCOME_CEILINGS.newFlat)}.`
-              : `New HDB flats are for households earning up to ${currency(flatCeiling)} a month. Resale flats and executive condominiums have higher limits.`,
+              : `New HDB flats are for ${single ? "singles" : "households"} earning up to ${currency(flatCeiling)} a month. Resale flats have no income ceiling unless you take an HDB loan or grant.`,
         },
   );
 
+  const loanCeiling = single ? INCOME_CEILINGS.singlesLoan : INCOME_CEILINGS.hdbLoan;
   checks.push(
-    income <= INCOME_CEILINGS.hdbLoan
+    hfe
       ? {
           key: "loan",
           status: "ok",
-          title: "HDB loan available",
-          body: "HDB lends at 2.6% a year for up to 25 years, and the HFE letter confirms the amount.",
+          title: "Loan and grant from your HFE letter",
+          body: "Every figure uses the amounts on your letter. It lasts 9 months, so apply for flats before it runs out.",
         }
-      : {
-          key: "loan",
-          status: "caution",
-          title: "A bank loan instead of an HDB loan",
-          body: `HDB loans are for households earning up to ${currency(INCOME_CEILINGS.hdbLoan)} a month. Bank rates move with the market.`,
-        },
+      : income <= loanCeiling
+        ? {
+            key: "loan",
+            status: "ok",
+            title: "HDB loan available",
+            body: "HDB lends at 2.6% a year for up to 25 years, ending by age 65. Your HFE letter confirms the amount.",
+          }
+        : {
+            key: "loan",
+            status: "caution",
+            title: "A bank loan instead of an HDB loan",
+            body: `HDB loans are for ${single ? "singles" : "households"} earning up to ${currency(loanCeiling)} a month. Bank rates move with the market.`,
+          },
   );
 
   if (firstTimers === "none") {
@@ -88,27 +130,71 @@ export function eligibilityChecks({
       key: "grant",
       status: "ok",
       title: `Housing grant of ${currency(grant)}`,
-      body: "Paid into your CPF before you sign. At least one of you needs to have worked for the 12 months before you apply.",
+      body: single
+        ? "Paid into your CPF before you sign. You need to have worked for the 12 months before you apply."
+        : "Paid into your CPF before you sign. At least one of you needs to have worked for the 12 months before you apply.",
     });
   } else {
     checks.push({
       key: "grant",
       status: "info",
       title: "No housing grant at this income",
-      body: `The Enhanced CPF Housing Grant stops at ${currency(INCOME_CEILINGS.ehg)} a month of household income.`,
+      body: `The Enhanced CPF Housing Grant stops at ${currency(single ? INCOME_CEILINGS.ehgSingles : INCOME_CEILINGS.ehg)} a month of ${single ? "income" : "household income"}.`,
     });
   }
 
-  if (firstTimers === "both") {
+  if (!single && firstTimers === "both") {
     checks.push({
       key: "priority",
       status: "ok",
       title: "First-timer priority in the ballot",
-      body: "First-timer couples get two ballot chances and most flats in each launch are set aside for them.",
+      body: "First-timer couples get at least two ballot chances, and most flats in each launch are set aside for them.",
     });
   }
 
   return checks;
+}
+
+export type BallotProfile = {
+  /** First-timer married couples aged 40 or under, or parents of a child aged 18 or under: FT(PMC). */
+  pmc: boolean;
+  /** Unsuccessful applications for Standard flats since the October 2024 launch. */
+  unsuccessfulStandard: number;
+};
+
+/**
+ * Ballot chances for one application. First-timer families get 2, or 3 as FT(PMC). After two or
+ * more unsuccessful Standard applications, each Standard application gets one more, up to 4
+ * (5 for FT(PMC)). Plus and Prime applications get no extra chances. Second-timers get 1.
+ * Sources: HDB Priority Schemes; MND written answers (2025) on additional ballot chances.
+ */
+export function ballotChances({
+  household,
+  firstTimers,
+  profile,
+  standard,
+}: {
+  household: Household;
+  firstTimers: FirstTimers;
+  profile: BallotProfile;
+  standard: boolean;
+}) {
+  if (household === "single" || firstTimers !== "both") return { chances: 1, base: 1, extra: 0 };
+  const base = profile.pmc ? 3 : 2;
+  const cap = profile.pmc ? 5 : 4;
+  const extra = standard && profile.unsuccessfulStandard >= 2 ? profile.unsuccessfulStandard - 1 : 0;
+  const chances = Math.min(base + extra, cap);
+  return { chances, base, extra: chances - base };
+}
+
+/**
+ * A rough chance of a queue number within the flats on offer: one in (applicants per flat), scaled
+ * by your ballot chances against what others in your group usually have. Only a guide: HDB
+ * doesn't publish odds, and many invited to book decline, so later queue numbers still get flats.
+ */
+export function roughOdds(rate: number, chances: number, typicalChances: number) {
+  if (rate <= 0) return 1;
+  return Math.min(1, chances / Math.max(typicalChances, 1) / rate);
 }
 
 export type LaunchSnapshot = {

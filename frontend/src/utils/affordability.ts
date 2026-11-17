@@ -22,6 +22,8 @@ export type FinancingEstimateInput = {
   outstandingHousingLoans: 0 | 1 | 2 | null;
   requestedTenureYears: number;
   repaymentRatePercent: number;
+  /** The HDB loan amount from an HFE letter; replaces the income-based limit when given. */
+  confirmedLoanLimit?: number | null;
 };
 
 export type FinancingEstimate = {
@@ -164,7 +166,9 @@ export function calculateFinancingEstimate(
         : Math.min(msrMonthlyLimit, tdsrMonthlyLimit)
       : msrMonthlyLimit;
   const serviceabilityLoanLimit =
-    monthlyPaymentLimit === null ||
+    input.financing === "hdb" && input.confirmedLoanLimit != null
+      ? input.confirmedLoanLimit
+      : monthlyPaymentLimit === null ||
     effectiveTenureYears === null ||
     assessmentRatePercent === null
       ? null

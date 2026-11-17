@@ -21,8 +21,10 @@
     "test:fees": "node backend/scripts/check-fees.mjs",
     "test:payment-allocation": "node backend/scripts/check-payment-allocation.mjs",
     "test:cpf": "node backend/scripts/check-cpf-projection.mjs",
-    "test": "npm run test:scoring && npm run test:affordability && npm run test:ehg && npm run test:fees && npm run test:payment-allocation && npm run test:cpf && npm run test:journey",
+    "test": "npm run test:scoring && npm run test:affordability && npm run test:ehg && npm run test:fees && npm run test:payment-allocation && npm run test:cpf && npm run test:journey && npm run test:extras",
     "data:refresh": "npm run data:recordbto:source && npm run data:recordbto:details && npm run data:btohq && npm run data:rail-stations && npm run data:merge-bto && npm run data:onemap",
-    "test:journey": "node backend/scripts/check-journey.mjs"
+    "test:journey": "node backend/scripts/check-journey.mjs",
+    "test:extras": "node backend/scripts/check-extras.mjs",
+    "data:resale": "node backend/scripts/backfill-resale.mjs"
   }
 }

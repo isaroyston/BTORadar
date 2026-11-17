@@ -39,8 +39,12 @@ import {
 } from "./utils/bto";
 import {
   calculateFinancingEstimate,
+  principalFromMonthlyPayment,
   type FinancingEstimateInput,
 } from "./utils/affordability";
+import { buildCalendar, saveFile, type CalendarEvent } from "./utils/calendar";
+import { afterKeys } from "./utils/ownership";
+import { readSharedPlan, shareUrl, type SharedPlan } from "./utils/share";
 import {
   loadBudgetInputs,
   saveBudgetInputs,
@@ -59,11 +63,12 @@ import {
   timingForLaunch,
   type PurchaseTiming,
 } from "./utils/cpfProjection";
-import { parseLaunchMonthInput, parseMonth, parseMonthYearDate } from "./utils/date";
+import { addMonths, parseLaunchMonthInput, parseMonth, parseMonthYearDate } from "./utils/date";
 import { keysMonth } from "./utils/projectFacts";
 import { clampNumber, currency } from "./utils/format";
 import { withViewTransition } from "./utils/motion";
 import {
+  FLAT_LABELS,
   eligibilityChecks,
   journeyStages,
   latestLaunch,
@@ -158,21 +163,30 @@ function App() {
     retry: retryBto,
   } = useBtoProjects();
 
+  // Who is buying: a single buyer has one CPF wage ceiling and the singles grant table. The
+  // age (a couple's income-weighted average) sets the loan tenure and CPF rates.
+  const single = budget.household === "single";
+  const earners = single ? 1 : 2;
+  const buyerAge = budget.age ?? ASSUMED_BUYER_AGE;
   const ehgMode =
-    budget.firstTimers === "both"
-      ? "family-estimate"
-      : budget.firstTimers === "one"
-        ? "mixed-couple-estimate"
-        : "none";
+    budget.hfeGrant !== null
+      ? "confirmed"
+      : budget.firstTimers === "none"
+        ? "none"
+        : single
+          ? "single-estimate"
+          : budget.firstTimers === "both"
+            ? "family-estimate"
+            : "mixed-couple-estimate";
   const grantFor = useCallback(
     (income: number) =>
       calculateEhgAssessment({
         mode: ehgMode,
         assessedAverageMonthlyIncome: income,
-        confirmedAmount: null,
+        confirmedAmount: budget.hfeGrant,
         familyEligibilityConfirmed: true,
       }),
-    [ehgMode]
+    [budget.hfeGrant, ehgMode]
   );
   const ehgAssessment = useMemo(() => grantFor(combinedIncome), [grantFor, combinedIncome]);
   const ehgGrant = ehgAssessment.amount ?? 0;
@@ -209,14 +223,17 @@ function App() {
       cashOnlyPurchaseAmount: optionFee,
       fixedAdditionalCosts: APPLICATION_FEE + surveyFee + fireInsurance,
       cashOnlyCosts: APPLICATION_FEE,
-      ageForLoanRules: ASSUMED_BUYER_AGE,
+      ageForLoanRules: buyerAge,
       outstandingHousingLoans: 0,
       requestedTenureYears: loanTenureYears,
       repaymentRatePercent: loanInterestRate,
+      confirmedLoanLimit: budget.hfeLoan,
     }),
     [
+      buyerAge,
       cashForMaths,
       budget.cpfOa,
+      budget.hfeLoan,
       combinedIncome,
       ehgGrant,
       financing,
@@ -240,12 +257,13 @@ function App() {
             timing,
             cpfToday: budget.cpfOa,
             combinedIncome,
-            age: ASSUMED_BUYER_AGE,
+            age: buyerAge,
+            earners,
             monthlyOverride: null,
             signingShare: downpaymentRule.signing,
             minCashSigningShare: downpaymentRule.minCashSigning,
           }),
-    [budget.cpfOa, budgetInput, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing]
+    [budget.cpfOa, budgetInput, buyerAge, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing, earners]
   );
   // The Budget screen shows a launch applied for now, with keys after the usual wait.
   const typicalTiming = useMemo(
@@ -265,12 +283,13 @@ function App() {
         },
         cpfToday: cpf,
         combinedIncome: income,
-        age: ASSUMED_BUYER_AGE,
+        age: buyerAge,
+        earners,
         monthlyOverride: null,
         signingShare: downpaymentRule.signing,
         minCashSigningShare: downpaymentRule.minCashSigning,
       }),
-    [budgetInput, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing, grantFor, typicalTiming]
+    [budgetInput, buyerAge, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing, earners, grantFor, typicalTiming]
   );
   const [setupOpen, setSetupOpen] = useState(false);
   const draftSplit = useMemo(
@@ -282,8 +301,8 @@ function App() {
   const budgetKnown = budgetMaxPrice !== null && budgetAtMax !== null;
   const monthlyCpfAt = useCallback(
     (timing: PurchaseTiming) =>
-      estimateMonthlyOa(combinedIncome, ASSUMED_BUYER_AGE + timing.monthsToKeys / 12),
-    [combinedIncome]
+      estimateMonthlyOa(combinedIncome, buyerAge + timing.monthsToKeys / 12, earners),
+    [buyerAge, combinedIncome, earners]
   );
   const loanAmount = budgetKnown
     ? Math.round(budgetAtMax.loanForTarget ?? 0)
@@ -314,12 +333,13 @@ function App() {
       projectOa({
         cpfToday: budget.cpfOa ?? 0,
         combinedIncome,
-        age: ASSUMED_BUYER_AGE,
+        age: buyerAge,
+        earners,
         monthlyOverride: null,
         months,
       });
     return { signing: project(planTiming.monthsToSigning), keys: project(planTiming.monthsToKeys) };
-  }, [budget.cpfOa, combinedIncome, planTiming]);
+  }, [budget.cpfOa, buyerAge, combinedIncome, earners, planTiming]);
   const targetEstimate = useMemo(
     () => calculateFinancingEstimate({ ...budgetInput, availableCpfOa: planOa?.keys ?? budget.cpfOa }),
     [budget.cpfOa, budgetInput, planOa]
@@ -428,10 +448,107 @@ function App() {
   );
   const sizePrices = useMemo(() => pricesBySize(btoProjects), [btoProjects]);
   const checks = useMemo(
-    () => eligibilityChecks({ income: combinedIncome, firstTimers: budget.firstTimers, flatType, grant: ehgGrant }),
-    [budget.firstTimers, combinedIncome, ehgGrant, flatType]
+    () =>
+      eligibilityChecks({
+        income: combinedIncome,
+        firstTimers: budget.firstTimers,
+        flatType,
+        grant: ehgGrant,
+        household: budget.household,
+        age: budget.age,
+        hfe: budget.hfeLoan !== null,
+      }),
+    [budget.age, budget.firstTimers, budget.hfeLoan, budget.household, combinedIncome, ehgGrant, flatType]
   );
   const journey = useMemo(() => journeyStages(timeline), [timeline]);
+
+  // For the HFE card: what we'd estimate without the letter, to compare with it.
+  const estimatedLoan = Math.round(
+    principalFromMonthlyPayment(combinedIncome * 0.3, 3, Math.max(Math.min(25, 65 - buyerAge), 0))
+  );
+  const estimatedGrant =
+    calculateEhgAssessment({
+      mode: ehgMode === "confirmed" ? (budget.firstTimers === "none" ? "none" : single ? "single-estimate" : budget.firstTimers === "both" ? "family-estimate" : "mixed-couple-estimate") : ehgMode,
+      assessedAverageMonthlyIncome: combinedIncome,
+      confirmedAmount: null,
+      familyEligibilityConfirmed: true,
+    }).amount ?? 0;
+
+  // After keys: the loan for the chosen project's price, or for the ceiling.
+  const keysDate = useMemo(
+    () =>
+      (selectedBtoProject ? parseMonthYearDate(keysMonth(selectedBtoProject)) : null) ??
+      addMonths(today, typicalTiming.monthsToKeys),
+    [selectedBtoProject, today, typicalTiming.monthsToKeys]
+  );
+  const after = useMemo(() => {
+    const loan = selectedBtoProject ? targetEstimate.loanForTarget : ceilingSplit?.loan;
+    const tenure = (selectedBtoProject ? targetEstimate.effectiveTenureYears : ceilingSplit?.tenure) ?? loanTenureYears;
+    if (!loan || financing === "none") return null;
+    return afterKeys({ keysDate, loan, ratePercent: loanInterestRate, tenureYears: tenure, project: selectedBtoProject });
+  }, [ceilingSplit, financing, keysDate, loanInterestRate, loanTenureYears, selectedBtoProject, targetEstimate]);
+
+  const handleShare = async () => {
+    const url = shareUrl(
+      { budget, combinedIncome, flatType, financing, projectId: selectedBtoProjectId },
+      window.location.href
+    );
+    try {
+      await navigator.clipboard.writeText(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleCalendar = () => {
+    const events: CalendarEvent[] = [];
+    if (budget.hfeIssued) {
+      events.push({
+        date: addMonths(parseMonth(budget.hfeIssued), 9),
+        title: "HFE letter runs out",
+        description: "Apply for a flat before this, or renew the letter on HDB's Flat Portal.",
+      });
+    }
+    if (launch && !launch.openNow) {
+      const next = addMonths(parseMonthYearDate(launch.label) ?? today, 3);
+      events.push({ date: next, title: "Next BTO launch expected", description: `HDB usually launches ${launch.nextExpected}. Check your HFE letter is still valid.` });
+    }
+    if (selectedBtoProject) {
+      for (const stage of journey) {
+        const date = parseMonthYearDate(stage.when);
+        if (!date) continue;
+        const due = stage.due && stage.due.total > 0 ? ` Due: ${currency(Math.round(stage.due.total))}.` : "";
+        events.push({ date, title: `${stage.title}: ${selectedBtoProject.name}`, description: `${stage.body}${due}` });
+      }
+    }
+    if (after) {
+      events.push({
+        date: addMonths(keysDate, after.mopYears * 12),
+        title: "Minimum occupation period ends",
+        description: "From now you can sell the flat, or rent out the whole flat.",
+      });
+    }
+    saveFile("bto-radar-plan.ics", buildCalendar(events), "text/calendar");
+  };
+
+  // A plan opened from a share link waits for the visitor to load it.
+  const [sharedPlan, setSharedPlan] = useState<SharedPlan | null>(() => readSharedPlan(window.location.hash));
+  const dismissShared = () => {
+    setSharedPlan(null);
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  };
+  const loadShared = () => {
+    if (!sharedPlan) return;
+    setBudget(sharedPlan.budget);
+    saveBudgetInputs(sharedPlan.budget);
+    setCombinedIncome(clampNumber(sharedPlan.combinedIncome, INCOME_MIN, INCOME_MAX));
+    setFlatType(sharedPlan.flatType);
+    setFinancing(sharedPlan.financing);
+    if (sharedPlan.projectId) setSelectedBtoProjectId(sharedPlan.projectId);
+    dismissShared();
+    setActiveTabState("overview");
+  };
   const levers = useMemo<Lever[]>(() => {
     if (budget.cpfOa === null || !typicalCeiling) return [];
     const base = typicalCeiling.price;
@@ -444,7 +561,12 @@ function App() {
         key: "income",
         label: `${currency(raise)} more income a month`,
         delta: gain(ceilingWith({ income: combinedIncome + raise, cpf: budget.cpfOa })),
-        note: grantDrop > 0 ? `A bigger loan, though the grant falls by ${currency(grantDrop)}.` : "A bigger loan, at 30% of income.",
+        note:
+          budget.hfeLoan !== null
+            ? "Your HFE letter fixes the loan; HDB would reassess it with a new letter."
+            : grantDrop > 0
+              ? `A bigger loan, though the grant falls by ${currency(grantDrop)}.`
+              : "A bigger loan, at 30% of income.",
       },
       {
         key: "savings",
@@ -459,7 +581,7 @@ function App() {
         note: "A project with a longer wait leaves more time for CPF to build up.",
       },
     ];
-  }, [budget.cpfOa, ceilingWith, combinedIncome, ehgGrant, grantFor, typicalCeiling]);
+  }, [budget.cpfOa, budget.hfeLoan, ceilingWith, combinedIncome, ehgGrant, grantFor, typicalCeiling]);
 
   // The setup edits the live plan so its running total is real; closing it early puts the
   // answers back as they were.
@@ -685,6 +807,26 @@ function App() {
       <Navigation activeTab={activeTab} doneTabs={doneTabs} onSelectTab={setActiveTab} />
 
       <main className="main">
+        {sharedPlan && (
+          <div className="shared-banner" role="region" aria-label="Shared plan">
+            <div>
+              <strong>A plan was shared with you</strong>
+              <span>
+                {currency(sharedPlan.combinedIncome)} a month
+                {sharedPlan.budget.cpfOa !== null ? `, ${currency(sharedPlan.budget.cpfOa)} in CPF` : ""}, a {FLAT_LABELS[sharedPlan.flatType]}. Loading it
+                replaces the answers in this browser.
+              </span>
+            </div>
+            <div className="row-actions">
+              <button type="button" className="btn btn-primary btn-small" onClick={loadShared}>
+                Load it
+              </button>
+              <button type="button" className="text-link" onClick={dismissShared}>
+                Not now
+              </button>
+            </div>
+          </div>
+        )}
         {activeTab === "budget" && (
           <BudgetTab
             combinedIncome={combinedIncome}
@@ -796,8 +938,15 @@ function App() {
             journey={journey}
             selectedProject={selectedBtoProject}
             flatPrice={flatPrice}
+            budget={budget}
+            estimatedLoan={estimatedLoan}
+            estimatedGrant={estimatedGrant}
+            after={after}
+            onBudgetChange={handleBudgetChange}
             onStartSetup={openSetup}
             onSelectTab={setActiveTab}
+            onShare={handleShare}
+            onCalendar={handleCalendar}
           />
         )}
 

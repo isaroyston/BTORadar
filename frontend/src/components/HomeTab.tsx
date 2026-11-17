@@ -1,5 +1,9 @@
+import { useState, type ReactNode } from "react";
+import { useStaticJson } from "../hooks/useStaticJson";
 import type { BtoProject } from "../policies/policyConfig";
 import type { FinancingType, FlatType, TabKey } from "../types";
+import type { BudgetInputs } from "../utils/budgetStorage";
+import { loadPlaces, savePlaces, type Place } from "../utils/commute";
 import type { CeilingResult } from "../utils/cpfProjection";
 import { currency } from "../utils/format";
 import {
@@ -11,8 +15,19 @@ import {
   type Lever,
 } from "../utils/journey";
 import { useCountUp } from "../utils/motion";
+import type { AfterKeys, SccData } from "../utils/ownership";
 import { EditChip } from "./Cards";
 import { Icon, PageHeader, type IconName } from "./DashboardUi";
+import {
+  AfterKeysCard,
+  BallotCard,
+  CommuteCard,
+  CostCard,
+  HfeCard,
+  ResaleCard,
+  type RatesData,
+  type ResaleData,
+} from "./HomeExtras";
 import { MoneySplit } from "./MoneySplit";
 
 type HomeTabProps = {
@@ -28,8 +43,15 @@ type HomeTabProps = {
   journey: JourneyStage[];
   selectedProject: BtoProject | null;
   flatPrice: number;
+  budget: BudgetInputs;
+  estimatedLoan: number;
+  estimatedGrant: number;
+  after: AfterKeys | null;
+  onBudgetChange: (patch: Partial<BudgetInputs>) => void;
   onStartSetup: () => void;
   onSelectTab: (tab: TabKey) => void;
+  onShare: () => Promise<boolean>;
+  onCalendar: () => void;
 };
 
 // What sets the ceiling, in one line under it.
@@ -46,6 +68,15 @@ const TYPICAL_WHEN: Record<string, string> = {
   keys: "Usually 3 to 5 years after booking",
 };
 
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <>
+      <h2 className="home-section">{title}</h2>
+      {children}
+    </>
+  );
+}
+
 export function HomeTab({
   split,
   limitedBy,
@@ -59,10 +90,33 @@ export function HomeTab({
   journey,
   selectedProject,
   flatPrice,
+  budget,
+  estimatedLoan,
+  estimatedGrant,
+  after,
+  onBudgetChange,
   onStartSetup,
   onSelectTab,
+  onShare,
+  onCalendar,
 }: HomeTabProps) {
   const known = split !== null;
+  const rates = useStaticJson<RatesData>("/data/hdb/application-rates.json");
+  const scc = useStaticJson<SccData>("/data/hdb/scc-rates.json");
+  const resale = useStaticJson<ResaleData>("/data/resale/medians.json");
+  const [places, setPlaces] = useState<Place[]>(loadPlaces);
+  const [copied, setCopied] = useState<"idle" | "done" | "failed">("idle");
+
+  const changePlaces = (next: Place[]) => {
+    setPlaces(next);
+    savePlaces(next);
+  };
+
+  const share = async () => {
+    const ok = await onShare();
+    setCopied(ok ? "done" : "failed");
+    setTimeout(() => setCopied("idle"), 2400);
+  };
 
   return (
     <section className="screen">
@@ -73,69 +127,112 @@ export function HomeTab({
             ? "Your plan at a glance. Everything saves in this browser."
             : "Plan a BTO from budget to keys. Everything stays in this browser."
         }
-        action={known ? <EditChip label="Edit answers" onClick={onStartSetup} /> : undefined}
+        action={
+          known ? (
+            <div className="head-actions no-print">
+              <button type="button" className="edit-chip" onClick={share}>
+                <Icon name={copied === "done" ? "check" : "external"} />
+                {copied === "done" ? "Link copied" : copied === "failed" ? "Couldn't copy" : "Share"}
+              </button>
+              <button type="button" className="edit-chip" onClick={onCalendar}>
+                <Icon name="calendar" />
+                Add to calendar
+              </button>
+              <button type="button" className="edit-chip" onClick={() => window.print()}>
+                <Icon name="document" />
+                Print
+              </button>
+              <EditChip label="Edit answers" onClick={onStartSetup} />
+            </div>
+          ) : undefined
+        }
       />
 
       <div className="home-grid">
         {known ? (
-          <CeilingCard split={split} limitedBy={limitedBy} financing={financing} monthlyCpf={monthlyCpf} onSelectTab={onSelectTab} />
+          <CeilingCard
+            split={split}
+            limitedBy={limitedBy}
+            financing={financing}
+            monthlyCpf={monthlyCpf}
+            hfe={budget.hfeLoan !== null}
+            onSelectTab={onSelectTab}
+          />
         ) : (
           <StartCard onStartSetup={onStartSetup} onBrowse={() => onSelectTab("bto")} />
         )}
 
         <LaunchCard launch={launch} flatType={flatType} known={known} ceilingFor={ceilingFor} onBrowse={() => onSelectTab("bto")} />
 
-        {known && (
-          <section className="card home-span-6">
-            <div className="card-head">
-              <h2>
-                <span className="head-icon" aria-hidden="true">
-                  <Icon name="check" />
-                </span>
-                What you qualify for
-              </h2>
-            </div>
-            <ul className="checks">
-              {checks.map((check) => (
-                <li key={check.key} className={`check is-${check.status}`}>
-                  <span className="check-mark" aria-hidden="true">
-                    <Icon name={check.status === "ok" ? "check" : check.status === "caution" ? "alert" : "info"} />
+        <Section title="Before you apply">
+          {known && (
+            <section className="card home-span-6">
+              <div className="card-head">
+                <h2>
+                  <span className="head-icon" aria-hidden="true">
+                    <Icon name="check" />
                   </span>
-                  <div>
-                    <strong>{check.title}</strong>
-                    <p>{check.body}</p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </section>
+                  What you qualify for
+                </h2>
+              </div>
+              <ul className="checks">
+                {checks.map((check) => (
+                  <li key={check.key} className={`check is-${check.status}`}>
+                    <span className="check-mark" aria-hidden="true">
+                      <Icon name={check.status === "ok" ? "check" : check.status === "caution" ? "alert" : "info"} />
+                    </span>
+                    <div>
+                      <strong>{check.title}</strong>
+                      <p>{check.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <p className="card-foot">Income ceilings as raised for HFE applications from 24 Aug 2026.</p>
+            </section>
+          )}
+          <HfeCard budget={budget} estimatedLoan={estimatedLoan} estimatedGrant={estimatedGrant} onBudgetChange={onBudgetChange} />
+          <BallotCard budget={budget} flatType={flatType} launch={launch} rates={rates} onBudgetChange={onBudgetChange} />
+          {known && levers.length > 0 && (
+            <section className="card home-span-6">
+              <div className="card-head">
+                <h2>
+                  <span className="head-icon" aria-hidden="true">
+                    <Icon name="chart" />
+                  </span>
+                  What would raise your ceiling
+                </h2>
+              </div>
+              <ul className="levers">
+                {levers.map((lever) => (
+                  <li key={lever.key}>
+                    <div>
+                      <strong>{lever.label}</strong>
+                      {lever.note && <p>{lever.note}</p>}
+                    </div>
+                    <span className={lever.delta > 0 ? "lever-delta is-up" : "lever-delta"}>
+                      {lever.delta > 0 ? `+${currency(lever.delta)}` : "No change"}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+              <p className="card-foot">Each is worked out with the same rules as your ceiling, one change at a time.</p>
+            </section>
+          )}
+        </Section>
+
+        {launch && (
+          <Section title="Choosing a project">
+            <CommuteCard places={places} projects={launch.projects} flatType={flatType} onPlacesChange={changePlaces} />
+            <ResaleCard projects={launch.projects} flatType={flatType} resale={resale} launchLabel={launch.label} />
+          </Section>
         )}
 
-        {known && levers.length > 0 && (
-          <section className="card home-span-6">
-            <div className="card-head">
-              <h2>
-                <span className="head-icon" aria-hidden="true">
-                  <Icon name="chart" />
-                </span>
-                What would raise your ceiling
-              </h2>
-            </div>
-            <ul className="levers">
-              {levers.map((lever) => (
-                <li key={lever.key}>
-                  <div>
-                    <strong>{lever.label}</strong>
-                    {lever.note && <p>{lever.note}</p>}
-                  </div>
-                  <span className={lever.delta > 0 ? "lever-delta is-up" : "lever-delta"}>
-                    {lever.delta > 0 ? `+${currency(lever.delta)}` : "No change"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            <p className="card-foot">Each is worked out with the same rules as your ceiling, one change at a time.</p>
-          </section>
+        {known && after && (
+          <Section title="Once you own it">
+            <CostCard monthly={split.monthly} monthlyCpf={monthlyCpf} flatType={flatType} scc={scc} />
+            <AfterKeysCard after={after} projectName={selectedProject?.name ?? null} />
+          </Section>
         )}
 
         <section className="card home-span-12">
@@ -151,7 +248,7 @@ export function HomeTab({
                 {selectedProject.name}, {currency(flatPrice)}
               </button>
             ) : (
-              <button type="button" className="text-link" onClick={() => onSelectTab("bto")}>
+              <button type="button" className="text-link no-print" onClick={() => onSelectTab("bto")}>
                 Pick a project to see each payment
               </button>
             )}
@@ -188,6 +285,7 @@ export function HomeTab({
 
 function StartCard({ onStartSetup, onBrowse }: { onStartSetup: () => void; onBrowse: () => void }) {
   const steps: { icon: IconName; label: string }[] = [
+    { icon: "team", label: "Who" },
     { icon: "wallet", label: "Income" },
     { icon: "piggy", label: "CPF" },
     { icon: "sparkle", label: "Grant" },
@@ -197,12 +295,12 @@ function StartCard({ onStartSetup, onBrowse }: { onStartSetup: () => void; onBro
   return (
     <section className="answer home-span-8">
       <p className="answer-label">Start here</p>
-      <h2 className="answer-title">Find your price ceiling in five questions</h2>
+      <h2 className="answer-title">Find your price ceiling in six questions</h2>
       <p className="answer-text">
         About a minute. You'll see what you can afford, your grant, the projects that fit, and what each step costs until
         keys.
       </p>
-      <ol className="answer-steps" aria-label="The five questions">
+      <ol className="answer-steps" aria-label="The six questions">
         {steps.map((step) => (
           <li key={step.label}>
             <Icon name={step.icon} />
@@ -228,8 +326,10 @@ function CeilingCard({
   limitedBy,
   financing,
   monthlyCpf,
+  hfe,
   onSelectTab,
 }: {
+  hfe: boolean;
   split: CeilingSplit;
   limitedBy: CeilingResult["limitedBy"] | null;
   financing: FinancingType;
@@ -241,7 +341,9 @@ function CeilingCard({
   const cpfCovers = monthly !== null && monthlyCpf >= monthly;
   return (
     <section className="answer home-span-8">
-      <p className="answer-label">You could buy a flat priced up to</p>
+      <p className="answer-label">
+        You could buy a flat priced up to{hfe && <span className="answer-tag">From your HFE letter</span>}
+      </p>
       <p className="answer-figure">{currency(Math.round(shown / 1000) * 1000)}</p>
       {monthly !== null && split.tenure && (
         <p className="answer-text">
@@ -264,7 +366,7 @@ function CeilingCard({
       {limitedBy && (
         <p className="answer-limit">
           <Icon name="info" />
-          {LIMITS[limitedBy]}
+          {hfe && limitedBy === "loan" ? "Your HFE letter's loan sets this, so more savings would raise it dollar for dollar." : LIMITS[limitedBy]}
         </p>
       )}
     </section>

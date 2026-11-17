@@ -1,0 +1,28 @@
+{
+  "launch": "Nov 2026",
+  "retrievedAt": "2026-11-10 12:10",
+  "note": "HDB's figures part-way through the application window (one day left), as reported by 99.co. Rates are applicants per flat. Bayshore Sails and Bayshore Oasis are reported together for 2-room Flexi and 4-room.",
+  "source": "HDB application status, via 99.co",
+  "sourceUrl": "https://www.99.co/singapore/insider/november-2026-bto-application-rates/",
+  "rows": [
+    { "projects": ["bayshore-sails"], "flatType": "3-room", "units": 90, "firstTimer": 2.5, "secondTimer": 48.3 },
+    { "projects": ["bayshore-sails", "bayshore-oasis"], "flatType": "4-room", "units": 1165, "firstTimer": 2.8, "secondTimer": 15.1 },
+    { "projects": ["bayshore-sails", "bayshore-oasis"], "flatType": "2-room", "units": 1237, "firstTimer": 0.2, "secondTimer": 0.3, "singles": 5.2 },
+    { "projects": ["merpati-meadow"], "flatType": "4-room", "units": 271, "firstTimer": 2.0, "secondTimer": 9.7 },
+    { "projects": ["merpati-meadow"], "flatType": "2-room", "units": 167, "firstTimer": 0.4, "secondTimer": 0.6, "singles": 7.3 },
+    { "projects": ["sembawang-anchor"], "flatType": "3-room", "units": 96, "firstTimer": 0.9, "secondTimer": 4.9 },
+    { "projects": ["sembawang-anchor"], "flatType": "4-room", "units": 464, "firstTimer": 0.6, "secondTimer": 3.2 },
+    { "projects": ["sembawang-anchor"], "flatType": "5-room", "units": 417, "firstTimer": 0.3, "secondTimer": 2.1 },
+    { "projects": ["sembawang-anchor"], "flatType": "2-room", "units": 333, "firstTimer": 0.1, "secondTimer": 0.5, "singles": 3.0 },
+    { "projects": ["plantation-dew"], "flatType": "3-room", "units": 84, "firstTimer": 2.4, "secondTimer": 15.8 },
+    { "projects": ["plantation-dew"], "flatType": "4-room", "units": 168, "firstTimer": 5.0, "secondTimer": 21.4 },
+    { "projects": ["plantation-dew"], "flatType": "5-room", "units": 280, "firstTimer": 3.5, "secondTimer": 20.1 },
+    { "projects": ["plantation-dew"], "flatType": "2-room", "units": 178, "firstTimer": 1.4, "secondTimer": 2.2, "singles": 16.8 },
+    { "projects": ["toa-payoh-hillside"], "flatType": "4-room", "units": 584, "firstTimer": 6.1, "secondTimer": 38.3 },
+    { "projects": ["toa-payoh-hillside"], "flatType": "2-room", "units": 592, "firstTimer": 0.2, "secondTimer": 0.3, "singles": 7.0 },
+    { "projects": ["chencharu-acres"], "flatType": "3-room", "units": 84, "firstTimer": 2.1, "secondTimer": 22.4 },
+    { "projects": ["chencharu-acres"], "flatType": "4-room", "units": 462, "firstTimer": 2.4, "secondTimer": 15.9 },
+    { "projects": ["chencharu-acres"], "flatType": "5-room", "units": 644, "firstTimer": 2.4, "secondTimer": 17.1 },
+    { "projects": ["chencharu-acres"], "flatType": "2-room", "units": 392, "firstTimer": 0.5, "secondTimer": 1.3, "singles": 7.7 }
+  ]
+}

@@ -21,6 +21,7 @@ import {
   getBtoProjectSourceLabel,
 } from "../utils/sourceCredits";
 import { Icon, PageHeader } from "./DashboardUi";
+import { ResaleNote } from "./HomeExtras";
 import { Segmented } from "./Segmented";
 import { SiteMap } from "./SiteMap";
 
@@ -969,6 +970,7 @@ function ProjectSheet({
                 ))}
               </ul>
             )}
+            <ResaleNote project={project} flatType={selectedFlatType} />
           </section>
 
           <section className="sheet-section">

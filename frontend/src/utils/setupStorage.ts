@@ -5,6 +5,8 @@ export type SetupSplit = {
   incomePartner: number | null;
   cpfYou: number | null;
   cpfPartner: number | null;
+  ageYou: number | null;
+  agePartner: number | null;
 };
 
 const STORAGE_KEY = "bto-radar:setup:v1";
@@ -22,6 +24,8 @@ export function loadSetupSplit(): SetupSplit | null {
       incomePartner: numberOrNull(parsed.incomePartner),
       cpfYou: numberOrNull(parsed.cpfYou),
       cpfPartner: numberOrNull(parsed.cpfPartner),
+      ageYou: numberOrNull(parsed.ageYou),
+      agePartner: numberOrNull(parsed.agePartner),
     };
   } catch {
     return null;

@@ -1,0 +1,9 @@
+{
+  "note": "Normal monthly Service and Conservancy Charges for standard HDB flats, including 9% GST, before rebates. Each town council sets its own; these three show the usual range.",
+  "checked": "2026-11-17",
+  "sources": [
+    { "townCouncil": "East Coast", "effective": "1 Apr 2026", "url": "https://www.ectc.org.sg/OurServices/SccCharges", "rates": { "2-room": 62.0, "3-room": 70.5, "4-room": 81.5, "5-room": 91.5, "executive": 118.0 } },
+    { "townCouncil": "Tanjong Pagar", "effective": null, "url": "https://www.tptc.org.sg/resident-services/scc/", "rates": { "2-room": 62.3, "3-room": 69.4, "4-room": 81.7, "5-room": 91.2, "executive": 123.6 } },
+    { "townCouncil": "Punggol", "effective": "1 Jul 2024", "url": "https://punggol-tc.org.sg/?p=2554", "rates": { "2-room": 66.5, "3-room": 78.4, "4-room": 89.5, "5-room": 101.4, "executive": 112.8 } }
+  ]
+}

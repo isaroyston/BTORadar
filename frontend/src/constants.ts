@@ -21,7 +21,7 @@ export const LOAN_TENURE_MIN = 1;
 export const LOAN_INTEREST_RATE_MIN = 0;
 export const LOAN_INTEREST_RATE_MAX = 8;
 export const INCOME_MIN = 1000;
-export const INCOME_MAX = 15000;
+export const INCOME_MAX = 25000;
 export const FLAT_MIN = 100000;
 export const FLAT_MAX = 1200000;
 

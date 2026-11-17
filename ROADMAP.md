@@ -1,47 +1,54 @@
 # Roadmap
 
-Goal: one place a Singapore couple can settle everything about buying a BTO, from "can we afford it" to keys and beyond. Every number should be correct, traceable to a rule, and useful to act on.
+Goal: one place a Singapore buyer can settle everything about a BTO, from "can we afford it" to keys and beyond. Every number should be correct, traceable to a rule, and useful to act on.
 
-Written 2026-11-17. Policy figures are checked against HDB and CPF sources in `frontend/src/policies/policyConfig.ts` and `frontend/src/utils/journey.ts`.
+Updated 2026-11-17. Policy figures live in `frontend/src/policies/policyConfig.ts` and `frontend/src/utils/journey.ts`; reference data in `frontend/public/data/`.
 
-## What changed on 2026-11-17
+## Built
 
-- **Guided setup.** A five-question dialog (each person's income and CPF, first-timer status, optional cash, flat size). The price ceiling builds up beside the questions, and the setup ends on a result: the ceiling, where its money comes from, how many projects in the newest launch fit, the grant, and whether CPF covers the repayment.
-- **Home dashboard.** Replaces the old Overview. It shows the ceiling and what limits it, the launch that's open now and the next expected one, what you qualify for (income ceilings, HDB loan, grant, ballot priority), what would raise the ceiling (more income, more savings, later keys), and the road from HFE letter to keys with each payment's grant, CPF and cash.
-- **Sleeker look.** Cool neutral canvas, hairline-edged white cards, a deep-ink answer card, the HDB scene at dusk, and colour-coded money splits. See `DESIGN.md`.
+**2026-11-17, first pass**
+- Guided setup dialog with a running ceiling, and a result.
+- Home dashboard: the ceiling and what limits it, the open launch, eligibility, levers, and the road to keys.
+- A sleeker neutral-and-ink look.
 
-## Can we connect Singpass, CPF or HDB?
+**2026-11-17, second pass: the rest of the roadmap**
+- **Income ceilings updated** to the National Day Rally 2026 change for HFE applications from 24 Aug 2026: S$16,000 for families and HDB loans, and S$8,000 for singles and 2-room Flexi. The grant ceilings are unchanged. This comes from consistent secondary reports; it still needs checking against HDB's own page.
+- **HFE letter mode.** Enter the letter's loan and grant, and the ceiling, payments and checks all use them. It shows our estimate alongside and warns as the 9 months run out.
+- **Singles and older buyers.** The setup asks who's buying and their ages. The age is income-weighted for couples, as HDB does it. Singles get one CPF wage ceiling, the singles grant table (up to S$4,500 of income), the 35-and-over rule and the 2-room Flexi limit. The loan tenure ends at 65.
+- **Ballot chances.**
+  - Chances follow HDB's rules: 2, or 3 for FT(PMC). After two unsuccessful Standard applications, each Standard application adds one, up to 4 (5). Plus and Prime get none extra. Singles and second-timers get 1.
+  - Rough odds per project come from the November 2026 application rates: HDB's figures at 12.10pm on 10 Nov 2026, during the window, via 99.co.
+- **BTO vs resale.** Median resale prices from data.gov.sg (Dec 2025 to Nov 2026, 24,852 sales) by town and flat size, using flats under 15 years old where there are enough sales. Shown on Home for the latest launch and in every project's detail sheet.
+- **Commute check.** One or two workplaces, found with OneMap's keyless search. Each project shows its straight-line distance, with a link to public transport directions.
+- **Monthly cost of owning:**
+  - the repayment and how much CPF covers
+  - S&CC ranges from three town councils
+  - IRAS's 2025 owner-occupier property tax rule
+  - HDB fire insurance
+  - the Home Protection Scheme, linked to CPF
+- **After keys.** When the minimum occupation period ends (5 years for Standard, 10 for Plus and Prime), the loan left then, total interest and the payoff date.
+- **Share with your partner.** A link that carries the plan in its hash, so no server is involved. Whoever opens it chooses whether to load it.
+- **Calendar file** (.ics) covering the HFE expiry, the next launch, each step for the chosen project and the end of the minimum occupation period.
+- **Print** layout for a one-document summary.
+- **Dark mode**, following the system or set from a switch.
 
-| Source | What it would give | Can we use it? |
+## Not built, and why
+
+| Idea | Why not | What would unlock it |
 | --- | --- | --- |
-| **Singpass Myinfo** | Verified income (NOA), CPF contribution history, HDB ownership | **Not now.** Only registered organisations (with a UEN) approved by GovTech can use it. That means a backend for OIDC with signed and encrypted tokens, PDPA obligations, and a case made for each data item. It's realistic only if BTO Radar becomes a registered business. |
-| **CPF Board** | Live OA balances | **No.** There's no public API for members' accounts. The setup tells people where to find the figure in the CPF app. |
-| **HDB Flat Portal / HFE** | Eligibility, loan amount, grant | **No API.** The practical option is letting people type in their HFE letter's figures (see Next). |
-| **data.gov.sg** | HDB resale prices by town, flat type and month, free and public | **Yes, now.** A backend script can turn it into static JSON, the same way the RecordBTO data is built. |
-| **OneMap** | Addresses, maps (already used), travel times | **Yes.** Static maps are keyless. Routing needs a free account token, so it would run in a build script or a small server function. |
-| **HDB application rates** | How oversubscribed each project was | **By hand or by scraping.** HDB publishes rates during and after each launch, but there's no dataset. Ballot odds need these. |
+| **Singpass Myinfo** | Only organisations with a UEN, approved by GovTech, can use it. It needs a backend for signed and encrypted OIDC tokens, plus PDPA obligations. | A registered entity and an approved use case. |
+| **CPF or HDB account data** | There's no public API for members' balances or HFE results. | Nothing for now; HFE mode covers the trust gap. |
+| **Accounts and partner sync** | Needs a backend and a database, which this static Vercel site doesn't have. The share link covers the main need. | A small backend (e.g. Supabase) and a decision on storing personal finances. |
+| **Ask BTO Radar** (Q&A on HDB and CPF documents) | Needs a server-side model API key and a budget. | A Vercel function, an API key and rate limits. |
+| **Door-to-door travel times** | OneMap routing needs an account token. Google's needs a paid key. | A OneMap account; times computed at build time for the current launch. |
 
-## Next: low-hanging fruit (days each)
+## Data to keep fresh
 
-1. **HFE letter mode.** Enter the loan and grants from your HFE letter, and every screen uses them in place of estimates, marked "from your HFE letter". The grant engine already has a `confirmed` mode. This is the biggest trust gain for the least work.
-2. **BTO vs resale.** For each project's town and flat size, show the median resale price over the last 12 months from data.gov.sg, so the subsidy is visible as a figure.
-3. **Share with your partner.** A link that carries the plan in the URL hash (no server), plus a printable one-page summary.
-4. **Launch reminders.** A calendar (.ics) file for the next expected launch and for each step on the road to keys.
-5. **Singles and older buyers.** Ask age and household type in the setup. Cover singles 35 and up (2-room Flexi, the singles grant and its ceiling) and loan tenure limits past 40.
-6. **Dark mode.** The tokens are ready; about 30 literal colours in `index.css` still need tokens.
-
-## Bigger bets (weeks)
-
-- **Ballot odds.** Use past application rates per town, classification and flat size, plus first-timer priority and the extra ballot chance after unsuccessful tries, to estimate "about 1 in N" per project. This needs a curated dataset and careful wording.
-- **Commute check.** Each partner adds a workplace, and every project shows door-to-door public transport time (OneMap routing, computed at build time for the current launch).
-- **Monthly cost of owning.** Repayment, service and conservancy charges, property tax, fire insurance and the Home Protection Scheme. Only add a figure once its source is pinned.
-- **Accounts and partner sync.** Optional sign-in so both partners see one plan on their phones. Everything should still work signed out.
-
-## Moonshots
-
-- **Myinfo sign-in**, once there's a registered entity: income and CPF filled in and verified in one tap.
-- **Ask BTO Radar.** A Q&A grounded only on HDB and CPF documents and on the user's own plan, citing its sources.
-- **After keys.** MOP countdown, loan balance and CPF interest, and the flat's value against resale prices in the block.
+- `npm run data:recordbto`, then `npm run data:merge-bto`, after each launch.
+- `frontend/public/data/hdb/application-rates.json` by hand after each launch, from HDB's application status page. Final figures are better than mid-window ones.
+- `npm run data:resale` monthly.
+- `frontend/public/data/hdb/scc-rates.json` when town councils revise rates.
+- Check the 24 Aug 2026 income ceilings against HDB's eligibility page.
 
 ## Principles
 

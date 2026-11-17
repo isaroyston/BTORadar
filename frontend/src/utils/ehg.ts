@@ -1,4 +1,4 @@
-import { lookupEhgFamiliesGrant, lookupEhgMixedCoupleGrant } from "../policies/policyConfig.ts";
+import { lookupEhgFamiliesGrant, lookupEhgMixedCoupleGrant, lookupEhgSinglesGrant } from "../policies/policyConfig.ts";
 import type { EhgMode } from "../types.ts";
 
 export type EhgAssessment = {
@@ -42,6 +42,24 @@ export function calculateEhgAssessment({
           status: "confirmed",
           amount: confirmedAmount,
           note: "Uses the EHG amount entered from your HFE letter.",
+        };
+  }
+
+  if (mode === "single-estimate") {
+    if (assessedAverageMonthlyIncome === null) {
+      return { status: "unassessed", amount: null, note: "Enter the assessed 12-month average income." };
+    }
+    const band = lookupEhgSinglesGrant(assessedAverageMonthlyIncome);
+    return band
+      ? {
+          status: "conditional-estimate",
+          amount: band.grantAmount,
+          note: "Estimate for a single first-timer aged 35 or over, from HDB's EHG (Singles) table. HDB checks the conditions through HFE.",
+        }
+      : {
+          status: "ineligible",
+          amount: 0,
+          note: "Income is above the EHG (Singles) ceiling of S$4,500. HFE remains authoritative.",
         };
   }
 
