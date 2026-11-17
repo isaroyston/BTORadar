@@ -268,7 +268,7 @@ export function PurchasePlanTab({
         </div>
       )}
 
-      <HeroCard art="plan">
+      <HeroCard>
         <div className="hero-top">
           <p className="hero-lead">
             <Icon name="target" />
@@ -331,9 +331,6 @@ export function PurchasePlanTab({
             <section className="card form-card">
               <div className="card-head">
                 <h2>
-                  <span className="head-icon" aria-hidden="true">
-                    <Icon name="wallet" />
-                  </span>
                   Check this price against your finances
                 </h2>
               </div>
@@ -366,18 +363,12 @@ export function PurchasePlanTab({
           <section className="card">
             <div className="card-head">
               <h2>
-                <span className="head-icon" aria-hidden="true">
-                  <Icon name="building" />
-                </span>
                 Your flat
               </h2>
               <EditChip label="Change" onClick={onOpenRadar} />
             </div>
             {selectedProject ? (
               <div className="flat-row">
-                <span className="flat-thumb" aria-hidden="true">
-                  <Icon name="building" />
-                </span>
                 <div>
                   <h3>{selectedProject.name}</h3>
                   <p className="muted">
@@ -391,9 +382,6 @@ export function PurchasePlanTab({
               </div>
             ) : (
               <div className="flat-row">
-                <span className="flat-thumb" aria-hidden="true">
-                  <Icon name="building" />
-                </span>
                 <p className="muted">
                   No project chosen. Plan around a target price, or pick a
                   project to fill it in.
@@ -432,9 +420,6 @@ export function PurchasePlanTab({
           <section className="card">
             <div className="card-head">
               <h2>
-                <span className="head-icon" aria-hidden="true">
-                  <Icon name="wallet" />
-                </span>
                 How you'll pay
               </h2>
             </div>
@@ -490,9 +475,6 @@ export function PurchasePlanTab({
           <section className="card payments">
             <div className="card-head">
               <h2>
-                <span className="head-icon" aria-hidden="true">
-                  <Icon name="calendar" />
-                </span>
                 Payments along the way
               </h2>
               <p className="muted">

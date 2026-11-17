@@ -1,4 +1,4 @@
-import { Icon, PageHeader, type IconName } from "./DashboardUi";
+import { Icon, PageHeader } from "./DashboardUi";
 
 type SourceLink = {
   label: string;
@@ -86,8 +86,8 @@ export function SourcesTab() {
       />
 
       <div className="sources">
-        <SourceList title="Project data" icon="external" links={dataSources} />
-        <SourceList title="Policy documents" icon="document" links={policyDocuments} />
+        <SourceList title="Project data" links={dataSources} />
+        <SourceList title="Policy documents" links={policyDocuments} />
       </div>
 
       <div className="callout">
@@ -100,7 +100,7 @@ export function SourcesTab() {
   );
 }
 
-function SourceList({ title, icon, links }: { title: string; icon: IconName; links: SourceLink[] }) {
+function SourceList({ title, links }: { title: string; links: SourceLink[] }) {
   return (
     <section className="card">
       <h2 className="card-title">{title}</h2>
@@ -108,9 +108,6 @@ function SourceList({ title, icon, links }: { title: string; icon: IconName; lin
         {links.map((link) => (
           <li key={link.href}>
             <a href={link.href} target="_blank" rel="noreferrer">
-              <span className="link-icon" aria-hidden="true">
-                <Icon name={icon} />
-              </span>
               <span>
                 <strong>{link.label}</strong>
                 <span className="muted">{link.description}</span>

@@ -30,7 +30,10 @@ Updated 2026-11-17. Policy figures live in `frontend/src/policies/policyConfig.t
 - **Share with your partner.** A link that carries the plan in its hash, so no server is involved. Whoever opens it chooses whether to load it.
 - **Calendar file** (.ics) covering the HFE expiry, the next launch, each step for the chosen project and the end of the minimum occupation period.
 - **Print** layout for a one-document summary.
-- **Dark mode**, following the system or set from a switch.
+- ~~Dark mode~~, built then removed the same day at the owner's request for a white theme.
+
+**2026-11-17, third pass: white theme**
+- A light-only, Stripe-Dashboard-level look: white cards edged by hairlines, Geist (self-hosted) instead of Inter, raspberry only for actions, focus and selection, the money split bar on every price breakdown, no icon tiles on rows and no illustrations on working screens.
 
 ## Not built, and why
 

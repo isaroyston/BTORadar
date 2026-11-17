@@ -21,3 +21,6 @@ frontend/.screenshots/
 frontend/.chrome-profile/
 frontend/.edge-profile/
 react-app/
+
+# Impeccable review captures
+.impeccable/review/

@@ -287,8 +287,8 @@ export function SetupFlow({
                     )}
                   </div>
                   {incomeTotal > 0 && (
-                    <p className={`setup-total ${incomeTotal > ceiling ? "is-caution" : ""}`.trim()}>
-                      <Icon name={incomeTotal > ceiling ? "alert" : "team"} />
+                    <p className={`setup-total ${incomeTotal > ceiling ? "is-caution" : single ? "is-positive" : ""}`.trim()}>
+                      <Icon name={incomeTotal > ceiling ? "alert" : single ? "check" : "team"} />
                       {incomeTotal > ceiling
                         ? `${currency(incomeTotal)}${single ? "" : " together"} is above HDB's ${currency(ceiling)} ceiling for new flats.`
                         : single
@@ -677,9 +677,6 @@ function Result({
       <ul className="setup-facts">
         {facts.map((fact) => (
           <li key={fact.text}>
-            <span className="icon-tile" aria-hidden="true">
-              <Icon name={fact.icon} />
-            </span>
             {fact.text}
           </li>
         ))}

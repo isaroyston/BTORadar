@@ -1,63 +1,41 @@
 import type { ReactNode } from "react";
 import { currency } from "../utils/format";
 import { Icon, type IconName } from "./DashboardUi";
-import { HeroArt, type ArtVariant } from "./HeroArt";
+import { MoneyParts } from "./MoneySplit";
 
-// The screen's headline card: a pink panel holding one figure, with a drawn scene beside it.
+// The screen's headline card: one figure on a white panel.
 export function HeroCard({
   children,
-  art,
   className = "",
 }: {
   children: ReactNode;
-  art?: ArtVariant;
   className?: string;
 }) {
   return (
-    <section className={`hero ${art ? "has-art" : ""} ${className}`.trim()}>
+    <section className={`hero ${className}`.trim()}>
       <div className="hero-body">{children}</div>
-      {art && <HeroArt variant={art} />}
     </section>
   );
 }
 
-export type Tile = { key: string; icon: IconName; label: string; amount: number };
+export type Tile = { key: "loan" | "grant" | "cpf" | "cash"; icon: IconName; label: string; amount: number };
 
-// Small white tiles for the parts of a figure: an icon, a label and an amount.
-export function StatTiles({ tiles }: { tiles: Tile[] }) {
-  const shown = tiles.filter((tile) => tile.amount > 0);
-  if (shown.length === 0) return null;
+// Where a figure's money comes from, as the same split bar Home uses, in its own card.
+export function StatTiles({ tiles, title = "Where the money comes from" }: { tiles: Tile[]; title?: string }) {
+  if (!tiles.some((tile) => tile.amount > 0)) return null;
   return (
-    <dl className="tiles">
-      {shown.map((tile, index) => (
-        <div key={tile.key} className={`tile tile-${tile.key}`} style={{ animationDelay: `${index * 50}ms` }}>
-          <span className="icon-tile" aria-hidden="true">
-            <Icon name={tile.icon} />
-          </span>
-          <div>
-            <dt>{tile.label}</dt>
-            <dd>{currency(tile.amount)}</dd>
-          </div>
-        </div>
-      ))}
-    </dl>
+    <section className="card split-card">
+      <h2 className="card-title">{title}</h2>
+      <MoneyParts parts={tiles.map(({ key, label, amount }) => ({ key, label, amount }))} />
+    </section>
   );
 }
 
-// The monthly repayment as a white chip with a calendar icon.
+// The monthly repayment as one plain line under the headline figure.
 export function MonthlyChip({ amount, years, note }: { amount: number; years: number; note?: string }) {
   return (
-    <p className="hero-chip">
-      <span className="hero-chip-icon" aria-hidden="true">
-        <Icon name="calendar" />
-      </span>
-      <span>
-        <strong>{currency(amount)}</strong> a month
-        <span className="hero-chip-sub">
-          {" "}
-          over {years} years{note ? `, as ${note}` : ""}
-        </span>
-      </span>
+    <p className="hero-monthly">
+      <strong>{currency(amount)}</strong> a month over {years} years{note ? `, as ${note}` : ""}
     </p>
   );
 }

@@ -132,15 +132,15 @@ export function HomeTab({
             <div className="head-actions no-print">
               <button type="button" className="edit-chip" onClick={share}>
                 <Icon name={copied === "done" ? "check" : "external"} />
-                {copied === "done" ? "Link copied" : copied === "failed" ? "Couldn't copy" : "Share"}
+                <span className="chip-label">{copied === "done" ? "Link copied" : copied === "failed" ? "Couldn't copy" : "Share"}</span>
               </button>
               <button type="button" className="edit-chip" onClick={onCalendar}>
                 <Icon name="calendar" />
-                Add to calendar
+                <span className="chip-label">Add to calendar</span>
               </button>
               <button type="button" className="edit-chip" onClick={() => window.print()}>
                 <Icon name="document" />
-                Print
+                <span className="chip-label">Print</span>
               </button>
               <EditChip label="Edit answers" onClick={onStartSetup} />
             </div>
@@ -169,9 +169,6 @@ export function HomeTab({
             <section className="card home-span-6">
               <div className="card-head">
                 <h2>
-                  <span className="head-icon" aria-hidden="true">
-                    <Icon name="check" />
-                  </span>
                   What you qualify for
                 </h2>
               </div>
@@ -197,9 +194,6 @@ export function HomeTab({
             <section className="card home-span-6">
               <div className="card-head">
                 <h2>
-                  <span className="head-icon" aria-hidden="true">
-                    <Icon name="chart" />
-                  </span>
                   What would raise your ceiling
                 </h2>
               </div>
@@ -238,9 +232,6 @@ export function HomeTab({
         <section className="card home-span-12">
           <div className="card-head">
             <h2>
-              <span className="head-icon" aria-hidden="true">
-                <Icon name="clipboard" />
-              </span>
               Road to keys
             </h2>
             {selectedProject ? (
@@ -294,7 +285,6 @@ function StartCard({ onStartSetup, onBrowse }: { onStartSetup: () => void; onBro
   ];
   return (
     <section className="answer home-span-8">
-      <p className="answer-label">Start here</p>
       <h2 className="answer-title">Find your price ceiling in six questions</h2>
       <p className="answer-text">
         About a minute. You'll see what you can afford, your grant, the projects that fit, and what each step costs until
@@ -398,9 +388,6 @@ function LaunchCard({
     <section className="card home-span-4 launch-card">
       <div className="card-head">
         <h2>
-          <span className="head-icon" aria-hidden="true">
-            <Icon name="calendar" />
-          </span>
           {launch.openNow ? "Applying now" : "Latest launch"}
         </h2>
         <span className={launch.openNow ? "pill pill-live" : "pill"}>{launch.label}</span>

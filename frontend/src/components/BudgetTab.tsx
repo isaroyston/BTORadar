@@ -153,7 +153,7 @@ export function BudgetTab({
           onOpenPlan={onOpenPlan}
         />
       ) : (
-        <HeroCard art="budget">
+        <HeroCard>
           <p className="hero-lead">Your price ceiling</p>
           <p className="hero-figure hero-figure-ghost" aria-hidden="true">
             S$ ···
@@ -188,9 +188,6 @@ export function BudgetTab({
             >
               <div className="card-head">
                 <h2>
-                  <span className="head-icon" aria-hidden="true">
-                    <Icon name="user" />
-                  </span>
                   Your answers
                 </h2>
                 {complete && (
@@ -256,9 +253,6 @@ export function BudgetTab({
             <section className="card">
               <div className="card-head">
                 <h2>
-                  <span className="head-icon" aria-hidden="true">
-                    <Icon name="user" />
-                  </span>
                   Your answers
                 </h2>
                 <EditChip onClick={() => setEditing(true)} />
@@ -271,9 +265,6 @@ export function BudgetTab({
                       className="row"
                       onClick={() => openField(answer.id)}
                     >
-                      <span className="row-icon" aria-hidden="true">
-                        <Icon name={answer.icon} />
-                      </span>
                       <span className="row-label">{answer.label}</span>
                       <span className="row-value">{answer.value}</span>
                       <Icon name="chevron" />
@@ -326,9 +317,6 @@ export function BudgetTab({
 function TipCard({ limit }: { limit: { title: string; body: string } }) {
   return (
     <section className="tip">
-      <span className="tip-icon" aria-hidden="true">
-        <Icon name="bulb" />
-      </span>
       <div>
         <h2>{limit.title}</h2>
         <p>{limit.body}</p>
@@ -412,7 +400,7 @@ function BudgetAnswer({
 
   if (ceiling <= 0) {
     return (
-      <HeroCard art="budget">
+      <HeroCard>
         <p className="hero-lead">Not enough to reach a flat yet</p>
         <p className="hero-body-text">
           With {financingLabel[financing]}, some of the price has to come from
@@ -423,7 +411,7 @@ function BudgetAnswer({
   }
 
   return (
-    <HeroCard art="budget">
+    <HeroCard>
       <p className="hero-lead">You could buy a flat priced up to</p>
       <p className="hero-figure">
         {currency(Math.round(shownCeiling / 1000) * 1000)}

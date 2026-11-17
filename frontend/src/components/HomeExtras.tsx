@@ -8,7 +8,7 @@ import { addMonths, formatMonthYear, parseMonth } from "../utils/date";
 import { currency } from "../utils/format";
 import { ballotChances, FLAT_LABELS, roughOdds, type LaunchSnapshot } from "../utils/journey";
 import { sccRange, type AfterKeys, type SccData } from "../utils/ownership";
-import { Icon, type IconName } from "./DashboardUi";
+import { Icon } from "./DashboardUi";
 
 export type RatesData = {
   launch: string;
@@ -27,13 +27,10 @@ export type ResaleData = {
   towns: Record<string, Partial<Record<FlatType, { median: number | null; sales: number; youngMedian: number | null; youngSales: number }>>>;
 };
 
-function CardHead({ icon, title, aside }: { icon: IconName; title: string; aside?: ReactNode }) {
+function CardHead({ title, aside }: { title: string; aside?: ReactNode }) {
   return (
     <div className="card-head">
       <h2>
-        <span className="head-icon" aria-hidden="true">
-          <Icon name={icon} />
-        </span>
         {title}
       </h2>
       {aside}
@@ -97,7 +94,6 @@ export function HfeCard({
   return (
     <section className="card home-span-6">
       <CardHead
-        icon="document"
         title="Your HFE letter"
         aside={using && !editing ? <span className="pill pill-positive">In use</span> : undefined}
       />
@@ -228,7 +224,7 @@ export function BallotCard({
 
   return (
     <section className="card home-span-6">
-      <CardHead icon="target" title="Your ballot chances" />
+      <CardHead title="Your ballot chances" />
       <div className="ballot-big">
         <strong>{standard.chances}</strong>
         <span>
@@ -352,7 +348,7 @@ export function CommuteCard({
 
   return (
     <section className="card home-span-6">
-      <CardHead icon="map" title="How far from work" />
+      <CardHead title="How far from work" />
       {places.length > 0 && (
         <ul className="places">
           {places.map((place, index) => (
@@ -452,7 +448,7 @@ export function ResaleCard({
 
   return (
     <section className="card home-span-6">
-      <CardHead icon="chart" title="New flat vs resale" />
+      <CardHead title="New flat vs resale" />
       <p className="card-text">
         A {FLAT_LABELS[flatType]} in the {launchLabel} launch against resale flats in the same town, sold{" "}
         {monthLabel(resale.from)} to {monthLabel(resale.to)}.
@@ -517,7 +513,7 @@ export function CostCard({
   const small = flatType === "2-room";
   return (
     <section className="card home-span-6">
-      <CardHead icon="wallet" title="Monthly cost of owning" />
+      <CardHead title="Monthly cost of owning" />
       <ul className="cost-rows">
         <li>
           <span>
@@ -599,7 +595,7 @@ export function AfterKeysCard({ after, projectName }: { after: AfterKeys; projec
   ];
   return (
     <section className="card home-span-6">
-      <CardHead icon="home" title="After keys" />
+      <CardHead title="After keys" />
       <ul className="cost-rows">
         {rows.map((row) => (
           <li key={row.label}>

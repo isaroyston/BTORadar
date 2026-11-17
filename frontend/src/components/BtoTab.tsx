@@ -571,9 +571,6 @@ function LaunchSummary({
 
   return (
     <div className="match-banner">
-      <span className="match-icon" aria-hidden="true">
-        <Icon name="sparkle" />
-      </span>
       <div>
         <h2>{title}</h2>
         <p>{detail}</p>

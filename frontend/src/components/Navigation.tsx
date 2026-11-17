@@ -1,27 +1,6 @@
-import { useState } from "react";
 import { TABS } from "../constants";
 import type { TabKey } from "../types";
-import { applyTheme, loadTheme, NEXT_THEME, THEME_LABEL, type ThemeChoice } from "../utils/theme";
 import { Icon, type IconName } from "./DashboardUi";
-
-function ThemeSwitch() {
-  const [theme, setTheme] = useState<ThemeChoice>(loadTheme);
-  return (
-    <button
-      type="button"
-      className="theme-switch"
-      aria-label={`${THEME_LABEL[theme]}. Switch to ${NEXT_THEME[theme]}.`}
-      onClick={() => {
-        const next = NEXT_THEME[theme];
-        applyTheme(next);
-        setTheme(next);
-      }}
-    >
-      <Icon name={theme === "dark" ? "bulb" : theme === "light" ? "sparkle" : "settings"} />
-      {THEME_LABEL[theme]}
-    </button>
-  );
-}
 
 type NavigationProps = {
   activeTab: TabKey;
@@ -80,13 +59,11 @@ export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps
         <div className="side-foot">
           <p>Estimates, not advice</p>
           <p className="side-note">Worked out from HDB and CPF rules. Your HFE letter is the final word.</p>
-          <ThemeSwitch />
         </div>
       </nav>
 
       <header className="top-bar">
         <Brand />
-        <ThemeSwitch />
       </header>
 
       <nav className="tab-bar" aria-label="Sections">
