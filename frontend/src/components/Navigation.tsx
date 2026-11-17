@@ -1,7 +1,6 @@
 import { TABS } from "../constants";
 import type { TabKey } from "../types";
 import { Icon, type IconName } from "./DashboardUi";
-import { HeroArt } from "./HeroArt";
 
 type NavigationProps = {
   activeTab: TabKey;
@@ -58,13 +57,8 @@ export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps
         </div>
         <div className="side-group side-group-quiet">{other.filter((tab) => tab.id !== "overview").map(item)}</div>
         <div className="side-foot">
-          <p>
-            Plan smarter.
-            <br />
-            Own sooner.
-          </p>
-          <p className="side-note">Estimates only. HDB's HFE letter is the final word.</p>
-          <HeroArt variant="quiet" />
+          <p>Estimates, not advice</p>
+          <p className="side-note">Worked out from HDB and CPF rules. Your HFE letter is the final word.</p>
         </div>
       </nav>
 

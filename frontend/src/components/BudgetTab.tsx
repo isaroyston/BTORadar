@@ -33,6 +33,7 @@ type BudgetTabProps = {
   onBudgetChange: (patch: Partial<BudgetInputs>) => void;
   onSeeProjects: () => void;
   onOpenPlan: () => void;
+  onStartSetup: () => void;
 };
 
 const SAVINGS_MAX = 2000000;
@@ -65,6 +66,7 @@ export function BudgetTab({
   onBudgetChange,
   onSeeProjects,
   onOpenPlan,
+  onStartSetup,
 }: BudgetTabProps) {
   // Cash is optional: most of a BTO downpayment can come from the grant and CPF.
   const complete = budget.cpfOa !== null;
@@ -169,6 +171,12 @@ export function BudgetTab({
               </li>
             ))}
           </ul>
+          <div className="hero-actions">
+            <button type="button" className="btn btn-primary" onClick={onStartSetup}>
+              Answer step by step
+              <Icon name="arrow" />
+            </button>
+          </div>
         </HeroCard>
       )}
       <div className="two-col">

@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BtoTab } from "./components/BtoTab";
 import { BudgetTab } from "./components/BudgetTab";
 import { Navigation } from "./components/Navigation";
-import { OverviewTab } from "./components/OverviewTab";
+import { HomeTab } from "./components/HomeTab";
 import { PurchasePlanTab } from "./components/PurchasePlanTab";
+import { SetupFlow } from "./components/SetupFlow";
 import { SourcesTab } from "./components/SourcesTab";
 import {
   TABS,
@@ -60,8 +61,16 @@ import {
 } from "./utils/cpfProjection";
 import { parseLaunchMonthInput, parseMonth, parseMonthYearDate } from "./utils/date";
 import { keysMonth } from "./utils/projectFacts";
-import { clampNumber } from "./utils/format";
+import { clampNumber, currency } from "./utils/format";
 import { withViewTransition } from "./utils/motion";
+import {
+  eligibilityChecks,
+  journeyStages,
+  latestLaunch,
+  pricesBySize,
+  splitCeiling,
+  type Lever,
+} from "./utils/journey";
 import { buildPaymentTimeline } from "./utils/paymentTimeline";
 import { loadShortlist, saveShortlist } from "./utils/shortlistStorage";
 import {
@@ -149,21 +158,23 @@ function App() {
     retry: retryBto,
   } = useBtoProjects();
 
-  const ehgAssessment = useMemo(
-    () =>
+  const ehgMode =
+    budget.firstTimers === "both"
+      ? "family-estimate"
+      : budget.firstTimers === "one"
+        ? "mixed-couple-estimate"
+        : "none";
+  const grantFor = useCallback(
+    (income: number) =>
       calculateEhgAssessment({
-        mode:
-          budget.firstTimers === "both"
-            ? "family-estimate"
-            : budget.firstTimers === "one"
-              ? "mixed-couple-estimate"
-              : "none",
-        assessedAverageMonthlyIncome: combinedIncome,
+        mode: ehgMode,
+        assessedAverageMonthlyIncome: income,
         confirmedAmount: null,
         familyEligibilityConfirmed: true,
       }),
-    [budget.firstTimers, combinedIncome]
+    [ehgMode]
   );
+  const ehgAssessment = useMemo(() => grantFor(combinedIncome), [grantFor, combinedIncome]);
   const ehgGrant = ehgAssessment.amount ?? 0;
 
   const downpaymentRule = POLICY_CONFIG.downpaymentRules[financing][scheme];
@@ -242,6 +253,30 @@ function App() {
     [today]
   );
   const typicalCeiling = useMemo(() => ceilingAt(typicalTiming), [ceilingAt, typicalTiming]);
+  // The same ceiling with one input changed: for the setup's running total (CPF counts as
+  // zero until given) and for what would raise it.
+  const ceilingWith = useCallback(
+    ({ income = combinedIncome, cpf, laterKeysMonths = 0 }: { income?: number; cpf: number; laterKeysMonths?: number }) =>
+      affordableCeiling({
+        base: { ...budgetInput, grossMonthlyIncome: income, grantAmount: grantFor(income).amount ?? 0 },
+        timing: {
+          monthsToSigning: typicalTiming.monthsToSigning,
+          monthsToKeys: typicalTiming.monthsToKeys + laterKeysMonths,
+        },
+        cpfToday: cpf,
+        combinedIncome: income,
+        age: ASSUMED_BUYER_AGE,
+        monthlyOverride: null,
+        signingShare: downpaymentRule.signing,
+        minCashSigningShare: downpaymentRule.minCashSigning,
+      }),
+    [budgetInput, combinedIncome, downpaymentRule.minCashSigning, downpaymentRule.signing, grantFor, typicalTiming]
+  );
+  const [setupOpen, setSetupOpen] = useState(false);
+  const draftSplit = useMemo(
+    () => (setupOpen ? splitCeiling(ceilingWith({ cpf: budget.cpfOa ?? 0 })) : null),
+    [budget.cpfOa, ceilingWith, setupOpen]
+  );
   const budgetMaxPrice = typicalCeiling?.price ?? null;
   const budgetAtMax = typicalCeiling?.estimate ?? null;
   const budgetKnown = budgetMaxPrice !== null && budgetAtMax !== null;
@@ -384,6 +419,67 @@ function App() {
     () => filterBtoProjects(btoProjects, activeYear, townQuery, flatType),
     [activeYear, btoProjects, flatType, townQuery]
   );
+
+  // Home and the guided setup.
+  const ceilingSplit = useMemo(() => splitCeiling(typicalCeiling), [typicalCeiling]);
+  const launch = useMemo(
+    () => latestLaunch({ projects: btoProjects, flatType, today, ceilingFor: budgetKnown ? ceilingFor : null }),
+    [btoProjects, budgetKnown, ceilingFor, flatType, today]
+  );
+  const sizePrices = useMemo(() => pricesBySize(btoProjects), [btoProjects]);
+  const checks = useMemo(
+    () => eligibilityChecks({ income: combinedIncome, firstTimers: budget.firstTimers, flatType, grant: ehgGrant }),
+    [budget.firstTimers, combinedIncome, ehgGrant, flatType]
+  );
+  const journey = useMemo(() => journeyStages(timeline), [timeline]);
+  const levers = useMemo<Lever[]>(() => {
+    if (budget.cpfOa === null || !typicalCeiling) return [];
+    const base = typicalCeiling.price;
+    const gain = (result: ReturnType<typeof ceilingWith>) =>
+      Math.max(Math.floor(((result?.price ?? base) - base) / 1000) * 1000, 0);
+    const raise = 500;
+    const grantDrop = ehgGrant - (grantFor(combinedIncome + raise).amount ?? 0);
+    return [
+      {
+        key: "income",
+        label: `${currency(raise)} more income a month`,
+        delta: gain(ceilingWith({ income: combinedIncome + raise, cpf: budget.cpfOa })),
+        note: grantDrop > 0 ? `A bigger loan, though the grant falls by ${currency(grantDrop)}.` : "A bigger loan, at 30% of income.",
+      },
+      {
+        key: "savings",
+        label: `${currency(10000)} more in CPF or cash`,
+        delta: gain(ceilingWith({ cpf: budget.cpfOa + 10000 })),
+        note: "Savings go into the downpayment.",
+      },
+      {
+        key: "keys",
+        label: "Keys a year later",
+        delta: gain(ceilingWith({ cpf: budget.cpfOa, laterKeysMonths: 12 })),
+        note: "A project with a longer wait leaves more time for CPF to build up.",
+      },
+    ];
+  }, [budget.cpfOa, ceilingWith, combinedIncome, ehgGrant, grantFor, typicalCeiling]);
+
+  // The setup edits the live plan so its running total is real; closing it early puts the
+  // answers back as they were.
+  const setupStart = useRef<{ income: number; budget: BudgetInputs; flatType: FlatType } | null>(null);
+  const openSetup = () => {
+    setupStart.current = { income: combinedIncome, budget, flatType };
+    setSetupOpen(true);
+  };
+  const closeSetup = (finished: boolean) => {
+    const start = setupStart.current;
+    if (!finished && start) {
+      setCombinedIncome(start.income);
+      setBudget(start.budget);
+      saveBudgetInputs(start.budget);
+      setFlatType(start.flatType);
+    }
+    setupStart.current = null;
+    setSetupOpen(false);
+    if (finished) setActiveTab("overview");
+  };
   useEffect(() => {
     try {
       savePlannerSnapshot(
@@ -606,6 +702,7 @@ function App() {
             onBudgetChange={handleBudgetChange}
             onSeeProjects={() => setActiveTab("bto")}
             onOpenPlan={() => setActiveTab("plan")}
+            onStartSetup={openSetup}
           />
         )}
 
@@ -686,21 +783,48 @@ function App() {
         )}
 
         {activeTab === "overview" && (
-          <OverviewTab
-            budgetKnown={budgetKnown}
-            budgetCeiling={totalAffordability}
+          <HomeTab
+            split={budgetKnown ? ceilingSplit : null}
+            limitedBy={budgetKnown ? (typicalCeiling?.limitedBy ?? null) : null}
+            financing={financing}
+            monthlyCpf={monthlyCpfAt(typicalTiming)}
+            flatType={flatType}
+            checks={checks}
+            levers={levers}
+            launch={launch}
+            ceilingFor={ceilingFor}
+            journey={journey}
             selectedProject={selectedBtoProject}
             flatPrice={flatPrice}
-            fundingGap={budgetKnown ? targetEstimate.fundingGap : null}
-            savedCount={savedProjectIds.length}
-            timeline={timeline}
-            completedMilestones={activeCompletedMilestones}
+            onStartSetup={openSetup}
             onSelectTab={setActiveTab}
           />
         )}
 
         {activeTab === "sources" && <SourcesTab />}
       </main>
+
+      {setupOpen && (
+        <SetupFlow
+          combinedIncome={combinedIncome}
+          budget={budget}
+          flatType={flatType}
+          draft={draftSplit}
+          grant={ehgGrant}
+          monthlyCpf={monthlyCpfAt(typicalTiming)}
+          sizePrices={sizePrices}
+          launch={launch}
+          onIncomeChange={handleIncomeChange}
+          onBudgetChange={handleBudgetChange}
+          onFlatTypeChange={setFlatType}
+          onClose={closeSetup}
+          onSeeProjects={() => {
+            setupStart.current = null;
+            setSetupOpen(false);
+            setActiveTab("bto");
+          }}
+        />
+      )}
     </div>
   );
 }

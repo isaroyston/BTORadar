@@ -5,7 +5,7 @@ import type { FlatType, TabKey } from "./types";
 export const ASSUMED_BUYER_AGE = 30;
 
 export const TABS: { id: TabKey; label: string }[] = [
-  { id: "overview", label: "Overview" },
+  { id: "overview", label: "Home" },
   { id: "budget", label: "Budget" },
   { id: "bto", label: "Projects" },
   { id: "plan", label: "Plan" },

@@ -27,7 +27,8 @@
 
 ## Product Surfaces
 
-- **Overview**: the front door. New visitors pick where they are (budget first, a project in mind, or already booked); returning visitors see the next payment and where each step stands.
+- **Home**: the front door and dashboard. New visitors get a five-question start, the launch that's open now and the steps from HFE letter to keys. Once the budget is known: the price ceiling with where its money comes from and what sets it; how many projects in the newest launch fit; what you qualify for (HDB's S$ 14,000 income ceiling, S$ 7,000 for a 2-room Flexi, the HDB loan, the grant, first-timer priority); what would raise the ceiling (more income, more savings, later keys), each worked out with the same rules; and the road to keys with each payment's date and its grant, CPF and cash.
+- **Guided setup**: a step-by-step dialog (each person's income and CPF, first-timer status, optional cash, flat size) with the ceiling building up beside the questions and a result at the end. Closing it early puts the previous answers back. Opened from Home ("Start", "Edit answers") and from an empty Budget.
 - **Budget**: one price ceiling; your answers (income, CPF savings, optional cash, first-timer status) directly under it as the one place to edit; what sets the ceiling; then the breakdown. Age and monthly CPF are not asked: buyers are assumed under 35 and monthly CPF is worked out from income.
 - **Projects**: launches; a "What matters most" choice that is always visible (best all-round, lowest price, near the MRT, soonest keys, or a fine-tuned mix); cards with a OneMap street map of the site, a rank, the price checked against the ceiling, and facts led by what the buyer ranked highest; a detail sheet with highlights, keys date, blocks and nearby schools and parks; saved projects; and side-by-side compare.
 - **Plan**: target price, loan and downpayment choices, whether it fits (asking income and CPF in place if they're missing), whether CPF covers the monthly repayment, and a payment timeline showing grant, CPF and cash per payment. Saves automatically.
@@ -54,7 +55,7 @@ npm.cmd run build
 npm.cmd test
 ```
 
-`npm test` runs the scoring, affordability, grant, fee, payment-allocation and CPF-projection checks.
+`npm test` runs the scoring, affordability, grant, fee, payment-allocation, CPF-projection and eligibility/journey checks.
 
 ## Saved Scenarios
 
