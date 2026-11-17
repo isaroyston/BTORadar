@@ -61,7 +61,11 @@ export type PlannerSnapshot = {
   applicationMonth: string;
   completedMilestones: string[];
   confirmedMilestoneDates: Record<string, string>;
+  paymentOverrides: Record<string, PaymentOverride>;
 };
+
+// An amount the person replaced with their actual figure, and how it is split.
+export type PaymentOverride = { total: number; cpf: number; cash: number };
 
 type PlannerSnapshotInput = Omit<PlannerSnapshot, "version" | "savedAt">;
 
@@ -167,7 +171,27 @@ export function parsePlannerSnapshot(raw: string): PlannerSnapshot {
     applicationMonth: parseApplicationMonth(parsed.applicationMonth),
     completedMilestones: parseStringArray(parsed.completedMilestones),
     confirmedMilestoneDates: parseDateMap(parsed.confirmedMilestoneDates),
+    paymentOverrides: parsePaymentOverrides(parsed.paymentOverrides),
   };
+}
+
+const MAX_PAYMENT = 5000000;
+
+// Older saved plans have no overrides; anything malformed is dropped rather than failing the load.
+function parsePaymentOverrides(value: unknown): Record<string, PaymentOverride> {
+  if (!isRecord(value)) return {};
+  const result: Record<string, PaymentOverride> = {};
+  for (const [label, entry] of Object.entries(value)) {
+    if (!isRecord(entry)) continue;
+    const { total, cpf, cash } = entry;
+    const valid = [total, cpf, cash].every(
+      (amount) => typeof amount === "number" && Number.isFinite(amount) && amount >= 0 && amount <= MAX_PAYMENT
+    );
+    if (valid && Math.abs((cpf as number) + (cash as number) - (total as number)) <= 1) {
+      result[label] = { total: total as number, cpf: cpf as number, cash: cash as number };
+    }
+  }
+  return result;
 }
 
 export function downloadPlannerSnapshot(snapshot: PlannerSnapshot) {

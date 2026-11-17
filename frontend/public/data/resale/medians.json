@@ -1,0 +1,807 @@
+{
+ "generatedAt": "2026-11-17T13:43:12.169Z",
+ "source": "data.gov.sg: Resale flat prices based on registration date from Jan-2017 onwards",
+ "sourceUrl": "https://data.gov.sg/datasets/d_8b84c4ee58e3cfc0ece0d773c8ca6abc/view",
+ "from": "2025-12",
+ "to": "2026-11",
+ "youngYears": 15,
+ "sales": 24852,
+ "towns": {
+  "ANG MO KIO": {
+   "2-room": {
+    "median": 323000,
+    "sales": 25,
+    "youngMedian": null,
+    "youngSales": 2
+   },
+   "3-room": {
+    "median": 430000,
+    "sales": 394,
+    "youngMedian": 710944,
+    "youngSales": 20
+   },
+   "4-room": {
+    "median": 615000,
+    "sales": 290,
+    "youngMedian": 1003888,
+    "youngSales": 97
+   },
+   "5-room": {
+    "median": 991500,
+    "sales": 150,
+    "youngMedian": 1220000,
+    "youngSales": 55
+   },
+   "executive": {
+    "median": 1201888,
+    "sales": 7,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "BEDOK": {
+   "2-room": {
+    "median": 325000,
+    "sales": 20,
+    "youngMedian": null,
+    "youngSales": 3
+   },
+   "3-room": {
+    "median": 415000,
+    "sales": 487,
+    "youngMedian": 628400,
+    "youngSales": 44
+   },
+   "4-room": {
+    "median": 600000,
+    "sales": 542,
+    "youngMedian": 928000,
+    "youngSales": 145
+   },
+   "5-room": {
+    "median": 800000,
+    "sales": 230,
+    "youngMedian": 1375000,
+    "youngSales": 28
+   },
+   "executive": {
+    "median": 1030000,
+    "sales": 73,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "BISHAN": {
+   "3-room": {
+    "median": 525000,
+    "sales": 58,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "4-room": {
+    "median": 788000,
+    "sales": 201,
+    "youngMedian": 1231444,
+    "youngSales": 8
+   },
+   "5-room": {
+    "median": 970000,
+    "sales": 122,
+    "youngMedian": 1584000,
+    "youngSales": 10
+   },
+   "executive": {
+    "median": 1295000,
+    "sales": 47,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "BUKIT BATOK": {
+   "2-room": {
+    "median": 380000,
+    "sales": 88,
+    "youngMedian": 380000,
+    "youngSales": 88
+   },
+   "3-room": {
+    "median": 412000,
+    "sales": 317,
+    "youngMedian": 525000,
+    "youngSales": 85
+   },
+   "4-room": {
+    "median": 627500,
+    "sales": 574,
+    "youngMedian": 680000,
+    "youngSales": 297
+   },
+   "5-room": {
+    "median": 810000,
+    "sales": 311,
+    "youngMedian": 828000,
+    "youngSales": 223
+   },
+   "executive": {
+    "median": 860000,
+    "sales": 69,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "BUKIT MERAH": {
+   "2-room": {
+    "median": 286944,
+    "sales": 34,
+    "youngMedian": null,
+    "youngSales": 4
+   },
+   "3-room": {
+    "median": 430000,
+    "sales": 300,
+    "youngMedian": 758000,
+    "youngSales": 65
+   },
+   "4-room": {
+    "median": 937000,
+    "sales": 403,
+    "youngMedian": 995000,
+    "youngSales": 155
+   },
+   "5-room": {
+    "median": 1040444,
+    "sales": 182,
+    "youngMedian": 1468888,
+    "youngSales": 13
+   }
+  },
+  "BUKIT PANJANG": {
+   "3-room": {
+    "median": 452500,
+    "sales": 102,
+    "youngMedian": 502888,
+    "youngSales": 49
+   },
+   "4-room": {
+    "median": 570000,
+    "sales": 364,
+    "youngMedian": 625000,
+    "youngSales": 119
+   },
+   "5-room": {
+    "median": 692500,
+    "sales": 220,
+    "youngMedian": 740000,
+    "youngSales": 47
+   },
+   "executive": {
+    "median": 853000,
+    "sales": 81,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "2-room": {
+    "median": 380000,
+    "sales": 11,
+    "youngMedian": 380000,
+    "youngSales": 11
+   }
+  },
+  "BUKIT TIMAH": {
+   "3-room": {
+    "median": 480000,
+    "sales": 11,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "4-room": {
+    "median": 930000,
+    "sales": 19,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "5-room": {
+    "median": 1100000,
+    "sales": 21,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "executive": {
+    "median": 1382500,
+    "sales": 10,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "CENTRAL AREA": {
+   "3-room": {
+    "median": 562500,
+    "sales": 66,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "4-room": {
+    "median": 1000000,
+    "sales": 84,
+    "youngMedian": 1388000,
+    "youngSales": 41
+   },
+   "2-room": {
+    "median": 298000,
+    "sales": 5,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "5-room": {
+    "median": 1480000,
+    "sales": 25,
+    "youngMedian": 1527500,
+    "youngSales": 14
+   }
+  },
+  "CHOA CHU KANG": {
+   "3-room": {
+    "median": 430000,
+    "sales": 71,
+    "youngMedian": 483500,
+    "youngSales": 34
+   },
+   "4-room": {
+    "median": 555000,
+    "sales": 494,
+    "youngMedian": 600000,
+    "youngSales": 153
+   },
+   "5-room": {
+    "median": 670000,
+    "sales": 341,
+    "youngMedian": 710000,
+    "youngSales": 96
+   },
+   "executive": {
+    "median": 830000,
+    "sales": 99,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "2-room": {
+    "median": 358000,
+    "sales": 17,
+    "youngMedian": 358000,
+    "youngSales": 17
+   }
+  },
+  "CLEMENTI": {
+   "3-room": {
+    "median": 433000,
+    "sales": 205,
+    "youngMedian": 710000,
+    "youngSales": 33
+   },
+   "4-room": {
+    "median": 793800,
+    "sales": 197,
+    "youngMedian": 1002500,
+    "youngSales": 86
+   },
+   "5-room": {
+    "median": 1110000,
+    "sales": 80,
+    "youngMedian": 1350000,
+    "youngSales": 42
+   },
+   "2-room": {
+    "median": 362500,
+    "sales": 6,
+    "youngMedian": null,
+    "youngSales": 3
+   },
+   "executive": {
+    "median": 1060000,
+    "sales": 11,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "GEYLANG": {
+   "2-room": {
+    "median": 280000,
+    "sales": 17,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "3-room": {
+    "median": 381000,
+    "sales": 304,
+    "youngMedian": 727500,
+    "youngSales": 42
+   },
+   "4-room": {
+    "median": 750000,
+    "sales": 225,
+    "youngMedian": 989888,
+    "youngSales": 62
+   },
+   "5-room": {
+    "median": 925888,
+    "sales": 75,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "executive": {
+    "median": 1077500,
+    "sales": 14,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "HOUGANG": {
+   "2-room": {
+    "median": 385500,
+    "sales": 39,
+    "youngMedian": 385500,
+    "youngSales": 39
+   },
+   "3-room": {
+    "median": 450000,
+    "sales": 244,
+    "youngMedian": 548500,
+    "youngSales": 58
+   },
+   "4-room": {
+    "median": 618888,
+    "sales": 566,
+    "youngMedian": 688000,
+    "youngSales": 193
+   },
+   "5-room": {
+    "median": 777000,
+    "sales": 253,
+    "youngMedian": 918000,
+    "youngSales": 55
+   },
+   "executive": {
+    "median": 959000,
+    "sales": 130,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "JURONG EAST": {
+   "3-room": {
+    "median": 405000,
+    "sales": 179,
+    "youngMedian": 507500,
+    "youngSales": 26
+   },
+   "4-room": {
+    "median": 548000,
+    "sales": 133,
+    "youngMedian": 636500,
+    "youngSales": 24
+   },
+   "5-room": {
+    "median": 712500,
+    "sales": 116,
+    "youngMedian": null,
+    "youngSales": 4
+   },
+   "executive": {
+    "median": 931500,
+    "sales": 36,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "2-room": {
+    "median": 351000,
+    "sales": 10,
+    "youngMedian": 351000,
+    "youngSales": 10
+   }
+  },
+  "JURONG WEST": {
+   "2-room": {
+    "median": 360000,
+    "sales": 27,
+    "youngMedian": 364000,
+    "youngSales": 24
+   },
+   "3-room": {
+    "median": 390000,
+    "sales": 297,
+    "youngMedian": 510000,
+    "youngSales": 55
+   },
+   "4-room": {
+    "median": 534500,
+    "sales": 576,
+    "youngMedian": 645000,
+    "youngSales": 94
+   },
+   "5-room": {
+    "median": 635000,
+    "sales": 454,
+    "youngMedian": 758000,
+    "youngSales": 53
+   },
+   "executive": {
+    "median": 776500,
+    "sales": 132,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "KALLANG/WHAMPOA": {
+   "3-room": {
+    "median": 450000,
+    "sales": 307,
+    "youngMedian": 704000,
+    "youngSales": 53
+   },
+   "4-room": {
+    "median": 905000,
+    "sales": 305,
+    "youngMedian": 1070000,
+    "youngSales": 137
+   },
+   "5-room": {
+    "median": 955000,
+    "sales": 125,
+    "youngMedian": 1430000,
+    "youngSales": 19
+   },
+   "executive": {
+    "median": 1000000,
+    "sales": 15,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "2-room": {
+    "median": 329000,
+    "sales": 10,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "MARINE PARADE": {
+   "3-room": {
+    "median": 460000,
+    "sales": 66,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "4-room": {
+    "median": 630000,
+    "sales": 37,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "5-room": {
+    "median": 1050000,
+    "sales": 30,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "2-room": {
+    "median": 318000,
+    "sales": 1,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "PASIR RIS": {
+   "4-room": {
+    "median": 635000,
+    "sales": 287,
+    "youngMedian": 775444,
+    "youngSales": 50
+   },
+   "5-room": {
+    "median": 735000,
+    "sales": 241,
+    "youngMedian": 955000,
+    "youngSales": 14
+   },
+   "executive": {
+    "median": 926944,
+    "sales": 200,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "3-room": {
+    "median": 608000,
+    "sales": 19,
+    "youngMedian": 625000,
+    "youngSales": 15
+   },
+   "2-room": {
+    "median": 418500,
+    "sales": 6,
+    "youngMedian": 418500,
+    "youngSales": 6
+   }
+  },
+  "PUNGGOL": {
+   "2-room": {
+    "median": 398444,
+    "sales": 128,
+    "youngMedian": 398444,
+    "youngSales": 128
+   },
+   "3-room": {
+    "median": 545000,
+    "sales": 182,
+    "youngMedian": 545000,
+    "youngSales": 182
+   },
+   "4-room": {
+    "median": 680000,
+    "sales": 850,
+    "youngMedian": 690000,
+    "youngSales": 732
+   },
+   "5-room": {
+    "median": 800000,
+    "sales": 482,
+    "youngMedian": 858000,
+    "youngSales": 293
+   },
+   "executive": {
+    "median": 821500,
+    "sales": 22,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "QUEENSTOWN": {
+   "2-room": {
+    "median": 300000,
+    "sales": 23,
+    "youngMedian": 540000,
+    "youngSales": 11
+   },
+   "3-room": {
+    "median": 460000,
+    "sales": 363,
+    "youngMedian": 815500,
+    "youngSales": 144
+   },
+   "4-room": {
+    "median": 1038000,
+    "sales": 315,
+    "youngMedian": 1089000,
+    "youngSales": 210
+   },
+   "5-room": {
+    "median": 1250000,
+    "sales": 91,
+    "youngMedian": 1500000,
+    "youngSales": 35
+   },
+   "executive": {
+    "median": 1390000,
+    "sales": 7,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "SEMBAWANG": {
+   "2-room": {
+    "median": 380000,
+    "sales": 83,
+    "youngMedian": 380000,
+    "youngSales": 83
+   },
+   "3-room": {
+    "median": 520000,
+    "sales": 91,
+    "youngMedian": 520000,
+    "youngSales": 91
+   },
+   "4-room": {
+    "median": 600000,
+    "sales": 384,
+    "youngMedian": 655000,
+    "youngSales": 221
+   },
+   "5-room": {
+    "median": 640444,
+    "sales": 234,
+    "youngMedian": 815000,
+    "youngSales": 57
+   },
+   "executive": {
+    "median": 760000,
+    "sales": 62,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "SENGKANG": {
+   "2-room": {
+    "median": 389000,
+    "sales": 68,
+    "youngMedian": 390000,
+    "youngSales": 67
+   },
+   "3-room": {
+    "median": 542888,
+    "sales": 127,
+    "youngMedian": 543000,
+    "youngSales": 117
+   },
+   "4-room": {
+    "median": 640000,
+    "sales": 838,
+    "youngMedian": 660000,
+    "youngSales": 459
+   },
+   "5-room": {
+    "median": 700000,
+    "sales": 597,
+    "youngMedian": 825000,
+    "youngSales": 203
+   },
+   "executive": {
+    "median": 845000,
+    "sales": 119,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "SERANGOON": {
+   "3-room": {
+    "median": 465000,
+    "sales": 95,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "4-room": {
+    "median": 653000,
+    "sales": 177,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "5-room": {
+    "median": 838000,
+    "sales": 65,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "executive": {
+    "median": 1120000,
+    "sales": 51,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "TAMPINES": {
+   "3-room": {
+    "median": 490000,
+    "sales": 376,
+    "youngMedian": 615000,
+    "youngSales": 93
+   },
+   "4-room": {
+    "median": 665000,
+    "sales": 915,
+    "youngMedian": 777000,
+    "youngSales": 353
+   },
+   "5-room": {
+    "median": 815888,
+    "sales": 601,
+    "youngMedian": 926000,
+    "youngSales": 217
+   },
+   "executive": {
+    "median": 980000,
+    "sales": 181,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "2-room": {
+    "median": 426444,
+    "sales": 10,
+    "youngMedian": 422888,
+    "youngSales": 9
+   }
+  },
+  "TOA PAYOH": {
+   "3-room": {
+    "median": 375000,
+    "sales": 409,
+    "youngMedian": 808800,
+    "youngSales": 97
+   },
+   "4-room": {
+    "median": 1020000,
+    "sales": 407,
+    "youngMedian": 1088888,
+    "youngSales": 242
+   },
+   "5-room": {
+    "median": 1050000,
+    "sales": 152,
+    "youngMedian": 1410000,
+    "youngSales": 47
+   },
+   "2-room": {
+    "median": 280000,
+    "sales": 21,
+    "youngMedian": null,
+    "youngSales": 1
+   },
+   "executive": {
+    "median": 976444,
+    "sales": 16,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  },
+  "WOODLANDS": {
+   "3-room": {
+    "median": 410000,
+    "sales": 207,
+    "youngMedian": 510000,
+    "youngSales": 64
+   },
+   "4-room": {
+    "median": 548000,
+    "sales": 852,
+    "youngMedian": 639388,
+    "youngSales": 164
+   },
+   "5-room": {
+    "median": 650000,
+    "sales": 537,
+    "youngMedian": 746444,
+    "youngSales": 70
+   },
+   "executive": {
+    "median": 915000,
+    "sales": 187,
+    "youngMedian": null,
+    "youngSales": 0
+   },
+   "2-room": {
+    "median": 377500,
+    "sales": 32,
+    "youngMedian": 378000,
+    "youngSales": 31
+   }
+  },
+  "YISHUN": {
+   "2-room": {
+    "median": 363000,
+    "sales": 49,
+    "youngMedian": 365000,
+    "youngSales": 47
+   },
+   "3-room": {
+    "median": 430000,
+    "sales": 397,
+    "youngMedian": 490000,
+    "youngSales": 101
+   },
+   "4-room": {
+    "median": 550000,
+    "sales": 757,
+    "youngMedian": 599500,
+    "youngSales": 324
+   },
+   "5-room": {
+    "median": 690000,
+    "sales": 269,
+    "youngMedian": 734000,
+    "youngSales": 128
+   },
+   "executive": {
+    "median": 914000,
+    "sales": 64,
+    "youngMedian": null,
+    "youngSales": 0
+   }
+  }
+ }
+}

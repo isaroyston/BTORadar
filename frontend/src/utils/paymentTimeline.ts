@@ -1,5 +1,6 @@
 import { POLICY_CONFIG } from "../policies/policyConfig";
 import type { FlatType, TimelineItem, TimelinePayment } from "../types";
+import type { StageFunding } from "./cpfProjection";
 import {
   addMonths,
   addWeeks,
@@ -20,6 +21,9 @@ type PaymentTimelineInput = {
   optionFee: number;
   surveyFee: number;
   fireInsurance: number;
+  // Funding worked out from CPF built up by each date; absent until the budget is known.
+  signingFunding?: StageFunding;
+  keyFunding?: StageFunding;
 };
 
 export function buildPaymentTimeline({
@@ -34,6 +38,8 @@ export function buildPaymentTimeline({
   optionFee,
   surveyFee,
   fireInsurance,
+  signingFunding,
+  keyFunding,
 }: PaymentTimelineInput): TimelineItem[] {
   const start = parseMonth(applicationMonth);
   const ballot = addMonths(start, POLICY_CONFIG.defaultOffsets.ballotAfterMonths);
@@ -69,21 +75,41 @@ export function buildPaymentTimeline({
     note: "Typically payable in cash at booking.",
   };
 
-  const agreementPayment: TimelinePayment = {
-    label: "Downpayment at signing",
-    total: signingAmount,
-    cpfOa: signingCpf,
-    cash: minCashSigning,
-    note: "CPF OA usage depends on available OA balance.",
-  };
+  const agreementPayment: TimelinePayment = signingFunding
+    ? {
+        label: "Downpayment at signing",
+        total: signingAmount,
+        grant: signingFunding.grant,
+        cpfOa: signingFunding.cpf,
+        cash: signingFunding.cash,
+        shortfall: signingFunding.uncovered,
+        note: "Your grant is credited to CPF before signing, so it pays this first.",
+      }
+    : {
+        label: "Downpayment at signing",
+        total: signingAmount,
+        cpfOa: signingCpf,
+        cash: minCashSigning,
+        note: "CPF OA usage depends on available OA balance.",
+      };
 
-  const keyPayment: TimelinePayment = {
-    label: "Downpayment at keys",
-    total: keyAmount,
-    cpfOa: keyCpf,
-    cash: 0,
-    note: "CPF OA usage depends on available OA balance.",
-  };
+  const keyPayment: TimelinePayment = keyFunding
+    ? {
+        label: "Downpayment at keys",
+        total: keyAmount,
+        grant: keyFunding.grant,
+        cpfOa: keyFunding.cpf,
+        cash: keyFunding.cash,
+        shortfall: keyFunding.uncovered,
+        note: "Paid mostly from CPF you build up while the flat is built.",
+      }
+    : {
+        label: "Downpayment at keys",
+        total: keyAmount,
+        cpfOa: keyCpf,
+        cash: 0,
+        note: "CPF OA usage depends on available OA balance.",
+      };
 
   const ancillaryPayment: TimelinePayment = {
     label: "Survey and fire insurance",

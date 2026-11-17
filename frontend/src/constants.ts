@@ -1,9 +1,14 @@
 import type { FlatType, TabKey } from "./types";
 
+// Most BTO buyers are under 35: the loan can run the full 25 years and CPF goes in at the
+// top rate. BTO Radar assumes this rather than asking.
+export const ASSUMED_BUYER_AGE = 30;
+
 export const TABS: { id: TabKey; label: string }[] = [
-  { id: "overview", label: "Overview" },
+  { id: "overview", label: "Home" },
+  { id: "budget", label: "Budget" },
+  { id: "bto", label: "Projects" },
   { id: "plan", label: "Plan" },
-  { id: "bto", label: "BTO Radar" },
   { id: "sources", label: "Sources" },
 ];
 
@@ -16,7 +21,7 @@ export const LOAN_TENURE_MIN = 1;
 export const LOAN_INTEREST_RATE_MIN = 0;
 export const LOAN_INTEREST_RATE_MAX = 8;
 export const INCOME_MIN = 1000;
-export const INCOME_MAX = 15000;
+export const INCOME_MAX = 25000;
 export const FLAT_MIN = 100000;
 export const FLAT_MAX = 1200000;
 

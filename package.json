@@ -9,11 +9,22 @@
     "preview": "npm --prefix frontend run preview --",
     "data:rail-stations": "node backend/scripts/backfill-rail-stations.mjs",
     "data:recordbto:source": "node backend/scripts/backfill-recordbto.mjs",
-    "data:recordbto": "npm run data:recordbto:source && npm run data:merge-bto",
+    "data:recordbto:details": "node backend/scripts/backfill-recordbto-details.mjs",
+    "data:recordbto": "npm run data:recordbto:source && npm run data:recordbto:details && npm run data:merge-bto",
     "data:btohq": "node backend/scripts/backfill-btohq.mjs",
+    "data:onemap": "node backend/scripts/backfill-onemap-coordinates.mjs && npm run data:merge-bto",
     "data:merge-bto": "node backend/scripts/merge-bto-datasets.mjs",
     "data:check-bto": "node backend/scripts/check-bto-data.mjs",
     "test:scoring": "node backend/scripts/check-bto-scoring.mjs",
-    "data:refresh": "npm run data:recordbto:source && npm run data:btohq && npm run data:rail-stations && npm run data:merge-bto"
+    "test:affordability": "node backend/scripts/check-affordability.mjs",
+    "test:ehg": "node backend/scripts/check-ehg.mjs",
+    "test:fees": "node backend/scripts/check-fees.mjs",
+    "test:payment-allocation": "node backend/scripts/check-payment-allocation.mjs",
+    "test:cpf": "node backend/scripts/check-cpf-projection.mjs",
+    "test": "npm run test:scoring && npm run test:affordability && npm run test:ehg && npm run test:fees && npm run test:payment-allocation && npm run test:cpf && npm run test:journey && npm run test:extras",
+    "data:refresh": "npm run data:recordbto:source && npm run data:recordbto:details && npm run data:btohq && npm run data:rail-stations && npm run data:merge-bto && npm run data:onemap",
+    "test:journey": "node backend/scripts/check-journey.mjs",
+    "test:extras": "node backend/scripts/check-extras.mjs",
+    "data:resale": "node backend/scripts/backfill-resale.mjs"
   }
 }

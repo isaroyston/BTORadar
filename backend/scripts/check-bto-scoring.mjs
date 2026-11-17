@@ -7,13 +7,21 @@ const BTO_PATH = fileURLToPath(BTO_URL);
 async function main() {
   const payload = JSON.parse(await readFile(BTO_PATH, "utf8"));
   const projects = payload.projects ?? [];
-  const latestPriced = projects.filter(
-    (project) =>
-      project.launchMonth === "Oct 2026" &&
-      project.flatVariants?.some((variant) => variant.type === "4-room")
-  );
+  // Test against the newest launch that has at least two priced 4-room projects,
+  // so a data refresh that adds a launch does not break this check.
+  const pricedByLaunch = new Map();
+  for (const project of projects) {
+    if (!project.flatVariants?.some((variant) => variant.type === "4-room")) continue;
+    const key = project.launchMonth;
+    if (!key || Number.isNaN(Date.parse(`1 ${key}`))) continue;
+    pricedByLaunch.set(key, [...(pricedByLaunch.get(key) ?? []), project]);
+  }
+  const latestLaunch = [...pricedByLaunch.entries()]
+    .filter(([, launchProjects]) => launchProjects.length >= 2)
+    .sort(([a], [b]) => Date.parse(`1 ${b}`) - Date.parse(`1 ${a}`))[0];
 
-  assert(latestPriced.length >= 2, "Need at least two priced Oct 2026 projects.");
+  assert(latestLaunch, "Need a launch with at least two priced 4-room projects.");
+  const latestPriced = latestLaunch[1];
 
   const [projectA, projectB] = latestPriced;
   const lowPrice = {
