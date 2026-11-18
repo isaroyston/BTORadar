@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import "./register-typescript-imports.mjs";
 
-const { eligibilityChecks, latestLaunch, journeyStages, splitCeiling, INCOME_CEILINGS } = await import(
+const { eligibilityChecks, latestLaunch, splitCeiling, INCOME_CEILINGS } = await import(
   "../../frontend/src/utils/journey.ts"
 );
 
@@ -65,20 +65,6 @@ assert.deepEqual(launch.fitting.map((item) => item.id), ["a", "b"]);
 assert.equal(launch.lowestPrice, 400000);
 assert.equal(launch.nextExpected, "Feb to Mar 2027");
 assert.equal(latestLaunch({ projects, flatType: "4-room", today: new Date(2026, 11, 1), ceilingFor: null }).openNow, false);
-
-// Journey stages take dates and money from the payment timeline; keys include post-keys fees.
-const timeline = [
-  { label: "Application window", date: "Nov 2026", note: "", payment: { label: "", total: 10, cpfOa: 0, cash: 10 } },
-  { label: "Flat booking", date: "Feb 2027", note: "", payment: { label: "", total: 2000, cpfOa: 0, cash: 2000 } },
-  { label: "Agreement for lease", date: "Jun 2027", note: "", payment: { label: "", total: 40000, cpfOa: 0, cash: 0, grant: 40000 } },
-  { label: "Key collection", date: "Jun 2030", note: "", payment: { label: "", total: 60000, cpfOa: 59000, cash: 0, grant: 1000 } },
-  { label: "Post-keys fees", date: "Jun 2030", note: "", payment: { label: "", total: 300, cpfOa: 0, cash: 300 } },
-];
-const stages = journeyStages(timeline);
-assert.deepEqual(stages.map((stage) => stage.key), ["hfe", "apply", "book", "sign", "keys"]);
-assert.equal(stages[0].due, undefined);
-assert.equal(stages[3].due.grant, 40000);
-assert.deepEqual(stages[4].due, { total: 60300, cash: 300, cpf: 59000, grant: 1000, shortfall: 0 });
 
 // The ceiling splits into loan, grant, CPF by keys, then cash.
 const split = splitCeiling({

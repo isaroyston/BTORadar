@@ -1,5 +1,5 @@
 import type { BtoProject } from "../policies/policyConfig";
-import type { FlatType, TimelineItem } from "../types";
+import type { FlatType } from "../types";
 import type { FirstTimers, Household } from "./budgetStorage";
 import type { CeilingResult } from "./cpfProjection";
 import { addMonths, formatMonthYear, getLaunchMonthSortValue, parseMonthYearDate } from "./date";
@@ -155,48 +155,6 @@ export function eligibilityChecks({
   return checks;
 }
 
-export type BallotProfile = {
-  /** First-timer married couples aged 40 or under, or parents of a child aged 18 or under: FT(PMC). */
-  pmc: boolean;
-  /** Unsuccessful applications for Standard flats since the October 2024 launch. */
-  unsuccessfulStandard: number;
-};
-
-/**
- * Ballot chances for one application. First-timer families get 2, or 3 as FT(PMC). After two or
- * more unsuccessful Standard applications, each Standard application gets one more, up to 4
- * (5 for FT(PMC)). Plus and Prime applications get no extra chances. Second-timers get 1.
- * Sources: HDB Priority Schemes; MND written answers (2025) on additional ballot chances.
- */
-export function ballotChances({
-  household,
-  firstTimers,
-  profile,
-  standard,
-}: {
-  household: Household;
-  firstTimers: FirstTimers;
-  profile: BallotProfile;
-  standard: boolean;
-}) {
-  if (household === "single" || firstTimers !== "both") return { chances: 1, base: 1, extra: 0 };
-  const base = profile.pmc ? 3 : 2;
-  const cap = profile.pmc ? 5 : 4;
-  const extra = standard && profile.unsuccessfulStandard >= 2 ? profile.unsuccessfulStandard - 1 : 0;
-  const chances = Math.min(base + extra, cap);
-  return { chances, base, extra: chances - base };
-}
-
-/**
- * A rough chance of a queue number within the flats on offer: one in (applicants per flat), scaled
- * by your ballot chances against what others in your group usually have. Only a guide: HDB
- * doesn't publish odds, and many invited to book decline, so later queue numbers still get flats.
- */
-export function roughOdds(rate: number, chances: number, typicalChances: number) {
-  if (rate <= 0) return 1;
-  return Math.min(1, chances / Math.max(typicalChances, 1) / rate);
-}
-
 export type LaunchSnapshot = {
   label: string;
   projects: BtoProject[];
@@ -267,76 +225,6 @@ export function pricesBySize(projects: BtoProject[]): Partial<Record<FlatType, {
   );
 }
 
-export type JourneyStage = {
-  key: string;
-  title: string;
-  when: string;
-  body: string;
-  /** Money due at this step, split by where it comes from. */
-  due?: { total: number; cash: number; cpf: number; grant: number; shortfall: number };
-};
-
-/** From HFE letter to keys, dated from the payment timeline. */
-export function journeyStages(timeline: TimelineItem[]): JourneyStage[] {
-  const find = (label: string) => timeline.find((item) => item.label === label);
-  const dueOf = (item: TimelineItem | undefined, extra?: TimelineItem) => {
-    const payments = [item?.payment, extra?.payment].filter(Boolean) as NonNullable<TimelineItem["payment"]>[];
-    if (payments.length === 0) return undefined;
-    return payments.reduce(
-      (sum, payment) => ({
-        total: sum.total + payment.total,
-        cash: sum.cash + payment.cash,
-        cpf: sum.cpf + payment.cpfOa,
-        grant: sum.grant + (payment.grant ?? 0),
-        shortfall: sum.shortfall + (payment.shortfall ?? 0),
-      }),
-      { total: 0, cash: 0, cpf: 0, grant: 0, shortfall: 0 },
-    );
-  };
-  const application = find("Application window");
-  const booking = find("Flat booking");
-  const signing = find("Agreement for lease");
-  const keys = find("Key collection");
-  const afterKeys = find("Post-keys fees");
-
-  return [
-    {
-      key: "hfe",
-      title: "Get your HFE letter",
-      when: "Before you apply",
-      body: "Apply on HDB's Flat Portal. It confirms you can buy, your loan and your grant, and lasts 9 months.",
-    },
-    {
-      key: "apply",
-      title: "Apply in a launch",
-      when: application?.date ?? "",
-      body: "Pick one project and flat size. Results come by ballot, with a queue number.",
-      due: dueOf(application),
-    },
-    {
-      key: "book",
-      title: "Book your flat",
-      when: booking?.date ?? "",
-      body: "When your queue number comes up, choose a unit and pay the option fee.",
-      due: dueOf(booking),
-    },
-    {
-      key: "sign",
-      title: "Sign the agreement for lease",
-      when: signing?.date ?? "",
-      body: "Pay the first part of the downpayment. Your grant is already in CPF by now.",
-      due: dueOf(signing),
-    },
-    {
-      key: "keys",
-      title: "Collect your keys",
-      when: keys?.date ?? "",
-      body: "Pay the rest of the downpayment and fees. Loan repayments start the month after.",
-      due: dueOf(keys, afterKeys),
-    },
-  ];
-}
-
 function variantFor(project: BtoProject, flatType: FlatType) {
   return project.flatVariants.find((variant) => variant.type === flatType && variant.basePrice > 0);
 }
@@ -377,6 +265,3 @@ export function splitCeiling(result: CeilingResult | null): CeilingSplit | null 
     tenure: result.estimate.effectiveTenureYears,
   };
 }
-
-/** One change and how far it moves the price ceiling. */
-export type Lever = { key: string; label: string; delta: number; note?: string };

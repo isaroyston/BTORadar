@@ -1,0 +1,676 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T00:00:00Z",
+  "title": "Design System: BTO Radar",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Raspberry",
+        "canonical": "oklch(55% 0.205 14)",
+        "tonalRamp": [
+          "oklch(15% 0.088 14)",
+          "oklch(25% 0.146 14)",
+          "oklch(35% 0.205 14)",
+          "oklch(45% 0.205 14)",
+          "oklch(55% 0.205 14)",
+          "oklch(65% 0.205 14)",
+          "oklch(80% 0.117 14)",
+          "oklch(95% 0.031 14)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Pressed Raspberry",
+        "canonical": "oklch(49.5% 0.195 14)",
+        "tonalRamp": [
+          "oklch(15% 0.084 14)",
+          "oklch(25% 0.139 14)",
+          "oklch(35% 0.195 14)",
+          "oklch(45% 0.195 14)",
+          "oklch(55% 0.195 14)",
+          "oklch(65% 0.195 14)",
+          "oklch(80% 0.111 14)",
+          "oklch(95% 0.029 14)"
+        ]
+      },
+      "accent-soft": {
+        "role": "primary",
+        "displayName": "Raspberry Mist",
+        "canonical": "oklch(97.2% 0.014 14)",
+        "tonalRamp": [
+          "oklch(15% 0.006 14)",
+          "oklch(25% 0.01 14)",
+          "oklch(35% 0.014 14)",
+          "oklch(45% 0.014 14)",
+          "oklch(55% 0.014 14)",
+          "oklch(65% 0.014 14)",
+          "oklch(80% 0.008 14)",
+          "oklch(95% 0.002 14)"
+        ]
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Paper White",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0.0 0)",
+          "oklch(25% 0.0 0)",
+          "oklch(35% 0.0 0)",
+          "oklch(45% 0.0 0)",
+          "oklch(55% 0.0 0)",
+          "oklch(65% 0.0 0)",
+          "oklch(80% 0.0 0)",
+          "oklch(95% 0.0 0)"
+        ]
+      },
+      "card": {
+        "role": "neutral",
+        "displayName": "Paper White (card)",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0.0 0)",
+          "oklch(25% 0.0 0)",
+          "oklch(35% 0.0 0)",
+          "oklch(45% 0.0 0)",
+          "oklch(55% 0.0 0)",
+          "oklch(65% 0.0 0)",
+          "oklch(80% 0.0 0)",
+          "oklch(95% 0.0 0)"
+        ]
+      },
+      "panel": {
+        "role": "neutral",
+        "displayName": "Rail Grey",
+        "canonical": "oklch(98.6% 0.002 248)",
+        "tonalRamp": [
+          "oklch(15% 0.001 248)",
+          "oklch(25% 0.001 248)",
+          "oklch(35% 0.002 248)",
+          "oklch(45% 0.002 248)",
+          "oklch(55% 0.002 248)",
+          "oklch(65% 0.002 248)",
+          "oklch(80% 0.001 248)",
+          "oklch(95% 0.0 248)"
+        ]
+      },
+      "canvas-deep": {
+        "role": "neutral",
+        "displayName": "Quiet Fill",
+        "canonical": "oklch(97.7% 0.0035 248)",
+        "tonalRamp": [
+          "oklch(15% 0.002 248)",
+          "oklch(25% 0.003 248)",
+          "oklch(35% 0.004 248)",
+          "oklch(45% 0.004 248)",
+          "oklch(55% 0.004 248)",
+          "oklch(65% 0.004 248)",
+          "oklch(80% 0.002 248)",
+          "oklch(95% 0.001 248)"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(93% 0.006 255)",
+        "tonalRamp": [
+          "oklch(15% 0.003 255)",
+          "oklch(25% 0.004 255)",
+          "oklch(35% 0.006 255)",
+          "oklch(45% 0.006 255)",
+          "oklch(55% 0.006 255)",
+          "oklch(65% 0.006 255)",
+          "oklch(80% 0.003 255)",
+          "oklch(95% 0.001 255)"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "oklch(87.5% 0.009 255)",
+        "tonalRamp": [
+          "oklch(15% 0.004 255)",
+          "oklch(25% 0.006 255)",
+          "oklch(35% 0.009 255)",
+          "oklch(45% 0.009 255)",
+          "oklch(55% 0.009 255)",
+          "oklch(65% 0.009 255)",
+          "oklch(80% 0.005 255)",
+          "oklch(95% 0.001 255)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(23% 0.025 264)",
+        "tonalRamp": [
+          "oklch(15% 0.011 264)",
+          "oklch(25% 0.018 264)",
+          "oklch(35% 0.025 264)",
+          "oklch(45% 0.025 264)",
+          "oklch(55% 0.025 264)",
+          "oklch(65% 0.025 264)",
+          "oklch(80% 0.014 264)",
+          "oklch(95% 0.004 264)"
+        ]
+      },
+      "ink-2": {
+        "role": "neutral",
+        "displayName": "Slate",
+        "canonical": "oklch(39% 0.022 260)",
+        "tonalRamp": [
+          "oklch(15% 0.009 260)",
+          "oklch(25% 0.016 260)",
+          "oklch(35% 0.022 260)",
+          "oklch(45% 0.022 260)",
+          "oklch(55% 0.022 260)",
+          "oklch(65% 0.022 260)",
+          "oklch(80% 0.013 260)",
+          "oklch(95% 0.003 260)"
+        ]
+      },
+      "mute": {
+        "role": "neutral",
+        "displayName": "Mute",
+        "canonical": "oklch(52.5% 0.02 255)",
+        "tonalRamp": [
+          "oklch(15% 0.009 255)",
+          "oklch(25% 0.014 255)",
+          "oklch(35% 0.02 255)",
+          "oklch(45% 0.02 255)",
+          "oklch(55% 0.02 255)",
+          "oklch(65% 0.02 255)",
+          "oklch(80% 0.011 255)",
+          "oklch(95% 0.003 255)"
+        ]
+      },
+      "faint": {
+        "role": "neutral",
+        "displayName": "Faint",
+        "canonical": "oklch(66% 0.015 255)",
+        "tonalRamp": [
+          "oklch(15% 0.006 255)",
+          "oklch(25% 0.011 255)",
+          "oklch(35% 0.015 255)",
+          "oklch(45% 0.015 255)",
+          "oklch(55% 0.015 255)",
+          "oklch(65% 0.015 255)",
+          "oklch(80% 0.009 255)",
+          "oklch(95% 0.002 255)"
+        ]
+      },
+      "positive": {
+        "role": "status",
+        "displayName": "Ledger Green",
+        "canonical": "oklch(47% 0.12 155)",
+        "tonalRamp": [
+          "oklch(15% 0.051 155)",
+          "oklch(25% 0.086 155)",
+          "oklch(35% 0.12 155)",
+          "oklch(45% 0.12 155)",
+          "oklch(55% 0.12 155)",
+          "oklch(65% 0.12 155)",
+          "oklch(80% 0.069 155)",
+          "oklch(95% 0.018 155)"
+        ]
+      },
+      "positive-pale": {
+        "role": "status",
+        "displayName": "Ledger Green Pale",
+        "canonical": "oklch(96.5% 0.035 155)",
+        "tonalRamp": [
+          "oklch(15% 0.015 155)",
+          "oklch(25% 0.025 155)",
+          "oklch(35% 0.035 155)",
+          "oklch(45% 0.035 155)",
+          "oklch(55% 0.035 155)",
+          "oklch(65% 0.035 155)",
+          "oklch(80% 0.02 155)",
+          "oklch(95% 0.005 155)"
+        ]
+      },
+      "caution": {
+        "role": "status",
+        "displayName": "Ochre",
+        "canonical": "oklch(50% 0.11 60)",
+        "tonalRamp": [
+          "oklch(15% 0.047 60)",
+          "oklch(25% 0.079 60)",
+          "oklch(35% 0.11 60)",
+          "oklch(45% 0.11 60)",
+          "oklch(55% 0.11 60)",
+          "oklch(65% 0.11 60)",
+          "oklch(80% 0.063 60)",
+          "oklch(95% 0.017 60)"
+        ]
+      },
+      "caution-pale": {
+        "role": "status",
+        "displayName": "Ochre Pale",
+        "canonical": "oklch(96.8% 0.04 80)",
+        "tonalRamp": [
+          "oklch(15% 0.017 80)",
+          "oklch(25% 0.029 80)",
+          "oklch(35% 0.04 80)",
+          "oklch(45% 0.04 80)",
+          "oklch(55% 0.04 80)",
+          "oklch(65% 0.04 80)",
+          "oklch(80% 0.023 80)",
+          "oklch(95% 0.006 80)"
+        ]
+      },
+      "gold-ink": {
+        "role": "category",
+        "displayName": "Gold",
+        "canonical": "oklch(48% 0.1 70)",
+        "tonalRamp": [
+          "oklch(15% 0.043 70)",
+          "oklch(25% 0.071 70)",
+          "oklch(35% 0.1 70)",
+          "oklch(45% 0.1 70)",
+          "oklch(55% 0.1 70)",
+          "oklch(65% 0.1 70)",
+          "oklch(80% 0.057 70)",
+          "oklch(95% 0.015 70)"
+        ]
+      },
+      "gold-pale": {
+        "role": "category",
+        "displayName": "Gold Pale",
+        "canonical": "oklch(96.8% 0.04 85)",
+        "tonalRamp": [
+          "oklch(15% 0.017 85)",
+          "oklch(25% 0.029 85)",
+          "oklch(35% 0.04 85)",
+          "oklch(45% 0.04 85)",
+          "oklch(55% 0.04 85)",
+          "oklch(65% 0.04 85)",
+          "oklch(80% 0.023 85)",
+          "oklch(95% 0.006 85)"
+        ]
+      },
+      "info-ink": {
+        "role": "category",
+        "displayName": "Info Blue",
+        "canonical": "oklch(45% 0.13 260)",
+        "tonalRamp": [
+          "oklch(15% 0.056 260)",
+          "oklch(25% 0.093 260)",
+          "oklch(35% 0.13 260)",
+          "oklch(45% 0.13 260)",
+          "oklch(55% 0.13 260)",
+          "oklch(65% 0.13 260)",
+          "oklch(80% 0.074 260)",
+          "oklch(95% 0.019 260)"
+        ]
+      },
+      "info-pale": {
+        "role": "category",
+        "displayName": "Info Blue Pale",
+        "canonical": "oklch(96.5% 0.025 255)",
+        "tonalRamp": [
+          "oklch(15% 0.011 255)",
+          "oklch(25% 0.018 255)",
+          "oklch(35% 0.025 255)",
+          "oklch(45% 0.025 255)",
+          "oklch(55% 0.025 255)",
+          "oklch(65% 0.025 255)",
+          "oklch(80% 0.014 255)",
+          "oklch(95% 0.004 255)"
+        ]
+      },
+      "split-loan": {
+        "role": "data",
+        "displayName": "Loan Indigo",
+        "canonical": "oklch(56% 0.16 268)",
+        "tonalRamp": [
+          "oklch(15% 0.069 268)",
+          "oklch(25% 0.114 268)",
+          "oklch(35% 0.16 268)",
+          "oklch(45% 0.16 268)",
+          "oklch(55% 0.16 268)",
+          "oklch(65% 0.16 268)",
+          "oklch(80% 0.091 268)",
+          "oklch(95% 0.024 268)"
+        ]
+      },
+      "split-grant": {
+        "role": "data",
+        "displayName": "Grant Green",
+        "canonical": "oklch(66% 0.14 162)",
+        "tonalRamp": [
+          "oklch(15% 0.06 162)",
+          "oklch(25% 0.1 162)",
+          "oklch(35% 0.14 162)",
+          "oklch(45% 0.14 162)",
+          "oklch(55% 0.14 162)",
+          "oklch(65% 0.14 162)",
+          "oklch(80% 0.08 162)",
+          "oklch(95% 0.021 162)"
+        ]
+      },
+      "split-cpf": {
+        "role": "data",
+        "displayName": "CPF Amber",
+        "canonical": "oklch(79% 0.13 80)",
+        "tonalRamp": [
+          "oklch(15% 0.056 80)",
+          "oklch(25% 0.093 80)",
+          "oklch(35% 0.13 80)",
+          "oklch(45% 0.13 80)",
+          "oklch(55% 0.13 80)",
+          "oklch(65% 0.13 80)",
+          "oklch(80% 0.074 80)",
+          "oklch(95% 0.019 80)"
+        ]
+      },
+      "split-cash": {
+        "role": "data",
+        "displayName": "Cash Raspberry",
+        "canonical": "oklch(60% 0.2 14)",
+        "tonalRamp": [
+          "oklch(15% 0.086 14)",
+          "oklch(25% 0.143 14)",
+          "oklch(35% 0.2 14)",
+          "oklch(45% 0.2 14)",
+          "oklch(55% 0.2 14)",
+          "oklch(65% 0.2 14)",
+          "oklch(80% 0.114 14)",
+          "oklch(95% 0.03 14)"
+        ]
+      },
+      "on-accent": {
+        "role": "neutral",
+        "displayName": "On Accent",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": [
+          "oklch(15% 0.0 0)",
+          "oklch(25% 0.0 0)",
+          "oklch(35% 0.0 0)",
+          "oklch(45% 0.0 0)",
+          "oklch(55% 0.0 0)",
+          "oklch(65% 0.0 0)",
+          "oklch(80% 0.0 0)",
+          "oklch(95% 0.0 0)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "The answer figure; tabular, tight tracking."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Page titles."
+      },
+      "section": {
+        "displayName": "Section",
+        "purpose": "Home section headings, sentence case."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Copy and descriptions."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Buttons, nav items, field labels, footnote rows."
+      },
+      "caption": {
+        "displayName": "Caption",
+        "purpose": "Legends, hints, credits, badges."
+      }
+    },
+    "shadows": [
+      {
+        "name": "shadow-card",
+        "value": "0 0 0 1px var(--hairline), 0 1px 2px oklch(23% 0.025 264 / 0.04)",
+        "purpose": "Hairline edge on every resting card and panel."
+      },
+      {
+        "name": "shadow-float",
+        "value": "0 0 0 1px oklch(23% 0.025 264 / 0.06), 0 24px 48px -16px oklch(23% 0.025 264 / 0.24), 0 8px 16px -8px oklch(23% 0.025 264 / 0.1)",
+        "purpose": "Dialogs, sheets, the compare dock, and project cards on hover."
+      },
+      {
+        "name": "shadow-button",
+        "value": "0 1px 1px oklch(23% 0.025 264 / 0.08), 0 0 0 1px var(--hairline-strong)",
+        "purpose": "Quiet buttons and edit chips."
+      },
+      {
+        "name": "selection-ring",
+        "value": "inset 0 0 0 2px var(--accent), var(--shadow-card)",
+        "purpose": "A selected project card or launch tab."
+      },
+      {
+        "name": "focus-ring",
+        "value": "outline: 2px solid var(--accent); outline-offset: 2px",
+        "purpose": "Keyboard focus on every interactive element."
+      },
+      {
+        "name": "input-focus",
+        "value": "inset 0 0 0 1px var(--accent), 0 0 0 3px var(--accent-glow)",
+        "purpose": "Focused fields."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "All transitions and animations."
+      },
+      {
+        "name": "count-up",
+        "value": "520ms, ease-out quart",
+        "purpose": "Numbers counting to new values."
+      },
+      {
+        "name": "count-up-result",
+        "value": "900ms",
+        "purpose": "Setup result figure counts up from zero."
+      },
+      {
+        "name": "split-grow",
+        "value": "700ms scaleX from 0, once",
+        "purpose": "Split bar segments grow from the left."
+      },
+      {
+        "name": "setup-step",
+        "value": "translateX(14px) plus fade",
+        "purpose": "Guided setup steps slide in."
+      },
+      {
+        "name": "setup-in",
+        "value": "360ms, rises 16px",
+        "purpose": "Setup dialog opens."
+      },
+      {
+        "name": "segmented-thumb",
+        "value": "320ms transform",
+        "purpose": "Segmented thumb slides under the choice."
+      },
+      {
+        "name": "screen-transition",
+        "value": "View Transitions cross-fade, 120ms out / 220ms in",
+        "purpose": "Screen changes; the rail stays put."
+      },
+      {
+        "name": "hover",
+        "value": "140-160ms",
+        "purpose": "Colour, background and shadow state changes."
+      },
+      {
+        "name": "reduced-motion",
+        "value": "durations forced to 1ms",
+        "purpose": "prefers-reduced-motion: nothing moves."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "setup-split",
+        "value": "760px"
+      },
+      {
+        "name": "home-grid",
+        "value": "900px"
+      },
+      {
+        "name": "rail",
+        "value": "1024px"
+      },
+      {
+        "name": "two-col",
+        "value": "1100px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "One per panel: the main action.",
+      "html": "<button class=\"ds-btn-primary\">See flats that fit <svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M5 12h14\"/><path d=\"m12 5 7 7-7 7\"/></svg></button>",
+      "css": ".ds-btn-primary { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:inline-flex; align-items:center; gap:0.45rem; min-height:2.5rem; padding:0.55rem 1rem; border:0; border-radius:8px; background:oklch(55% 0.205 14); color:#fff; font-size:0.9rem; font-weight:500; line-height:1; letter-spacing:-0.005em; cursor:pointer; box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.14), 0 0 0 1px oklch(47% 0.19 14), 0 1px 2px oklch(40% 0.15 14 / 0.3); transition: background-color 160ms cubic-bezier(0.16,1,0.3,1), transform 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary svg { transition: transform 220ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary:hover { background:oklch(49.5% 0.195 14); } .ds-btn-primary:hover svg { transform:translateX(3px); } .ds-btn-primary:active { transform:translateY(0.5px); } .ds-btn-primary:focus-visible { outline:2px solid oklch(55% 0.205 14); outline-offset:2px; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Every secondary action and the page-head actions.",
+      "html": "<button class=\"ds-btn-quiet\">How this is worked out</button>",
+      "css": ".ds-btn-quiet { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:inline-flex; align-items:center; gap:0.45rem; min-height:2.5rem; padding:0.55rem 1rem; border:0; border-radius:8px; background:#fff; color:oklch(23% 0.025 264); font-size:0.9rem; font-weight:500; line-height:1; cursor:pointer; box-shadow:0 1px 1px oklch(23% 0.025 264 / 0.08), 0 0 0 1px oklch(87.5% 0.009 255); transition: background-color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-quiet:hover { background:oklch(97.7% 0.0035 248); } .ds-btn-quiet:active { transform:translateY(0.5px); } .ds-btn-quiet:focus-visible { outline:2px solid oklch(55% 0.205 14); outline-offset:2px; }"
+    },
+    {
+      "name": "Edit Chip",
+      "kind": "button",
+      "refersTo": "edit-chip",
+      "description": "Small icon-and-label action in the page head or a card corner.",
+      "html": "<button class=\"ds-edit-chip\"><svg width=\"15\" height=\"15\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z\"/></svg> Edit answers</button>",
+      "css": ".ds-edit-chip { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:inline-flex; align-items:center; gap:0.4rem; min-height:2rem; padding:0.3rem 0.7rem; border:0; border-radius:8px; background:#fff; color:oklch(23% 0.025 264); font-size:0.825rem; font-weight:500; cursor:pointer; box-shadow:0 1px 1px oklch(23% 0.025 264 / 0.08), 0 0 0 1px oklch(87.5% 0.009 255); transition: background-color 140ms cubic-bezier(0.16,1,0.3,1); } .ds-edit-chip:hover { background:oklch(97.7% 0.0035 248); } .ds-edit-chip:focus-visible { outline:2px solid oklch(55% 0.205 14); outline-offset:2px; }"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Money and text fields with a raspberry focus ring.",
+      "html": "<label class=\"ds-field\"><span>Monthly income</span><input class=\"ds-input\" value=\"S$ 4,000\" /></label>",
+      "css": ".ds-field { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:grid; gap:0.3rem; max-width:16rem; font-size:0.85rem; font-weight:500; color:oklch(39% 0.022 260); } .ds-input { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; min-height:2.5rem; padding:0 0.85rem; border:0; border-radius:8px; background:#fff; color:oklch(23% 0.025 264); font-size:0.95rem; font-weight:500; caret-color:oklch(55% 0.205 14); box-shadow: inset 0 0 0 1px oklch(87.5% 0.009 255), 0 1px 1px oklch(23% 0.025 264 / 0.04); transition: box-shadow 160ms cubic-bezier(0.16,1,0.3,1); } .ds-input:hover { box-shadow: inset 0 0 0 1px color-mix(in oklch, oklch(23% 0.025 264) 28%, transparent); } .ds-input:focus { outline:none; box-shadow: inset 0 0 0 1px oklch(55% 0.205 14), 0 0 0 3px oklch(55% 0.205 14 / 0.18); }"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "chip",
+      "refersTo": "segmented",
+      "description": "One-of-few choices; a white thumb sits under the choice.",
+      "html": "<div class=\"ds-seg\" role=\"radiogroup\"><button role=\"radio\" aria-checked=\"true\">2 room</button><button role=\"radio\" aria-checked=\"false\">3 room</button><button role=\"radio\" aria-checked=\"false\">4 room</button></div>",
+      "css": ".ds-seg { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:inline-grid; grid-auto-flow:column; padding:0.2rem; border-radius:8px; background:oklch(97.7% 0.0035 248); box-shadow: inset 0 0 0 1px oklch(93% 0.006 255); } .ds-seg button { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; min-height:2.4rem; padding:0.35rem 0.9rem; border:0; border-radius:6px; background:transparent; font-size:0.875rem; font-weight:500; color:oklch(39% 0.022 260); cursor:pointer; transition: color 200ms cubic-bezier(0.16,1,0.3,1), background-color 320ms cubic-bezier(0.16,1,0.3,1); } .ds-seg button:hover { color:oklch(23% 0.025 264); } .ds-seg button[aria-checked=\"true\"] { background:#fff; font-weight:600; color:oklch(23% 0.025 264); box-shadow:0 0 0 1px oklch(87.5% 0.009 255), 0 1px 2px oklch(23% 0.025 264 / 0.08); } .ds-seg button:focus-visible { outline:2px solid oklch(55% 0.205 14); outline-offset:2px; }"
+    },
+    {
+      "name": "Status Pills",
+      "kind": "chip",
+      "refersTo": "pill-positive",
+      "description": "Green within budget, ochre over (never red), raspberry only for live.",
+      "html": "<span class=\"ds-pill ds-pill-ok\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg> Within budget</span> <span class=\"ds-pill ds-pill-caution\">S$ 12,000 over</span> <span class=\"ds-pill ds-pill-live\">Open</span>",
+      "css": ".ds-pill { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:inline-flex; align-items:center; gap:0.3rem; padding:0.2rem 0.55rem; border-radius:6px; font-size:0.78rem; font-weight:500; line-height:1.25; } .ds-pill-ok { background:oklch(96.5% 0.035 155); color:oklch(47% 0.12 155); } .ds-pill-caution { background:oklch(96.8% 0.04 80); color:oklch(50% 0.11 60); } .ds-pill-live { background:oklch(55% 0.205 14); color:#fff; font-weight:600; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Resting white panel edged by a hairline, with a footnote row.",
+      "html": "<section class=\"ds-card\"><h2>What you qualify for</h2><p>Singles aged 35 and over can buy a new 2-room Flexi in Standard, Plus and Prime projects.</p><p class=\"ds-card-foot\">HDB allows up to S$ 8,000 a month; you earn S$ 4,000.</p></section>",
+      "css": ".ds-card { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:grid; gap:1rem; max-width:28rem; padding:1.35rem 1.5rem 1.5rem; border-radius:12px; background:#fff; color:oklch(23% 0.025 264); box-shadow:0 0 0 1px oklch(93% 0.006 255), 0 1px 2px oklch(23% 0.025 264 / 0.04); } .ds-card h2 { margin:0; font-size:1rem; font-weight:600; letter-spacing:-0.015em; } .ds-card p { margin:0; font-size:15px; line-height:1.55; color:oklch(39% 0.022 260); } .ds-card .ds-card-foot { padding-top:1rem; border-top:1px solid oklch(93% 0.006 255); font-size:0.85rem; }"
+    },
+    {
+      "name": "Side Rail",
+      "kind": "nav",
+      "refersTo": "side-rail",
+      "description": "Pale grey rail; the current item is a white raised row with a raspberry icon.",
+      "html": "<nav class=\"ds-rail\"><a class=\"ds-rail-item\" aria-current=\"page\" href=\"#\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M3 10.5 12 3l9 7.5V21H3z\"/></svg>Home</a><a class=\"ds-rail-item\" href=\"#\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"6\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"M16 13h2\"/></svg>Budget<span class=\"ds-done\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20 6 9 17l-5-5\"/></svg></span></a><a class=\"ds-rail-item\" href=\"#\"><svg width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/></svg>Projects</a></nav>",
+      "css": ".ds-rail { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:grid; gap:0.2rem; width:14rem; padding:1rem; background:oklch(98.6% 0.002 248); border-right:1px solid oklch(93% 0.006 255); } .ds-rail-item { display:flex; align-items:center; gap:0.65rem; min-height:2.25rem; padding:0.35rem 0.6rem; border-radius:8px; font-size:0.9rem; font-weight:500; color:oklch(39% 0.022 260); text-decoration:none; transition: background-color 140ms cubic-bezier(0.16,1,0.3,1), color 140ms cubic-bezier(0.16,1,0.3,1); } .ds-rail-item > svg { color:oklch(66% 0.015 255); } .ds-rail-item:hover { background:color-mix(in oklch, oklch(23% 0.025 264) 5%, transparent); color:oklch(23% 0.025 264); } .ds-rail-item[aria-current=\"page\"] { background:#fff; color:oklch(23% 0.025 264); box-shadow:0 0 0 1px oklch(93% 0.006 255), 0 1px 2px oklch(23% 0.025 264 / 0.05); } .ds-rail-item[aria-current=\"page\"] > svg { color:oklch(55% 0.205 14); } .ds-rail-item:focus-visible { outline:2px solid oklch(55% 0.205 14); outline-offset:2px; } .ds-done { display:grid; place-items:center; width:1.15rem; height:1.15rem; margin-left:auto; border-radius:50%; background:oklch(96.5% 0.035 155); color:oklch(47% 0.12 155); } .ds-done svg { width:0.75rem; height:0.75rem; }"
+    },
+    {
+      "name": "Money Split",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Signature: the four fixed source colours wherever a price is broken down.",
+      "html": "<div class=\"ds-split\"><div class=\"ds-split-bar\"><span style=\"flex:248889;background:oklch(56% 0.16 268)\"></span><span style=\"flex:10000;background:oklch(66% 0.14 162)\"></span><span style=\"flex:72963;background:oklch(79% 0.13 80)\"></span></div><dl class=\"ds-split-legend\"><div><dt><i style=\"background:oklch(56% 0.16 268)\"></i>HDB loan</dt><dd>S$ 248,889</dd></div><div><dt><i style=\"background:oklch(66% 0.14 162)\"></i>Grant</dt><dd>S$ 10,000</dd></div><div><dt><i style=\"background:oklch(79% 0.13 80)\"></i>CPF by keys</dt><dd>S$ 72,963</dd></div></dl></div>",
+      "css": ".ds-split { font-family: \"Geist Variable\", Geist, ui-sans-serif, system-ui, sans-serif; display:grid; gap:0.85rem; max-width:30rem; color:oklch(23% 0.025 264); } .ds-split-bar { display:flex; gap:3px; height:0.7rem; overflow:hidden; border-radius:8px; } .ds-split-bar span { min-width:6px; border-radius:3px; transform-origin:left; animation: ds-grow 700ms cubic-bezier(0.16,1,0.3,1) both; } @keyframes ds-grow { from { transform:scaleX(0); } } @media (prefers-reduced-motion: reduce) { .ds-split-bar span { animation:none; } } .ds-split-legend { display:grid; grid-auto-flow:column; grid-auto-columns:minmax(0,1fr); gap:0.6rem 1rem; margin:0; } .ds-split-legend dt { display:flex; align-items:center; gap:0.4rem; font-size:0.8rem; color:oklch(52.5% 0.02 255); } .ds-split-legend i { width:0.55rem; height:0.55rem; border-radius:50%; } .ds-split-legend dd { margin:0.1rem 0 0; font-weight:600; font-variant-numeric:tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Ledger in Daylight",
+    "overview": "BTO Radar is a money tool for people with a real decision in front of them: can we afford a flat, which launch, and when the money is due. It reads like a top-tier financial dashboard (the owner's bar is Stripe Dashboard): a white page, white cards edged by cool-grey hairlines, near-black ink, and every figure traceable to its inputs. The system is light only. The owner asked for a \"white sleek clean theme instead of the dark\", so there is no dark mode and no theme switch.\n\nDensity is that of a working dashboard, not a landing page. A fixed pale-grey rail on the left, a page title with one factual line, then two-column rows of panels. Emphasis comes from the size and weight of the numbers, not from colour or ornament. Raspberry is the one accent and is rare on purpose. The signature is the four-colour money split bar, which appears wherever a price is broken into loan, grant, CPF by keys and cash.\n\nThe system rejects the consumer-app look: tinted canvases, dark hero cards, icon tiles on rows, pill buttons, drawn illustrations on working screens, decorative gradients and glassmorphism.",
+    "keyCharacteristics": [
+      "White page and cards; depth from 1px hairlines, not floating shadows.",
+      "One typeface, Geist, at 400/500/600 with tabular figures.",
+      "Large semibold numbers carry the hierarchy.",
+      "Raspberry only on primary actions, focus, the current nav icon, live marks and selection rings.",
+      "Four fixed money-split colours that mean the same thing everywhere.",
+      "Quiet, exact motion: numbers count, bars grow once, nothing bounces."
+    ],
+    "rules": [
+      {
+        "name": "The Raspberry Is Not for Reading Rule",
+        "body": "Raspberry marks what you can act on or what is live: primary actions, focus, the current nav icon, live marks and selection rings. It is never the colour of body text, labels or decorative icons.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Red Verdict Rule",
+        "body": "Over budget is ochre, never red. Green means within budget, gains or grant. Status is always carried by an icon or word as well as colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Fixed Split Rule",
+        "body": "Loan, grant, CPF by keys and cash always use their four split colours, in that order, and those colours mean nothing else.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Face Rule",
+        "body": "Geist is the only typeface. No second family, no system display face, no weights above 600.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every number that can sit beside another (prices, dates, amounts, legends) uses tabular numerals.",
+        "section": "typography"
+      },
+      {
+        "name": "The Sentence Case Rule",
+        "body": "Headings are sentence case at their size. No uppercase tracked labels, eyebrows or kickers above headings.",
+        "section": "typography"
+      },
+      {
+        "name": "The Edged, Not Floated Rule",
+        "body": "A resting card never floats. If it needs separation, it gets a hairline; only things above the page, or a card under the pointer, get a shadow.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do lead each screen with its title and one factual line, then the answer, then the inputs that change it.",
+      "Do edge resting cards with the hairline ring and keep them white.",
+      "Do use the four-colour split bar wherever a price is broken down, with figures in the legend.",
+      "Do set every comparable number in tabular Geist, and let size and weight carry emphasis.",
+      "Do keep raspberry to one primary action per panel plus focus, the current nav icon, live marks and selection rings.",
+      "Do pair every status colour with an icon or word."
+    ],
+    "donts": [
+      "Don't add a dark mode, a theme switch, a tinted canvas or a dark hero card.",
+      "Don't add a second typeface, a second accent or weights above 600.",
+      "Don't set reading text, labels or decorative icons in raspberry.",
+      "Don't show over budget in red; use ochre.",
+      "Don't put icon tiles on rows or illustrations on working screens.",
+      "Don't use pill-shaped buttons, decorative gradients, glassmorphism or floating shadows on resting cards.",
+      "Don't put uppercase eyebrow or kicker labels above headings.",
+      "Don't animate with bounce, pulse or spin, or ignore reduced motion."
+    ]
+  }
+}

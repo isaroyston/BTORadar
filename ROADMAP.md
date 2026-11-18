@@ -30,7 +30,22 @@ Updated 2026-11-17. Policy figures live in `frontend/src/policies/policyConfig.t
 - **Share with your partner.** A link that carries the plan in its hash, so no server is involved. Whoever opens it chooses whether to load it.
 - **Calendar file** (.ics) covering the HFE expiry, the next launch, each step for the chosen project and the end of the minimum occupation period.
 - **Print** layout for a one-document summary.
-- **Dark mode**, following the system or set from a switch.
+- ~~Dark mode~~, built then removed the same day at the owner's request for a white theme.
+
+**2026-11-17, third pass: white theme**
+- A light-only, Stripe-Dashboard-level look: white cards edged by hairlines, Geist (self-hosted) instead of Inter, raspberry only for actions, focus and selection, the money split bar on every price breakdown, no icon tiles on rows and no illustrations on working screens.
+
+**2026-11-18, distilled for ordinary buyers**
+
+The owner found the app had become too much to read. It now has three screens, each with one job: Home (what can we afford), Projects (which flat) and Plan (what do we pay when). Removed, and why:
+- **Ballot chances and odds:** they only matter to buyers with several failed tries, and they rested on a mid-window snapshot that needed hand updates every launch.
+- **Commute check, monthly cost of owning, after-keys (MOP, loan balance), levers:** nice to know, but not part of deciding whether and what to buy. They added a screen's worth of reading.
+- **Eligibility list:** it now shows only when something blocks or changes the purchase (income ceilings, singles rules).
+- **Budget screen:** merged into Home. Editing goes through the guided setup.
+- **Calendar file, print layout, road to keys on Home:** Plan already has the payment timeline.
+- **Ages in the setup:** couples are assumed under 35 and singles 35.
+
+Kept, but out of the way: the HFE letter (a disclosure on Home), resale prices (inside each project's detail sheet) and the share link.
 
 ## Not built, and why
 

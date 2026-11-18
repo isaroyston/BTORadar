@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BtoTab } from "./components/BtoTab";
-import { BudgetTab } from "./components/BudgetTab";
 import { Navigation } from "./components/Navigation";
 import { HomeTab } from "./components/HomeTab";
 import { PurchasePlanTab } from "./components/PurchasePlanTab";
@@ -42,8 +41,6 @@ import {
   principalFromMonthlyPayment,
   type FinancingEstimateInput,
 } from "./utils/affordability";
-import { buildCalendar, saveFile, type CalendarEvent } from "./utils/calendar";
-import { afterKeys } from "./utils/ownership";
 import { readSharedPlan, shareUrl, type SharedPlan } from "./utils/share";
 import {
   loadBudgetInputs,
@@ -63,18 +60,16 @@ import {
   timingForLaunch,
   type PurchaseTiming,
 } from "./utils/cpfProjection";
-import { addMonths, parseLaunchMonthInput, parseMonth, parseMonthYearDate } from "./utils/date";
+import { parseLaunchMonthInput, parseMonth, parseMonthYearDate } from "./utils/date";
 import { keysMonth } from "./utils/projectFacts";
 import { clampNumber, currency } from "./utils/format";
 import { withViewTransition } from "./utils/motion";
 import {
   FLAT_LABELS,
   eligibilityChecks,
-  journeyStages,
   latestLaunch,
   pricesBySize,
   splitCeiling,
-  type Lever,
 } from "./utils/journey";
 import { buildPaymentTimeline } from "./utils/paymentTimeline";
 import { loadShortlist, saveShortlist } from "./utils/shortlistStorage";
@@ -167,7 +162,7 @@ function App() {
   // age (a couple's income-weighted average) sets the loan tenure and CPF rates.
   const single = budget.household === "single";
   const earners = single ? 1 : 2;
-  const buyerAge = budget.age ?? ASSUMED_BUYER_AGE;
+  const buyerAge = budget.age ?? (single ? 35 : ASSUMED_BUYER_AGE);
   const ehgMode =
     budget.hfeGrant !== null
       ? "confirmed"
@@ -460,7 +455,6 @@ function App() {
       }),
     [budget.age, budget.firstTimers, budget.hfeLoan, budget.household, combinedIncome, ehgGrant, flatType]
   );
-  const journey = useMemo(() => journeyStages(timeline), [timeline]);
 
   // For the HFE card: what we'd estimate without the letter, to compare with it.
   const estimatedLoan = Math.round(
@@ -474,20 +468,6 @@ function App() {
       familyEligibilityConfirmed: true,
     }).amount ?? 0;
 
-  // After keys: the loan for the chosen project's price, or for the ceiling.
-  const keysDate = useMemo(
-    () =>
-      (selectedBtoProject ? parseMonthYearDate(keysMonth(selectedBtoProject)) : null) ??
-      addMonths(today, typicalTiming.monthsToKeys),
-    [selectedBtoProject, today, typicalTiming.monthsToKeys]
-  );
-  const after = useMemo(() => {
-    const loan = selectedBtoProject ? targetEstimate.loanForTarget : ceilingSplit?.loan;
-    const tenure = (selectedBtoProject ? targetEstimate.effectiveTenureYears : ceilingSplit?.tenure) ?? loanTenureYears;
-    if (!loan || financing === "none") return null;
-    return afterKeys({ keysDate, loan, ratePercent: loanInterestRate, tenureYears: tenure, project: selectedBtoProject });
-  }, [ceilingSplit, financing, keysDate, loanInterestRate, loanTenureYears, selectedBtoProject, targetEstimate]);
-
   const handleShare = async () => {
     const url = shareUrl(
       { budget, combinedIncome, flatType, financing, projectId: selectedBtoProjectId },
@@ -499,37 +479,6 @@ function App() {
     } catch {
       return false;
     }
-  };
-
-  const handleCalendar = () => {
-    const events: CalendarEvent[] = [];
-    if (budget.hfeIssued) {
-      events.push({
-        date: addMonths(parseMonth(budget.hfeIssued), 9),
-        title: "HFE letter runs out",
-        description: "Apply for a flat before this, or renew the letter on HDB's Flat Portal.",
-      });
-    }
-    if (launch && !launch.openNow) {
-      const next = addMonths(parseMonthYearDate(launch.label) ?? today, 3);
-      events.push({ date: next, title: "Next BTO launch expected", description: `HDB usually launches ${launch.nextExpected}. Check your HFE letter is still valid.` });
-    }
-    if (selectedBtoProject) {
-      for (const stage of journey) {
-        const date = parseMonthYearDate(stage.when);
-        if (!date) continue;
-        const due = stage.due && stage.due.total > 0 ? ` Due: ${currency(Math.round(stage.due.total))}.` : "";
-        events.push({ date, title: `${stage.title}: ${selectedBtoProject.name}`, description: `${stage.body}${due}` });
-      }
-    }
-    if (after) {
-      events.push({
-        date: addMonths(keysDate, after.mopYears * 12),
-        title: "Minimum occupation period ends",
-        description: "From now you can sell the flat, or rent out the whole flat.",
-      });
-    }
-    saveFile("bto-radar-plan.ics", buildCalendar(events), "text/calendar");
   };
 
   // A plan opened from a share link waits for the visitor to load it.
@@ -549,40 +498,6 @@ function App() {
     dismissShared();
     setActiveTabState("overview");
   };
-  const levers = useMemo<Lever[]>(() => {
-    if (budget.cpfOa === null || !typicalCeiling) return [];
-    const base = typicalCeiling.price;
-    const gain = (result: ReturnType<typeof ceilingWith>) =>
-      Math.max(Math.floor(((result?.price ?? base) - base) / 1000) * 1000, 0);
-    const raise = 500;
-    const grantDrop = ehgGrant - (grantFor(combinedIncome + raise).amount ?? 0);
-    return [
-      {
-        key: "income",
-        label: `${currency(raise)} more income a month`,
-        delta: gain(ceilingWith({ income: combinedIncome + raise, cpf: budget.cpfOa })),
-        note:
-          budget.hfeLoan !== null
-            ? "Your HFE letter fixes the loan; HDB would reassess it with a new letter."
-            : grantDrop > 0
-              ? `A bigger loan, though the grant falls by ${currency(grantDrop)}.`
-              : "A bigger loan, at 30% of income.",
-      },
-      {
-        key: "savings",
-        label: `${currency(10000)} more in CPF or cash`,
-        delta: gain(ceilingWith({ cpf: budget.cpfOa + 10000 })),
-        note: "Savings go into the downpayment.",
-      },
-      {
-        key: "keys",
-        label: "Keys a year later",
-        delta: gain(ceilingWith({ cpf: budget.cpfOa, laterKeysMonths: 12 })),
-        note: "A project with a longer wait leaves more time for CPF to build up.",
-      },
-    ];
-  }, [budget.cpfOa, budget.hfeLoan, ceilingWith, combinedIncome, ehgGrant, grantFor, typicalCeiling]);
-
   // The setup edits the live plan so its running total is real; closing it early puts the
   // answers back as they were.
   const setupStart = useRef<{ income: number; budget: BudgetInputs; flatType: FlatType } | null>(null);
@@ -598,6 +513,8 @@ function App() {
       saveBudgetInputs(start.budget);
       setFlatType(start.flatType);
     }
+    // With no flat picked yet, Plan starts from the price you can afford rather than a stock figure.
+    if (finished && !selectedBtoProjectId && draftSplit) setFlatPrice(clampNumber(draftSplit.price, FLAT_MIN, FLAT_MAX));
     setupStart.current = null;
     setSetupOpen(false);
     if (finished) setActiveTab("overview");
@@ -662,7 +579,7 @@ function App() {
 
   const doneTabs = useMemo(() => {
     const done = new Set<TabKey>();
-    if (budgetKnown) done.add("budget");
+    if (budgetKnown) done.add("overview");
     if (selectedBtoProjectId) done.add("bto");
     if (timeline.length > 0 && activeCompletedMilestones.length === timeline.length) done.add("plan");
     return done;
@@ -676,7 +593,7 @@ function App() {
     });
 
     const url = new URL(window.location.href);
-    if (tab === "budget") {
+    if (tab === "overview") {
       url.searchParams.delete("tab");
     } else {
       url.searchParams.set("tab", tab);
@@ -827,27 +744,6 @@ function App() {
             </div>
           </div>
         )}
-        {activeTab === "budget" && (
-          <BudgetTab
-            combinedIncome={combinedIncome}
-            budget={budget}
-            financing={financing}
-            loanTenureYears={loanTenureYears}
-            estimateAtMax={budgetAtMax}
-            maxPrice={budgetMaxPrice}
-            ceiling={typicalCeiling}
-            timing={typicalTiming}
-            monthlyCpf={monthlyCpfAt(typicalTiming)}
-            feesInCash={feesInCash}
-            ehg={ehgAssessment}
-            onIncomeChange={handleIncomeChange}
-            onBudgetChange={handleBudgetChange}
-            onSeeProjects={() => setActiveTab("bto")}
-            onOpenPlan={() => setActiveTab("plan")}
-            onStartSetup={openSetup}
-          />
-        )}
-
         {activeTab === "bto" && (
           <BtoTab
             btoLoading={btoLoading}
@@ -876,7 +772,7 @@ function App() {
             onSelectProject={handleSelectBtoProject}
             onToggleSaved={handleToggleSaved}
             onResetFilters={handleResetBtoFilters}
-            onOpenBudget={() => setActiveTab("budget")}
+            onOpenBudget={openSetup}
           />
         )}
 
@@ -888,7 +784,6 @@ function App() {
             budgetKnown={budgetKnown}
             stageFunding={stageFunding}
             oaAtKeys={planOa?.keys ?? null}
-            monthlyCpf={monthlyCpfAt(planTiming)}
             budget={budget}
             flatPrice={flatPrice}
             flatType={flatType}
@@ -911,7 +806,7 @@ function App() {
             combinedIncome={combinedIncome}
             onIncomeChange={handleIncomeChange}
             onBudgetChange={handleBudgetChange}
-            onOpenBudget={() => setActiveTab("budget")}
+            onOpenBudget={openSetup}
             onOpenRadar={() => setActiveTab("bto")}
             onFlatPriceChange={handleFlatPriceChange}
             onFlatTypeChange={setFlatType}
@@ -931,22 +826,20 @@ function App() {
             financing={financing}
             monthlyCpf={monthlyCpfAt(typicalTiming)}
             flatType={flatType}
-            checks={checks}
-            levers={levers}
+            combinedIncome={combinedIncome}
+            warnings={checks.filter((check) => check.status === "caution")}
             launch={launch}
             ceilingFor={ceilingFor}
-            journey={journey}
             selectedProject={selectedBtoProject}
-            flatPrice={flatPrice}
+            timeline={timeline}
+            completedMilestones={activeCompletedMilestones}
             budget={budget}
             estimatedLoan={estimatedLoan}
             estimatedGrant={estimatedGrant}
-            after={after}
             onBudgetChange={handleBudgetChange}
             onStartSetup={openSetup}
             onSelectTab={setActiveTab}
             onShare={handleShare}
-            onCalendar={handleCalendar}
           />
         )}
 
@@ -989,7 +882,7 @@ function getDefaultApplicationMonth() {
 // Everyone starts at the overview: new visitors choose where to begin, returning ones see what is next.
 function getInitialTab(): TabKey {
   const tab = new URLSearchParams(window.location.search).get("tab");
-  if (tab === "plan" || tab === "bto" || tab === "sources" || tab === "overview" || tab === "budget") return tab;
+  if (tab === "plan" || tab === "bto" || tab === "sources" || tab === "overview") return tab;
   return "overview";
 }
 
