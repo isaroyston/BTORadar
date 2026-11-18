@@ -13,9 +13,6 @@ export type BudgetInputs = {
   hfeGrant: number | null;
   // The month the HFE letter was issued (YYYY-MM); it is valid for 9 months.
   hfeIssued: string | null;
-  // For ballot chances: FT(PMC) status and unsuccessful Standard applications since Oct 2024.
-  pmc: boolean;
-  unsuccessfulStandard: number;
 };
 
 // Whether the buyers are first-timers, which decides the housing grant table.
@@ -35,8 +32,6 @@ export const EMPTY_BUDGET_INPUTS: BudgetInputs = {
   hfeLoan: null,
   hfeGrant: null,
   hfeIssued: null,
-  pmc: false,
-  unsuccessfulStandard: 0,
 };
 
 const numberOrNull = (value: unknown) =>
@@ -69,8 +64,6 @@ export function parseBudgetInputs(parsed: Record<string, unknown>): BudgetInputs
     hfeLoan: numberOrNull(parsed.hfeLoan),
     hfeGrant: numberOrNull(parsed.hfeGrant),
     hfeIssued: typeof parsed.hfeIssued === "string" && /^\d{4}-\d{2}$/.test(parsed.hfeIssued) ? parsed.hfeIssued : null,
-    pmc: parsed.pmc === true,
-    unsuccessfulStandard: Math.min(Math.floor(numberOrNull(parsed.unsuccessfulStandard) ?? 0), 20),
   };
 }
 

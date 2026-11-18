@@ -9,19 +9,18 @@ type NavigationProps = {
 };
 
 const tabIcons: Record<TabKey, IconName> = {
-  budget: "wallet",
   bto: "building",
   plan: "clipboard",
   overview: "home",
   sources: "document",
 };
 
-// The first three sections are the journey, in order; the rest are places to check in.
-const JOURNEY: TabKey[] = ["budget", "bto", "plan"];
+// Three places do the work; Sources sits apart, and only in the sidebar.
+const MAIN: TabKey[] = ["overview", "bto", "plan"];
 
 export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps) {
-  const journey = TABS.filter((tab) => JOURNEY.includes(tab.id));
-  const other = TABS.filter((tab) => !JOURNEY.includes(tab.id));
+  const main = TABS.filter((tab) => MAIN.includes(tab.id));
+  const other = TABS.filter((tab) => !MAIN.includes(tab.id));
 
   const item = (tab: (typeof TABS)[number]) => {
     const done = doneTabs.has(tab.id);
@@ -51,15 +50,8 @@ export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps
     <>
       <nav className="side-nav" aria-label="Sections">
         <Brand />
-        <div className="side-group">
-          {other.filter((tab) => tab.id === "overview").map(item)}
-          {journey.map(item)}
-        </div>
-        <div className="side-group side-group-quiet">{other.filter((tab) => tab.id !== "overview").map(item)}</div>
-        <div className="side-foot">
-          <p>Estimates, not advice</p>
-          <p className="side-note">Worked out from HDB and CPF rules. Your HFE letter is the final word.</p>
-        </div>
+        <div className="side-group">{main.map(item)}</div>
+        <div className="side-group side-group-quiet">{other.map(item)}</div>
       </nav>
 
       <header className="top-bar">
@@ -67,7 +59,7 @@ export function Navigation({ activeTab, doneTabs, onSelectTab }: NavigationProps
       </header>
 
       <nav className="tab-bar" aria-label="Sections">
-        {TABS.map((tab) => (
+        {main.map((tab) => (
           <button
             key={tab.id}
             type="button"

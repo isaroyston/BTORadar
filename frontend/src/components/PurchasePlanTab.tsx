@@ -29,12 +29,12 @@ import type { PaymentOverride } from "../utils/planStorage";
 import {
   EditChip,
   HeroCard,
+  MoneyField,
   MonthlyChip,
   Note,
   StatTiles,
   type Tile,
 } from "./Cards";
-import { MoneyField } from "./BudgetTab";
 import { Icon, PageHeader } from "./DashboardUi";
 import { Segmented } from "./Segmented";
 
@@ -45,7 +45,6 @@ type PurchasePlanTabProps = {
   budgetKnown: boolean;
   stageFunding: { signing: StageFunding; keys: StageFunding } | null;
   oaAtKeys: number | null;
-  monthlyCpf: number | null;
   budget: BudgetInputs;
   flatPrice: number;
   flatType: FlatType;
@@ -111,7 +110,6 @@ export function PurchasePlanTab({
   budgetKnown,
   stageFunding,
   oaAtKeys,
-  monthlyCpf,
   budget,
   flatPrice,
   flatType,
@@ -170,7 +168,6 @@ export function PurchasePlanTab({
     ? Math.min(oaAtKeys ?? budget.cpfOa ?? 0, ownNeeded)
     : signingCpf + keyCpf;
   const signingShort = stageFunding ? stageFunding.signing.uncovered : 0;
-  const cpfCoversMonthly = monthlyCpf !== null && monthlyCpf >= monthlyPayment;
   const cashUsed = known
     ? Math.max(ownNeeded - cpfUsed - gap, 0)
     : minCashSigning;
@@ -307,26 +304,17 @@ export function PurchasePlanTab({
         <div className="col">
           <StatTiles tiles={tiles} />
 
-          {known && signingShort > 0 && (
+          {known && gap > 0 ? (
             <Note>
-              At signing you'd need {currency(signingShort)} more than your grant, CPF by then and cash cover. The
-              Staggered scheme, more cash, or a lower price would close it.
+              Your loan, grant and savings fall {currency(gap)} short of this price. A cheaper flat or more savings
+              would close the gap.
             </Note>
-          )}
-          {known && monthlyCpf !== null && monthlyPayment > 0 && (
+          ) : known && signingShort > 0 ? (
             <Note>
-              {cpfCoversMonthly
-                ? `After keys, your CPF of about ${currency(monthlyCpf)} a month covers the ${currency(Math.round(monthlyPayment))} repayment.`
-                : `After keys, CPF covers about ${currency(monthlyCpf)} of the ${currency(Math.round(monthlyPayment))} monthly repayment; the rest is cash.`}
+              The first downpayment at signing is {currency(signingShort)} more than you'll have by then. More cash, or
+              the Staggered option below, would cover it.
             </Note>
-          )}
-          {known && gap > 0 && (
-            <Note>
-              Your loan, grant and savings don't reach this price by{" "}
-              {currency(gap)}. A lower target, more savings or a different
-              project would close the gap.
-            </Note>
-          )}
+          ) : null}
           {!known && (
             <section className="card form-card">
               <div className="card-head">
@@ -334,9 +322,7 @@ export function PurchasePlanTab({
                   Check this price against your finances
                 </h2>
               </div>
-              <p className="muted">
-                Two answers check this price against your loan, grant and CPF. The rest of your budget is optional.
-              </p>
+              <p className="muted">Two answers check this price against your loan, grant and CPF.</p>
               <MoneyField
                 id="plan-income"
                 label="Household income, per month"
@@ -355,7 +341,7 @@ export function PurchasePlanTab({
                 onCommit={(value) => onBudgetChange({ cpfOa: value })}
               />
               <button type="button" className="text-link" onClick={onOpenBudget}>
-                Add cash and grant details on Budget
+                Answer the rest step by step
               </button>
             </section>
           )}
@@ -417,12 +403,14 @@ export function PurchasePlanTab({
             </div>
           </section>
 
-          <section className="card">
-            <div className="card-head">
-              <h2>
-                How you'll pay
-              </h2>
-            </div>
+          <details className="card disclosure-card pay-options">
+            <summary>
+              Loan and downpayment
+              <span className="summary-value">
+                {FINANCING_OPTIONS.find((option) => option.value === financing)?.label},{" "}
+                {SCHEME_OPTIONS.find((option) => option.value === scheme)?.label.toLowerCase()}
+              </span>
+            </summary>
             <div className="field">
               <span className="field-label">Loan</span>
               <Segmented
@@ -444,9 +432,7 @@ export function PurchasePlanTab({
             <Note>
               {SCHEME_HELP[scheme]} {downpaymentNote}
             </Note>
-            <details className="disclosure">
-              <summary>Loan length and interest rate</summary>
-              <div className="field-row">
+            <div className="field-row">
                 <NumberInput
                   id="plan-tenure"
                   label="Loan length"
@@ -466,9 +452,8 @@ export function PurchasePlanTab({
                   suffix="% a year"
                   onChange={onLoanInterestRateChange}
                 />
-              </div>
-            </details>
-          </section>
+            </div>
+          </details>
         </div>
 
         <div className="col">

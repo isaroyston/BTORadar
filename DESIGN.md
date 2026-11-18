@@ -215,9 +215,9 @@ A white, cool-grey neutral system with a single raspberry accent, two status hue
 **Character:** One neutral, engineered face doing every job. Hierarchy comes from size, weight (400/500/600 only) and tight negative tracking on large numbers, never from a second family.
 
 ### Hierarchy
-- **Figure** (600, clamp(2.6rem, 5vw, 3.5rem), 1.0, -0.045em, tabular): the answer figure on Home. Budget and Plan headline figures sit a step down (up to 3.2rem); the setup result goes up to 4.2rem; the running total is 2.1rem.
-- **Headline** (600, clamp(1.6rem, 2vw, 1.875rem), 1.15, -0.03em): page titles ("Home", "Budget", "Projects", "Plan"); setup questions run slightly larger (up to 2rem).
-- **Section** (600, 1.05rem, -0.015em): Home's section headings (Before you apply, Choosing a project, Once you own it, Road to keys), plain sentence case.
+- **Figure** (600, clamp(2.6rem, 5vw, 3.5rem), 1.0, -0.045em, tabular): the answer figure on Home. The Plan headline figure sits a step down (up to 3.2rem); the setup result goes up to 4.2rem; the running total is 2.1rem.
+- **Headline** (600, clamp(1.6rem, 2vw, 1.875rem), 1.15, -0.03em): page titles ("Home", "Projects", "Plan"); setup questions run slightly larger (up to 2rem).
+- **Section** (600, 1.05rem, -0.015em): card headings such as Home's next step, plain sentence case.
 - **Title** (600, 1rem, -0.015em): card titles.
 - **Body** (400, 15px, 1.55): copy and descriptions, capped near 52 to 60ch.
 - **Label** (500, 0.85 to 0.9rem): buttons, nav items, field labels, footnote rows.
@@ -234,7 +234,7 @@ A white, cool-grey neutral system with a single raspberry accent, two status hue
 
 On desktop (1024px and up) a fixed 248px pale-grey rail sits on the left with a hairline right edge; the main column is padded 2.5rem top and clamp(1.75rem, 3.5vw, 3.5rem) at the sides, and screens cap at 1180px. Below 1024px the rail becomes a top bar and a five-item bottom tab bar (near-opaque white with a hairline top).
 
-Screens are a single vertical stack with a 1.25rem gap. Home is a 12-column grid from 900px (1.25rem gap): the answer panel spans 8 and the launch panel 4, section cards span 6 or 12. Other screens split into two equal columns from 1100px (1.5rem gap); Plan uses 1.05fr / 0.95fr with the right column sticky. Each screen opens with a page head: title and one factual subline on the left, secondary buttons right-aligned to the bottom edge. Cards pad 1.25rem, 1.5rem from 640px; answer panels pad 1.75rem 2rem. Home sections add 1.5rem above their heading.
+Screens are a single vertical stack with a 1.25rem gap. Home is a 12-column grid from 900px (1.25rem gap): the answer panel spans 8 and the launch panel 4; the next-step card spans 12. Other screens split into two equal columns from 1100px (1.5rem gap); Plan uses 1.05fr / 0.95fr with the right column sticky. Each screen opens with a page head: title and one factual subline on the left, secondary buttons right-aligned to the bottom edge. Cards pad 1.25rem, 1.5rem from 640px; answer panels pad 1.75rem 2rem. 
 
 ## Elevation & Depth
 
@@ -283,16 +283,18 @@ Compact and exact.
 
 ### Navigation
 - **Rail:** Rail Grey, 0.9rem medium items in Slate with Faint icons. Hover tints 5% ink. The current item is a white raised row with ink text and a raspberry icon. A small green check marks a completed step. Sources sits in a quieter group below a hairline; an "Estimates, not advice" note sits at the foot.
-- **Mobile:** a five-item bottom tab bar; the current item is raspberry.
+- **Mobile:** a three-item bottom tab bar (Home, Projects, Plan); the current icon is raspberry, its label ink.
+- **Three screens, one job each.** Home answers "what can we afford", Projects "which flat", Plan "what do we pay when". Sources is a quiet link, not a destination.
+- **Progressive disclosure.** Only what every buyer needs is shown; the HFE letter and the method sit behind disclosures, and eligibility appears only when it blocks or changes a purchase.
 
 ### Money Split (signature)
-A 0.7rem bar of up to four segments (loan, grant, CPF by keys, cash) in the fixed split colours with 3px gaps, over a legend: coloured dot, muted label, semibold tabular figure. Segments grow from the left once (700ms). It appears wherever a price is broken down: the Home answer, Budget, Plan, the setup result and project detail.
+A 0.7rem bar of up to four segments (loan, grant, CPF by keys, cash) in the fixed split colours with 3px gaps, over a legend: coloured dot, muted label, semibold tabular figure. Segments grow from the left once (700ms). It appears wherever a price is broken down: the Home answer, Plan and the setup result.
 
 ### Answer Panel
-Home's lead panel: a muted plain label ("You could buy a flat priced up to"), the Figure, one slate line on monthly cost, the split bar, a primary and a quiet button, and the limiting factor as a footnote row. It is a white card, not a dark or tinted hero.
+Home's lead panel: a muted plain label ("You can afford a flat up to"), the Figure, one line on the monthly repayment and how much of it is cash, the split bar, any blocking eligibility warning, one primary button, then a footer: the inputs it came from with a Change link, what limits the ceiling, and two disclosures ("Got your HFE letter?", "How we work this out"). It is a white card, not a dark or tinted hero. Beside it, the launch panel lists the flats that fit; below, one next-step card (pick a flat, or the next payment).
 
 ### Guided Setup
-A full-screen white dialog that rises 16px on open: a progress strip, one question per step (sliding in 14px with a fade), large choice cards with a radio ring that fills when chosen, and a Quiet Fill running-total panel beside the questions. It ends on a result whose figure counts up from zero over 900ms, with the split and three plain facts.
+A white dialog of five questions (who is buying, income, savings with optional cash, first-timer status, flat size) that rises 16px on open: a progress strip, one question per step (sliding in 14px with a fade), large choice cards with a radio ring that fills when chosen, and a Quiet Fill running-total panel beside the questions. It ends on a result whose figure counts up from zero over 900ms, with the split and three plain facts.
 
 ### Motion
 All motion uses `cubic-bezier(0.16, 1, 0.3, 1)`. Numbers count to new values over about 500ms; split bars grow once; screens cross-fade through the View Transitions API (120ms out, 220ms in) while the rail stays put. Nothing bounces, pulses or spins, and under `prefers-reduced-motion` everything settles instantly.

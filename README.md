@@ -28,19 +28,13 @@
 
 ## Product Surfaces
 
-- **Home**: the front door and dashboard.
-  - New visitors get a six-question start, the launch that's open now and the steps from HFE letter to keys.
-  - The answer card: the price ceiling, where its money comes from, what sets it, and a tag when it comes from an HFE letter.
-  - **Before you apply**: what you qualify for (the income ceilings as raised for HFE applications from 24 Aug 2026: S$ 16,000 for families and HDB loans, S$ 8,000 for singles and 2-room Flexi; singles from 35; the grant; first-timer priority); your HFE letter (enter its loan and grant and every figure uses them; it warns before the 9 months run out); your ballot chances (2, 3 for FT(PMC), more after unsuccessful Standard tries, none extra for Plus and Prime) with rough odds per project from the current launch's application rates; and what would raise the ceiling.
-  - **Choosing a project**: straight-line distance from one or two workplaces (found with OneMap) with public transport directions, and each project's price against resale flats in the same town (data.gov.sg, last 12 months, flats under 15 years old where there are enough sales).
-  - **Once you own it**: the monthly cost (repayment and how much CPF covers, S&CC range, property tax rule, fire insurance, Home Protection Scheme) and after keys (minimum occupation period end, loan left then, total interest).
-  - The road to keys with each payment's date and its grant, CPF and cash.
-  - **Share** copies a link that carries the plan in its hash (nothing is sent to a server; the person opening it chooses whether to load it). **Add to calendar** saves an .ics file of the dates. **Print** gives a clean one-document summary.
-- **Guided setup**: a step-by-step dialog (who's buying and ages, each person's income and CPF, first-timer status, optional cash, flat size) with the ceiling building up beside the questions and a result at the end. Closing it early puts the previous answers back. Opened from Home ("Start", "Edit answers") and from an empty Budget.
+Three screens, one job each. Everything an ordinary buyer doesn't need was removed on 2026-11-18 (see ROADMAP.md).
+
+- **Home**: what you can afford. New visitors get one question, "What can we afford?", and the launch that's open now. After the setup: the price ceiling, the monthly repayment and how much of it is cash, where the money comes from (the split bar), a warning only if something blocks the purchase, the inputs it came from with a Change link, and what limits it. Two disclosures hold the rest: "Got your HFE letter?" (enter its loan and grant to replace the estimates) and "How we work this out". Beside it, the flats in the current launch you can afford; below, one next step (pick a flat, or the next payment). Share copies a link carrying the plan in its hash, so nothing is sent to a server.
+- **Guided setup**: five questions (who's buying, each person's income, savings in CPF with optional cash, first-timer status, flat size), with the ceiling building up beside them and a result at the end. Closing early puts the previous answers back.
 - **Look**: a white, Stripe-Dashboard-level light theme in Geist (self-hosted), with raspberry as the one accent. See [`DESIGN.md`](DESIGN.md).
-- **Budget**: one price ceiling; your answers (income, CPF savings, optional cash, first-timer status) directly under it as the one place to edit; what sets the ceiling; then the breakdown. Age comes from the guided setup (assumed under 35 if left blank), and monthly CPF is worked out from income and age.
 - **Projects**: launches; resale prices in the same town in each project's detail sheet; a "What matters most" choice that is always visible (best all-round, lowest price, near the MRT, soonest keys, or a fine-tuned mix); cards with a OneMap street map of the site, a rank, the price checked against the ceiling, and facts led by what the buyer ranked highest; a detail sheet with highlights, keys date, blocks and nearby schools and parks; saved projects; and side-by-side compare.
-- **Plan**: target price, loan and downpayment choices, whether it fits (asking income and CPF in place if they're missing), whether CPF covers the monthly repayment, and a payment timeline showing grant, CPF and cash per payment. Saves automatically.
+- **Plan**: target price, loan and downpayment choices (folded away; most buyers keep an HDB loan), whether it fits (asking income and CPF in place if they're missing), whether CPF covers the monthly repayment, and a payment timeline showing grant, CPF and cash per payment. Saves automatically.
 
 The visual system is described in [`DESIGN.md`](DESIGN.md).
 
@@ -64,7 +58,7 @@ npm.cmd run build
 npm.cmd test
 ```
 
-`npm test` runs the scoring, affordability, grant, fee, payment-allocation, CPF-projection, eligibility/journey and extras (singles, HFE, ballot, ownership, calendar, share links) checks.
+`npm test` runs the scoring, affordability, grant, fee, payment-allocation, CPF-projection, eligibility/journey and extras (singles, HFE letter, share links) checks.
 
 ## Saved Scenarios
 
@@ -103,13 +97,6 @@ coordinates.
 - `npm run data:resale` rebuilds `frontend/public/data/resale/medians.json`: median
   resale prices by town and flat type over the latest 12 months from data.gov.sg (no
   key), overall and for flats under 15 years old.
-- `frontend/public/data/hdb/application-rates.json` holds applicants per flat for the
-  current launch, by project and flat size, for first-timer families, second-timer
-  families and singles. Update it by hand after each launch from HDB's application
-  status page; the Home ballot card only shows rates whose `launch` matches the
-  newest launch in the data.
-- `frontend/public/data/hdb/scc-rates.json` holds normal S&CC rates from three town
-  councils; refresh when they change.
 
 ## Deploy
 

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { currency } from "../utils/format";
 import { Icon, type IconName } from "./DashboardUi";
 import { MoneyParts } from "./MoneySplit";
@@ -37,6 +37,57 @@ export function MonthlyChip({ amount, years, note }: { amount: number; years: nu
     <p className="hero-monthly">
       <strong>{currency(amount)}</strong> a month over {years} years{note ? `, as ${note}` : ""}
     </p>
+  );
+}
+
+// A money field that formats as you type and reports null when cleared.
+export function MoneyField({
+  id,
+  label,
+  hint,
+  value,
+  max,
+  placeholder,
+  onCommit,
+}: {
+  id: string;
+  label: string;
+  hint: string;
+  value: number | null;
+  max: number;
+  placeholder?: string;
+  onCommit: (value: number | null) => void;
+}) {
+  const [text, setText] = useState(value === null ? "" : value.toLocaleString("en-SG"));
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label}</label>
+      <p className="field-hint" id={`${id}-hint`}>
+        {hint}
+      </p>
+      <div className="input input-money">
+        <span aria-hidden="true">S$</span>
+        <input
+          id={id}
+          inputMode="numeric"
+          autoComplete="off"
+          placeholder={placeholder}
+          value={text}
+          aria-describedby={`${id}-hint`}
+          onChange={(event) => {
+            const digits = event.target.value.replace(/\D/g, "").slice(0, 9);
+            if (digits === "") {
+              setText("");
+              onCommit(null);
+              return;
+            }
+            const amount = Math.min(Number(digits), max);
+            setText(amount.toLocaleString("en-SG"));
+            onCommit(amount);
+          }}
+        />
+      </div>
+    </div>
   );
 }
 
